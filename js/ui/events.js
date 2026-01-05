@@ -992,8 +992,10 @@ export function initContactButton() {
     if (!wrapper || !closeBtn) return;
 
     closeBtn.addEventListener('click', (e) => {
+        e.preventDefault();
         e.stopPropagation();
-        wrapper.style.display = 'none';
+        wrapper.classList.add('d-none');
+        wrapper.style.setProperty('display', 'none', 'important');
     });
 
     const contactModal = document.getElementById('contactModal');
