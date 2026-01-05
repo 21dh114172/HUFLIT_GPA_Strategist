@@ -1,4 +1,4 @@
-import { initCourseGradeTab, initTargetGPATab, initManualCalcTab, initContactButton, initThemeToggle, initUserGuide, fetchVisitCount } from './ui/events.js';
+import { initCourseGradeTab, initTargetGPATab, initManualCalcTab, initContactButton, initThemeToggle, initUserGuide, fetchVisitCount, initFeedbackForm } from './ui/events.js';
 import { initGradeScaleTab } from './ui/renderers.js';
 import { initSnowEffect, initChristmasTreeInteraction } from './ui/effects.js';
 
@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initContactButton();
     initThemeToggle();
     initUserGuide();
+    initFeedbackForm();
     fetchVisitCount();
     // initSnowEffect();
     // initChristmasTreeInteraction();

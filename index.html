@@ -768,6 +768,10 @@ Năm học: 2023-2024 - Học kỳ: HK01
                             <i class="bi bi-book-half me-2"></i>Xem hướng dẫn sử dụng
                         </button>
 
+                        <button type="button" class="btn btn-outline-success rounded-pill" data-bs-toggle="modal" data-bs-target="#feedbackModal">
+                            <i class="bi bi-lightbulb-fill me-2"></i>Góp ý tính năng
+                        </button>
+
                         <a href="https://www.facebook.com/tienxdun/" target="_blank" rel="noopener noreferrer" class="btn btn-primary rounded-pill shadow-sm">
                             <i class="bi bi-messenger me-2"></i>Nhắn tin qua Facebook
                         </a>
@@ -1009,6 +1013,48 @@ Năm học: 2023-2024 - Học kỳ: HK01
                 </div>
                 <div class="modal-footer border-top-0 pt-0">
                     <button type="button" class="btn btn-primary rounded-pill px-4" data-bs-dismiss="modal">Đã hiểu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feedback Modal -->
+    <div class="modal fade" id="feedbackModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title fw-bold text-success"><i class="bi bi-lightbulb-fill me-2"></i>Góp ý tính năng</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="feedback-form">
+                        <div class="mb-3">
+                            <label for="feedback-name" class="form-label fw-medium small text-secondary">Tên của bạn (Không bắt buộc)</label>
+                            <input type="text" class="form-control" id="feedback-name" placeholder="Nhập tên của bạn">
+                        </div>
+                        <div class="mb-3">
+                            <label for="feedback-type" class="form-label fw-medium small text-secondary">Loại góp ý</label>
+                            <select class="form-select" id="feedback-type" required>
+                                <option value="feature_request">Yêu cầu tính năng mới</option>
+                                <option value="bug_report">Báo lỗi</option>
+                                <option value="improvement">Đề xuất cải tiến</option>
+                                <option value="other">Khác</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="feedback-content" class="form-label fw-medium small text-secondary">Nội dung góp ý <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="feedback-content" rows="4" placeholder="Mô tả chi tiết ý tưởng hoặc vấn đề của bạn..." required></textarea>
+                        </div>
+                        <div class="alert alert-light border small text-muted mb-0">
+                            <i class="bi bi-shield-check me-1"></i> Ý kiến của bạn sẽ giúp HUFLIT GPA Strategist ngày càng hoàn thiện hơn.
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-top-0 pt-0 px-4 pb-4">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Đóng</button>
+                    <button type="submit" form="feedback-form" class="btn btn-success shadow-sm" id="submit-feedback-btn">
+                        <i class="bi bi-send-fill me-2"></i>Gửi góp ý
+                    </button>
                 </div>
             </div>
         </div>

@@ -1133,3 +1133,70 @@ export function initUserGuide() {
         }, 1000);
     }
 }
+
+// ==========================================
+// FEEDBACK FORM
+// ==========================================
+
+export function initFeedbackForm() {
+    const form = document.getElementById('feedback-form');
+    const submitBtn = document.getElementById('submit-feedback-btn');
+    
+    if (!form || !submitBtn) return;
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        // Disable button and show loading state
+        const originalBtnText = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Đang gửi...';
+
+        const name = document.getElementById('feedback-name').value;
+        const type = document.getElementById('feedback-type').value;
+        const content = document.getElementById('feedback-content').value;
+
+        // GOOGLE APPS SCRIPT URL
+        // TODO: Thay thế URL bên dưới bằng URL Web App của bạn sau khi deploy Google Apps Script
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz_KJF_96v5p0sML6y3wcKJqmGbTUJ2h4LSVZldnRDNn608mhvAumBy_3UGF6xZgURK/exec'; 
+
+        if (SCRIPT_URL.includes('PLACEHOLDER')) {
+             alert('Tính năng đang được bảo trì (Chưa cấu hình Server). Vui lòng liên hệ qua Facebook.');
+             submitBtn.disabled = false;
+             submitBtn.innerHTML = originalBtnText;
+             return;
+        }
+
+        try {
+            await fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'text/plain',
+                },
+                body: JSON.stringify({
+                    name: name || 'Ẩn danh',
+                    type: type,
+                    content: content,
+                    timestamp: new Date().toLocaleString('vi-VN')
+                })
+            });
+
+            // Giả lập thành công vì no-cors không trả về status
+            alert('Cảm ơn bạn đã đóng góp ý kiến! Chúng tôi sẽ xem xét sớm nhất.');
+            form.reset();
+            
+            // Close modal
+            const modalEl = document.getElementById('feedbackModal');
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            if (modal) modal.hide();
+
+        } catch (error) {
+            console.error('Error submitting feedback:', error);
+            alert('Có lỗi xảy ra khi gửi góp ý. Vui lòng thử lại sau.');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnText;
+        }
+    });
+}
