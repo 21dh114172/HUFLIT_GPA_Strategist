@@ -1141,62 +1141,164 @@ export function initUserGuide() {
 export function initFeedbackForm() {
     const form = document.getElementById('feedback-form');
     const submitBtn = document.getElementById('submit-feedback-btn');
+    const listTabBtn = document.getElementById('feedback-list-tab');
+    const refreshBtn = document.getElementById('refresh-feedback-btn');
     
-    if (!form || !submitBtn) return;
+    // GOOGLE APPS SCRIPT URL
+    // TODO: Thay thế URL bên dưới bằng URL Web App của bạn sau khi deploy Google Apps Script
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz_KJF_96v5p0sML6y3wcKJqmGbTUJ2h4LSVZldnRDNn608mhvAumBy_3UGF6xZgURK/exec'; 
 
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        // Disable button and show loading state
-        const originalBtnText = submitBtn.innerHTML;
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Đang gửi...';
+    // --- 1. Handle Form Submission ---
+    if (form && submitBtn) {
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Disable button and show loading state
+            const originalBtnText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Đang gửi...';
 
-        const name = document.getElementById('feedback-name').value;
-        const type = document.getElementById('feedback-type').value;
-        const content = document.getElementById('feedback-content').value;
+            const name = document.getElementById('feedback-name').value;
+            const type = document.getElementById('feedback-type').value;
+            const content = document.getElementById('feedback-content').value;
 
-        // GOOGLE APPS SCRIPT URL
-        // TODO: Thay thế URL bên dưới bằng URL Web App của bạn sau khi deploy Google Apps Script
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz_KJF_96v5p0sML6y3wcKJqmGbTUJ2h4LSVZldnRDNn608mhvAumBy_3UGF6xZgURK/exec'; 
+            if (SCRIPT_URL.includes('PLACEHOLDER')) {
+                alert('Tính năng đang được bảo trì (Chưa cấu hình Server). Vui lòng liên hệ qua Facebook.');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnText;
+                return;
+            }
 
-        if (SCRIPT_URL.includes('PLACEHOLDER')) {
-             alert('Tính năng đang được bảo trì (Chưa cấu hình Server). Vui lòng liên hệ qua Facebook.');
-             submitBtn.disabled = false;
-             submitBtn.innerHTML = originalBtnText;
-             return;
-        }
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'text/plain',
+                    },
+                    body: JSON.stringify({
+                        name: name || 'Ẩn danh',
+                        type: type,
+                        content: content,
+                        timestamp: new Date().toLocaleString('vi-VN')
+                    })
+                });
+
+                // Giả lập thành công vì no-cors không trả về status
+                alert('Cảm ơn bạn đã đóng góp ý kiến! Chúng tôi sẽ xem xét sớm nhất.');
+                form.reset();
+                
+                // Switch to list tab to see the new feedback (if auto-approved)
+                if (listTabBtn) {
+                    const tab = new bootstrap.Tab(listTabBtn);
+                    tab.show();
+                }
+
+            } catch (error) {
+                console.error('Error submitting feedback:', error);
+                alert('Có lỗi xảy ra khi gửi góp ý. Vui lòng thử lại sau.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnText;
+            }
+        });
+    }
+
+    // --- 2. Handle List Loading ---
+    const loadFeedbacks = async () => {
+        const container = document.getElementById('feedback-list-container');
+        if (!container) return;
+
+        container.innerHTML = `
+            <div class="text-center py-5 text-muted">
+                <div class="spinner-border text-primary mb-2" role="status"></div>
+                <p class="small mb-0">Đang tải dữ liệu...</p>
+            </div>
+        `;
 
         try {
-            await fetch(SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: {
-                    'Content-Type': 'text/plain',
-                },
-                body: JSON.stringify({
-                    name: name || 'Ẩn danh',
-                    type: type,
-                    content: content,
-                    timestamp: new Date().toLocaleString('vi-VN')
-                })
+            const response = await fetch(SCRIPT_URL);
+            const data = await response.json();
+
+            container.innerHTML = '';
+
+            if (!data || data.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-5 text-muted">
+                        <i class="bi bi-chat-square-dots fs-1 mb-2"></i>
+                        <p class="small mb-0">Chưa có góp ý nào được hiển thị.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            data.forEach(item => {
+                const typeBadge = getTypeBadge(item.type);
+                const card = document.createElement('div');
+                card.className = 'card border-0 bg-light shadow-sm';
+                card.innerHTML = `
+                    <div class="card-body p-3">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-white rounded-circle border d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+                                    <i class="bi bi-person-fill text-secondary"></i>
+                                </div>
+                                <div>
+                                    <h6 class="fw-bold mb-0 text-dark" style="font-size: 0.9rem;">${escapeHtml(item.name)}</h6>
+                                    <small class="text-muted" style="font-size: 0.75rem;">${item.timestamp}</small>
+                                </div>
+                            </div>
+                            ${typeBadge}
+                        </div>
+                        <p class="card-text text-secondary small mb-0" style="white-space: pre-line;">${escapeHtml(item.content)}</p>
+                    </div>
+                `;
+                container.appendChild(card);
             });
 
-            // Giả lập thành công vì no-cors không trả về status
-            alert('Cảm ơn bạn đã đóng góp ý kiến! Chúng tôi sẽ xem xét sớm nhất.');
-            form.reset();
-            
-            // Close modal
-            const modalEl = document.getElementById('feedbackModal');
-            const modal = bootstrap.Modal.getInstance(modalEl);
-            if (modal) modal.hide();
-
         } catch (error) {
-            console.error('Error submitting feedback:', error);
-            alert('Có lỗi xảy ra khi gửi góp ý. Vui lòng thử lại sau.');
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = originalBtnText;
+            console.error('Error loading feedbacks:', error);
+            container.innerHTML = `
+                <div class="text-center py-5 text-danger">
+                    <i class="bi bi-exclamation-circle fs-1 mb-2"></i>
+                    <p class="small mb-0">Không thể tải dữ liệu. Vui lòng thử lại sau.</p>
+                </div>
+            `;
         }
-    });
+    };
+
+    if (listTabBtn) {
+        listTabBtn.addEventListener('shown.bs.tab', () => {
+            loadFeedbacks();
+        });
+    }
+
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', () => {
+            loadFeedbacks();
+        });
+    }
+}
+
+function getTypeBadge(type) {
+    switch (type) {
+        case 'feature_request':
+            return '<span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill">Tính năng mới</span>';
+        case 'bug_report':
+            return '<span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill">Báo lỗi</span>';
+        case 'improvement':
+            return '<span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill">Cải tiến</span>';
+        default:
+            return '<span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill">Khác</span>';
+    }
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }

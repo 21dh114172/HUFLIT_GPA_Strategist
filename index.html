@@ -1020,41 +1020,75 @@ Năm học: 2023-2024 - Học kỳ: HK01
 
     <!-- Feedback Modal -->
     <div class="modal fade" id="feedbackModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content border-0 shadow">
-                <div class="modal-header bg-light">
-                    <h5 class="modal-title fw-bold text-success"><i class="bi bi-lightbulb-fill me-2"></i>Góp ý tính năng</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="modal-header bg-light pb-0 border-bottom-0">
+                    <ul class="nav nav-tabs border-bottom-0" id="feedbackTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active fw-bold" id="feedback-form-tab" data-bs-toggle="tab" data-bs-target="#feedback-form-pane" type="button" role="tab">
+                                <i class="bi bi-pencil-square me-2"></i>Gửi góp ý
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link fw-bold" id="feedback-list-tab" data-bs-toggle="tab" data-bs-target="#feedback-list-pane" type="button" role="tab">
+                                <i class="bi bi-chat-quote-fill me-2"></i>Cộng đồng
+                            </button>
+                        </li>
+                    </ul>
+                    <button type="button" class="btn-close mb-2 me-2" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body p-4">
-                    <form id="feedback-form">
-                        <div class="mb-3">
-                            <label for="feedback-name" class="form-label fw-medium small text-secondary">Tên của bạn (Không bắt buộc)</label>
-                            <input type="text" class="form-control" id="feedback-name" placeholder="Nhập tên của bạn">
+                <div class="modal-body p-4 bg-white rounded-bottom">
+                    <div class="tab-content" id="feedbackTabContent">
+                        <!-- Tab 1: Form -->
+                        <div class="tab-pane fade show active" id="feedback-form-pane" role="tabpanel" tabindex="0">
+                            <form id="feedback-form">
+                                <div class="mb-3">
+                                    <label for="feedback-name" class="form-label fw-medium small text-secondary">Tên của bạn (Không bắt buộc)</label>
+                                    <input type="text" class="form-control" id="feedback-name" placeholder="Nhập tên của bạn">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="feedback-type" class="form-label fw-medium small text-secondary">Loại góp ý</label>
+                                    <select class="form-select" id="feedback-type" required>
+                                        <option value="feature_request">Yêu cầu tính năng mới</option>
+                                        <option value="bug_report">Báo lỗi</option>
+                                        <option value="improvement">Đề xuất cải tiến</option>
+                                        <option value="other">Khác</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="feedback-content" class="form-label fw-medium small text-secondary">Nội dung góp ý <span class="text-danger">*</span></label>
+                                    <textarea class="form-control" id="feedback-content" rows="4" placeholder="Mô tả chi tiết ý tưởng hoặc vấn đề của bạn..." required></textarea>
+                                </div>
+                                <div class="alert alert-light border small text-muted mb-3">
+                                    <i class="bi bi-shield-check me-1"></i> Ý kiến của bạn sẽ được kiểm duyệt trước khi hiển thị công khai.
+                                </div>
+                                <div class="d-flex justify-content-end">
+                                    <button type="button" class="btn btn-secondary btn-sm me-2" data-bs-dismiss="modal">Đóng</button>
+                                    <button type="submit" class="btn btn-success shadow-sm" id="submit-feedback-btn">
+                                        <i class="bi bi-send-fill me-2"></i>Gửi góp ý
+                                    </button>
+                                </div>
+                            </form>
                         </div>
-                        <div class="mb-3">
-                            <label for="feedback-type" class="form-label fw-medium small text-secondary">Loại góp ý</label>
-                            <select class="form-select" id="feedback-type" required>
-                                <option value="feature_request">Yêu cầu tính năng mới</option>
-                                <option value="bug_report">Báo lỗi</option>
-                                <option value="improvement">Đề xuất cải tiến</option>
-                                <option value="other">Khác</option>
-                            </select>
+
+                        <!-- Tab 2: List -->
+                        <div class="tab-pane fade" id="feedback-list-pane" role="tabpanel" tabindex="0">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h6 class="fw-bold text-primary mb-0">Ý kiến từ cộng đồng</h6>
+                                <button class="btn btn-sm btn-outline-secondary" id="refresh-feedback-btn" title="Làm mới">
+                                    <i class="bi bi-arrow-clockwise"></i>
+                                </button>
+                            </div>
+                            
+                            <div id="feedback-list-container" class="d-flex flex-column gap-3" style="max-height: 400px; overflow-y: auto;">
+                                <!-- Loading State -->
+                                <div class="text-center py-5 text-muted">
+                                    <div class="spinner-border text-primary mb-2" role="status"></div>
+                                    <p class="small mb-0">Đang tải dữ liệu...</p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="feedback-content" class="form-label fw-medium small text-secondary">Nội dung góp ý <span class="text-danger">*</span></label>
-                            <textarea class="form-control" id="feedback-content" rows="4" placeholder="Mô tả chi tiết ý tưởng hoặc vấn đề của bạn..." required></textarea>
-                        </div>
-                        <div class="alert alert-light border small text-muted mb-0">
-                            <i class="bi bi-shield-check me-1"></i> Ý kiến của bạn sẽ giúp HUFLIT GPA Strategist ngày càng hoàn thiện hơn.
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer border-top-0 pt-0 px-4 pb-4">
-                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Đóng</button>
-                    <button type="submit" form="feedback-form" class="btn btn-success shadow-sm" id="submit-feedback-btn">
-                        <i class="bi bi-send-fill me-2"></i>Gửi góp ý
-                    </button>
+                    </div>
                 </div>
             </div>
         </div>
