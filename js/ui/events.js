@@ -520,13 +520,16 @@ export function initTargetGPATab() {
             let statusMessage = 'Khả thi! Bạn hoàn toàn có thể đạt được.';
             let statusBadgeClass = 'bg-success-subtle text-success-emphasis border-success-subtle';
             
+            // Determine credits used for calculation (New + Retake)
+            const creditsToStudy = result.totalEffortCredits !== undefined ? result.totalEffortCredits : result.newCredits;
+
             if (result.requiredGPA > 4.0) {
                 statusIcon = 'bi-x-circle-fill';
                 statusColor = 'danger';
                 statusMessage = 'Không khả thi! GPA yêu cầu vượt quá 4.0.';
                 statusBadgeClass = 'bg-danger-subtle text-danger-emphasis border-danger-subtle';
             } else if (result.requiredGPA <= 0) {
-                if (result.newCredits === 0 && result.requiredPoints > 0.01) {
+                if (creditsToStudy === 0 && result.requiredPoints > 0.01) {
                     statusIcon = 'bi-exclamation-triangle-fill';
                     statusColor = 'danger';
                     statusMessage = 'Không thể đạt được! Hết tín chỉ để cải thiện.';
@@ -548,8 +551,8 @@ export function initTargetGPATab() {
             let combinationsHTML = '';
             let combinationsCount = 0;
             
-            if (result.requiredGPA > 0 && result.requiredGPA <= 4.0 && result.newCredits > 0) {
-                const combinations = generateGradeCombinations(result.newCredits, result.requiredPoints);
+            if (result.requiredGPA > 0 && result.requiredGPA <= 4.0 && creditsToStudy > 0) {
+                const combinations = generateGradeCombinations(creditsToStudy, result.requiredPoints);
                 combinationsCount = combinations.length;
                 
                 if (combinations.length > 0) {
@@ -597,7 +600,7 @@ export function initTargetGPATab() {
                     <div class="display-1 fw-bold text-${statusColor}-emphasis mb-2" style="letter-spacing: -2px;">
                         ${result.requiredGPA > 0 ? result.requiredGPA.toFixed(2) : (result.requiredGPA <= 0 && result.requiredPoints <= 0.01 ? 'Đạt' : '---')}
                     </div>
-                    <p class="text-muted fw-medium mb-0">cho <span class="fw-bold text-dark">${result.newCredits}</span> tín chỉ tiếp theo</p>
+                    <p class="text-muted fw-medium mb-0">cho <span class="fw-bold text-dark">${creditsToStudy}</span> tín chỉ tiếp theo</p>
                     <div class="mt-3">
                         <span class="badge rounded-pill ${statusBadgeClass} px-3 py-2 border">
                             ${statusMessage}

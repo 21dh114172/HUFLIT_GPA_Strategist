@@ -203,7 +203,10 @@ export function calculateTargetResult(currentGPA, currentCredits, targetGPA, new
     const targetTotalPoints = targetGPA * totalFutureCredits;
     
     const requiredPoints = targetTotalPoints - effectiveCurrentPoints;
-    const requiredGPA = newCredits > 0 ? (requiredPoints / newCredits) : 0;
+    
+    // Credits available to earn points: New credits + All retake credits
+    const totalEffortCredits = newCredits + retakeCreditsTotal;
+    const requiredGPA = totalEffortCredits > 0 ? (requiredPoints / totalEffortCredits) : 0;
 
     return {
         requiredGPA,
@@ -211,7 +214,8 @@ export function calculateTargetResult(currentGPA, currentCredits, targetGPA, new
         totalFutureCredits,
         effectiveCurrentPoints,
         targetTotalPoints,
-        newCredits
+        newCredits,
+        totalEffortCredits
     };
 }
 
@@ -238,8 +242,12 @@ export function generateGradeCombinations(credits, targetPoints) {
             
             if (Math.abs(g1.gpa - g2.gpa) < 0.01) {
                 if (credits * g1.gpa >= targetPoints - 0.01) {
-                    c1 = 0; // All credits to g2 (which is same as g1)
-                    found = true;
+                    c1 = 0; // All credits to g2
+                    
+                    // If credits is 1, c2 will be 1, which is invalid
+                    if (credits !== 1) {
+                        found = true;
+                    }
                 }
             } else {
                 // g1.gpa > g2.gpa (since array is sorted desc)
@@ -250,6 +258,16 @@ export function generateGradeCombinations(credits, targetPoints) {
                 let minC1 = Math.ceil(numerator / denominator - 0.0001);
                 if (minC1 < 0) minC1 = 0;
                 
+                // Constraint: Avoid 1 credit
+                // If minC1 is 1, bump to 2
+                if (minC1 === 1) minC1 = 2;
+                
+                // Check if resulting c2 would be 1
+                let c2_temp = credits - minC1;
+                if (c2_temp === 1) {
+                    minC1 += 1; // Bump c1 to reduce c2 to 0
+                }
+                
                 if (minC1 <= credits) {
                     c1 = minC1;
                     found = true;
@@ -258,6 +276,10 @@ export function generateGradeCombinations(credits, targetPoints) {
             
             if (found) {
                 const c2 = credits - c1;
+                
+                // Double check constraint (should be guaranteed by logic above)
+                if (c1 === 1 || c2 === 1) continue;
+
                 const totalPoints = (c1 * g1.gpa) + (c2 * g2.gpa);
                 
                 combinations.push({
