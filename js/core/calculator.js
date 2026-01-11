@@ -79,11 +79,14 @@ export function calculateManualGPA(semesters, initialGPA, initialCredits) {
 
     const gpa = totalCredits > 0 ? (totalPoints / totalCredits) : 0;
     
+    // Fix: Use rounded GPA for classification to match display (e.g. 3.199 -> 3.20 -> Giỏi instead of Khá)
+    const displayGpa = parseFloat(gpa.toFixed(2));
+
     let rank = 'Yếu';
-    if (gpa >= 3.6) rank = 'Xuất sắc';
-    else if (gpa >= 3.2) rank = 'Giỏi';
-    else if (gpa >= 2.5) rank = 'Khá';
-    else if (gpa >= 2.0) rank = 'Trung bình';
+    if (displayGpa >= 3.6) rank = 'Xuất sắc';
+    else if (displayGpa >= 3.2) rank = 'Giỏi';
+    else if (displayGpa >= 2.5) rank = 'Khá';
+    else if (displayGpa >= 2.0) rank = 'Trung bình';
 
     return { gpa, totalCredits, totalPoints, rank };
 }
