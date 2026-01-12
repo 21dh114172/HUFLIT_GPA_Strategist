@@ -1,4 +1,4 @@
-import { GRADE_SCALE } from '../core/constants.js';
+import { GRADE_SCALE, IMGUR_CLIENT_ID } from '../core/constants.js';
 import { getManualState, setManualState, addManualSemester, removeManualSemester, updateManualCourse, addManualCourse, removeManualCourse, loadManualStateFromStorage, getTargetState, setTargetState, loadTargetStateFromStorage, subscribe } from '../state/store.js';
 import { calculateManualGPA, calculateTargetResult, generateRetakeSuggestions, generateGradeCombinations } from '../core/calculator.js';
 import { renderManualSemesters } from './renderers.js';
@@ -1148,10 +1148,40 @@ export function initFeedbackForm() {
     const submitBtn = document.getElementById('submit-feedback-btn');
     const listTabBtn = document.getElementById('feedback-list-tab');
     const refreshBtn = document.getElementById('refresh-feedback-btn');
+    const fileInput = document.getElementById('feedback-image');
+    const previewContainer = document.getElementById('feedback-image-preview');
+    const previewImg = previewContainer ? previewContainer.querySelector('img') : null;
+    const removeImgBtn = document.getElementById('remove-image-btn');
     
     // GOOGLE APPS SCRIPT URL
     // TODO: Thay thế URL bên dưới bằng URL Web App của bạn sau khi deploy Google Apps Script
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz_KJF_96v5p0sML6y3wcKJqmGbTUJ2h4LSVZldnRDNn608mhvAumBy_3UGF6xZgURK/exec'; 
+
+    // --- 0. Handle Image Preview ---
+    if (fileInput && previewContainer) {
+        fileInput.addEventListener('change', () => {
+            const file = fileInput.files[0];
+            if (file) {
+                if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                    alert('Ảnh quá lớn! Vui lòng chọn ảnh dưới 5MB.');
+                    fileInput.value = '';
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    previewImg.src = e.target.result;
+                    previewContainer.classList.remove('d-none');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        removeImgBtn.addEventListener('click', () => {
+            fileInput.value = '';
+            previewContainer.classList.add('d-none');
+            previewImg.src = '';
+        });
+    }
 
     // --- 1. Handle Form Submission ---
     if (form && submitBtn) {
@@ -1161,11 +1191,13 @@ export function initFeedbackForm() {
             // Disable button and show loading state
             const originalBtnText = submitBtn.innerHTML;
             submitBtn.disabled = true;
-            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Đang gửi...';
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Đang xử lý...';
 
             const name = document.getElementById('feedback-name').value;
             const type = document.getElementById('feedback-type').value;
             const content = document.getElementById('feedback-content').value;
+            const file = fileInput.files[0];
+            let imageUrl = '';
 
             if (SCRIPT_URL.includes('PLACEHOLDER')) {
                 alert('Tính năng đang được bảo trì (Chưa cấu hình Server). Vui lòng liên hệ qua Facebook.');
@@ -1175,6 +1207,38 @@ export function initFeedbackForm() {
             }
 
             try {
+                // Step A: Upload Image to Imgur (if any)
+                if (file) {
+                    submitBtn.textContent = 'Đang upload ảnh...';
+                    const formData = new FormData();
+                    formData.append('image', file);
+
+                    try {
+                        const imgurResponse = await fetch('https://api.imgur.com/3/image', {
+                            method: 'POST',
+                            headers: {
+                                Authorization: `Client-ID ${IMGUR_CLIENT_ID}`,
+                            },
+                            body: formData,
+                            referrer: '' // Fix 403 error sometimes
+                        });
+                        
+                        const imgurData = await imgurResponse.json();
+                        if (imgurData.success) {
+                            imageUrl = imgurData.data.link;
+                        } else {
+                            throw new Error('Imgur upload failed: ' + (imgurData.data.error || 'Unknown error'));
+                        }
+                    } catch (uploadError) {
+                        console.error('Upload Error:', uploadError);
+                        if (!confirm('Upload ảnh thất bại. Bạn có muốn tiếp tục gửi góp ý mà không có ảnh?')) {
+                            throw new Error('User cancelled due to upload failure');
+                        }
+                    }
+                }
+
+                // Step B: Submit to Google Sheet
+                submitBtn.textContent = 'Đang gửi góp ý...';
                 await fetch(SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
@@ -1185,6 +1249,7 @@ export function initFeedbackForm() {
                         name: name || 'Ẩn danh',
                         type: type,
                         content: content,
+                        image: imageUrl, // New field
                         timestamp: new Date().toLocaleString('vi-VN')
                     })
                 });
@@ -1192,6 +1257,10 @@ export function initFeedbackForm() {
                 // Giả lập thành công vì no-cors không trả về status
                 alert('Cảm ơn bạn đã đóng góp ý kiến! Chúng tôi sẽ xem xét sớm nhất.');
                 form.reset();
+                if (previewContainer) {
+                    previewContainer.classList.add('d-none');
+                    previewImg.src = '';
+                }
                 
                 // Switch to list tab to see the new feedback (if auto-approved)
                 if (listTabBtn) {
@@ -1201,7 +1270,9 @@ export function initFeedbackForm() {
 
             } catch (error) {
                 console.error('Error submitting feedback:', error);
-                alert('Có lỗi xảy ra khi gửi góp ý. Vui lòng thử lại sau.');
+                if (error.message !== 'User cancelled due to upload failure') {
+                    alert('Có lỗi xảy ra khi gửi góp ý. Vui lòng thử lại sau.');
+                }
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = originalBtnText;
@@ -1241,6 +1312,18 @@ export function initFeedbackForm() {
                 const typeBadge = getTypeBadge(item.type);
                 const card = document.createElement('div');
                 card.className = 'card border-0 bg-light shadow-sm';
+
+                let imageHtml = '';
+                if (item.image) {
+                    imageHtml = `
+                        <div class="mt-2">
+                            <a href="${item.image}" target="_blank">
+                                <img src="${item.image}" alt="Minh họa" class="img-fluid rounded border" style="max-height: 200px;">
+                            </a>
+                        </div>
+                    `;
+                }
+
                 card.innerHTML = `
                     <div class="card-body p-3">
                         <div class="d-flex justify-content-between align-items-start mb-2">
@@ -1256,6 +1339,7 @@ export function initFeedbackForm() {
                             ${typeBadge}
                         </div>
                         <p class="card-text text-secondary small mb-0" style="white-space: pre-line;">${escapeHtml(item.content)}</p>
+                        ${imageHtml}
                     </div>
                 `;
                 container.appendChild(card);
@@ -1307,3 +1391,88 @@ function escapeHtml(text) {
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
 }
+
+// ==========================================
+// TAB: TIN TỨC (NEWS)
+// ==========================================
+
+export function initNewsTab() {
+    const imageViewerModal = document.getElementById('imageViewerModal');
+    if (imageViewerModal) {
+        imageViewerModal.addEventListener('show.bs.modal', event => {
+            const button = event.relatedTarget;
+            if (!button) return;
+            
+            const src = button.getAttribute('data-bs-src');
+            const modalImage = imageViewerModal.querySelector('#imageViewerSrc');
+            if (modalImage && src) {
+                modalImage.src = src;
+            }
+        });
+    }
+
+    // Sorting functionality
+    const toggleSortBtn = document.getElementById('toggle-sort-news-btn');
+    const newsContainer = document.getElementById('news-list-container');
+    const ORDER_KEY = 'HUFLIT_NEWS_ORDER';
+
+    // 1. Load saved order
+    const savedOrder = JSON.parse(localStorage.getItem(ORDER_KEY) || '[]');
+    if (savedOrder.length > 0 && newsContainer) {
+        const currentItems = Array.from(newsContainer.children);
+        const itemMap = new Map(currentItems.map(item => [item.id, item]));
+        
+        // Clear container
+        newsContainer.innerHTML = '';
+        
+        // Append in saved order
+        savedOrder.forEach(id => {
+            const item = itemMap.get(id);
+            if (item) {
+                newsContainer.appendChild(item);
+                itemMap.delete(id);
+            }
+        });
+
+        // Append remaining items (new ones)
+        itemMap.forEach(item => newsContainer.appendChild(item));
+    }
+
+    // 2. Toggle sort mode
+    if (toggleSortBtn && newsContainer) {
+        toggleSortBtn.addEventListener('click', () => {
+            newsContainer.classList.toggle('news-sort-mode');
+            toggleSortBtn.classList.toggle('active');
+        });
+
+        // 3. Handle move
+        newsContainer.addEventListener('click', (e) => {
+            const btn = e.target.closest('button');
+            if (!btn) return;
+
+            const card = btn.closest('.news-card');
+            if (!card) return;
+
+            if (btn.classList.contains('btn-move-up')) {
+                const prev = card.previousElementSibling;
+                if (prev) {
+                    newsContainer.insertBefore(card, prev);
+                    saveOrder();
+                }
+            } else if (btn.classList.contains('btn-move-down')) {
+                const next = card.nextElementSibling;
+                if (next) {
+                    newsContainer.insertBefore(next, card);
+                    saveOrder();
+                }
+            }
+        });
+    }
+
+    function saveOrder() {
+        if (!newsContainer) return;
+        const newOrder = Array.from(newsContainer.children).map(item => item.id);
+        localStorage.setItem(ORDER_KEY, JSON.stringify(newOrder));
+    }
+}
+

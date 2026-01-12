@@ -1068,3 +1068,53 @@ body {
     }
 }
 
+
+/* News Tab Styles */
+.news-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.news-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+.clickable-image {
+    transition: transform 0.3s ease;
+}
+
+.clickable-image:hover {
+    transform: scale(1.02);
+}
+
+.news-date {
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+/* Modal Image Viewer */
+#imageViewerModal .modal-close-btn {
+    z-index: 1056; /* Higher than modal backdrop */
+}
+
+#imageViewerModal img {
+    max-width: 100%;
+    object-fit: contain;
+}
+
+
+/* News Sorting */
+.news-sort-mode .news-sort-controls {
+    display: flex !important;
+}
+
+.news-sort-mode .news-card {
+    border: 1px dashed #0d6efd !important;
+    background-color: #f8f9fa;
+}
+
+.news-sort-mode #toggle-sort-news-btn {
+    background-color: #0d6efd;
+    color: white;
+}
+

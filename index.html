@@ -101,6 +101,11 @@
                                 <i class="bi bi-table me-1"></i> Thang điểm
                             </button>
                         </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="pills-news-tab" data-bs-toggle="pill" data-bs-target="#pills-news" type="button" role="tab">
+                                <i class="bi bi-newspaper me-1"></i> Tin tức
+                            </button>
+                        </li>
                     </ul>
                     
                     <!-- Desktop Theme Toggle -->
@@ -143,6 +148,13 @@
                         id="mobile-pills-scale-tab" data-bs-toggle="pill" data-bs-target="#pills-scale" type="button" role="tab">
                         <i class="bi bi-table fs-4 mb-1"></i>
                         <span>Thang điểm</span>
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link d-flex flex-column align-items-center py-2 rounded-0" style="font-size: 0.7rem;" 
+                        id="mobile-pills-news-tab" data-bs-toggle="pill" data-bs-target="#pills-news" type="button" role="tab">
+                        <i class="bi bi-newspaper fs-4 mb-1"></i>
+                        <span>Tin tức</span>
                     </button>
                 </li>
             </ul>
@@ -663,10 +675,111 @@
                 </div>
             </div>
 
+            <!-- Tab: Tin tức -->
+            <div class="tab-pane fade" id="pills-news" role="tabpanel" tabindex="0">
+                <div class="row g-4 justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="d-flex align-items-center justify-content-between mb-4">
+                             <div class="d-flex align-items-center">
+                                <div class="bg-primary bg-opacity-10 rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                                    <i class="bi bi-newspaper text-primary fs-4"></i>
+                                </div>
+                                <h4 class="fw-bold text-primary mb-0">Tin tức & Thông báo</h4>
+                             </div>
+                             <button class="btn btn-outline-primary btn-sm rounded-pill" id="toggle-sort-news-btn">
+                                <i class="bi bi-arrow-down-up me-1"></i> Sắp xếp
+                             </button>
+                        </div>
+                        
+                        <div id="news-list-container">
+                            <!-- News Item 1: Announcement Link -->
+                            <div class="card shadow-sm border-0 mb-4 news-card overflow-hidden" id="news-item-announcement">
+                                <div class="card-body p-4 position-relative">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-1 fw-bold">Thông báo</span>
+                                        <span class="text-muted small ms-auto"><i class="bi bi-clock me-1"></i>Học kỳ 2 (2025-2026)</span>
+                                    </div>
+                                    <h5 class="card-title fw-bold mb-3">
+                                        <a href="https://portal.huflit.edu.vn/News/Detail/3794/Thong-bao-ve-viec-to-chuc-hoat-dong-ren-luyen-hoc-ky-2-nam-hoc-2025-2026" 
+                                        target="_blank" class="text-decoration-none text-dark stretched-link hover-text-primary">
+                                        Thông báo về việc tổ chức hoạt động rèn luyện học kỳ 2 năm học 2025 – 2026
+                                        </a>
+                                    </h5>
+                                    <div class="news-sort-controls position-absolute top-0 end-0 m-2 d-none gap-1 bg-white rounded shadow-sm p-1 z-3">
+                                        <button class="btn btn-sm btn-light border btn-move-up" title="Lên"><i class="bi bi-chevron-up"></i></button>
+                                        <button class="btn btn-sm btn-light border btn-move-down" title="Xuống"><i class="bi bi-chevron-down"></i></button>
+                                    </div>
+                                    <p class="card-text text-secondary mb-0">
+                                        Thông tin chi tiết về các hoạt động, quy chế điểm rèn luyện và lịch trình thực hiện trong học kỳ mới. Sinh viên cần theo dõi để đảm bảo quyền lợi.
+                                    </p>
+                                </div>
+                            </div>
+                
+                            <!-- News Item 2: Handbook Embed -->
+                            <div class="card shadow-sm border-0 mb-4 news-card overflow-hidden" id="news-item-handbook">
+                                <div class="card-header bg-white border-bottom-0 pt-4 pb-0 position-relative">
+                                        <div class="d-flex align-items-center">
+                                            <span class="badge bg-info-subtle text-info-emphasis rounded-pill px-3 py-1 fw-bold me-2">Tài liệu</span>
+                                            <h6 class="mb-0 fw-bold">Cẩm nang Đại học</h6>
+                                        </div>
+                                        <div class="news-sort-controls position-absolute top-0 end-0 m-2 d-none gap-1 bg-white rounded shadow-sm p-1 z-3">
+                                            <button class="btn btn-sm btn-light border btn-move-up" title="Lên"><i class="bi bi-chevron-up"></i></button>
+                                            <button class="btn btn-sm btn-light border btn-move-down" title="Xuống"><i class="bi bi-chevron-down"></i></button>
+                                        </div>
+                                </div>
+                                <div class="card-body p-3">
+                                    <div class="rounded-3 overflow-hidden border shadow-sm" style="height: 500px;">
+                                        <iframe allowfullscreen="allowfullscreen" scrolling="no" class="fp-iframe w-100 h-100 border-0" src="https://heyzine.com/flip-book/feafd1ca30.html"></iframe>
+                                    </div>
+                                    <p class="text-muted small mt-2 mb-0 text-center">
+                                        <a href="https://heyzine.com/flip-book/feafd1ca30.html" target="_blank" class="text-decoration-none">
+                                            <i class="bi bi-box-arrow-up-right me-1"></i>Mở trong tab mới
+                                        </a>
+                                    </p>
+                                </div>
+                            </div>
+                
+                            <!-- News Item 3: Image -->
+                            <div class="card shadow-sm border-0 mb-4 news-card overflow-hidden" id="news-item-holiday">
+                                <div class="card-header bg-white border-bottom-0 pt-4 pb-0 position-relative">
+                                    <div class="d-flex align-items-center">
+                                        <span class="badge bg-success-subtle text-success rounded-pill px-3 py-1 fw-bold me-2">Hoạt động</span>
+                                        <h6 class="mb-0 fw-bold">Kế hoạch Nghỉ Tết - Kỳ 2</h6>
+                                    </div>
+                                    <div class="news-sort-controls position-absolute top-0 end-0 m-2 d-none gap-1 bg-white rounded shadow-sm p-1 z-3">
+                                        <button class="btn btn-sm btn-light border btn-move-up" title="Lên"><i class="bi bi-chevron-up"></i></button>
+                                        <button class="btn btn-sm btn-light border btn-move-down" title="Xuống"><i class="bi bi-chevron-down"></i></button>
+                                    </div>
+                                </div>
+                                <div class="card-body p-3">
+                                    <div class="rounded-3 overflow-hidden position-relative shadow-sm user-select-none">
+                                        <img src="assets/images/NghiTet.jpg" class="img-fluid w-100 news-image clickable-image" alt="Kế hoạch Nghỉ Tết" data-bs-toggle="modal" data-bs-target="#imageViewerModal" data-bs-src="assets/images/NghiTet.jpg" style="cursor: zoom-in;">
+                                    </div>
+                                    <p class="text-muted small mt-2 mb-0 fst-italic text-center"><i class="bi bi-zoom-in me-1"></i>Nhấn vào ảnh để phóng to</p>
+                                </div>
+                            </div>
+                        </div> <!-- End #news-list-container -->
+            
+                    </div>
+                </div>
+            </div>
+
         </div>
         
         <!-- Mobile Spacer to prevent content from being hidden behind bottom nav -->
         <div class="d-lg-none" style="height: 120px;"></div>
+    </div>
+
+    <!-- Image Viewer Modal -->
+    <div class="modal fade" id="imageViewerModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content bg-transparent border-0 shadow-none">
+                <div class="modal-body p-0 text-center position-relative">
+                    <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3 z-3 bg-white p-2 rounded" data-bs-dismiss="modal" aria-label="Close" style="opacity: 0.8;"></button>
+                    <img src="" id="imageViewerSrc" class="img-fluid rounded shadow-lg" style="max-height: 90vh;" alt="Preview">
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Import Modal -->

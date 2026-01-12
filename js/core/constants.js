@@ -9,3 +9,6 @@ export const GRADE_SCALE = [
     { grade: 'D', min: 4.0, max: 4.9, gpa: 1.0 },
     { grade: 'F', min: 0.0, max: 3.9, gpa: 0.0 }
 ];
+
+// CLIENT ID Imgur (Register at: https://api.imgur.com/oauth2/addclient)
+export const IMGUR_CLIENT_ID = 'e6133fc609825d1'; 
