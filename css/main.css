@@ -1012,6 +1012,7 @@ body {
     content: '★';
     background: linear-gradient(to bottom, #fff700, #ffd700);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 

@@ -690,9 +690,29 @@
                                 <i class="bi bi-arrow-down-up me-1"></i> Sắp xếp
                              </button>
                         </div>
-                        
+                        <!-- News Item 1: Image -->
+                            <div class="card shadow-sm border-0 mb-4 news-card overflow-hidden" id="news-item-holiday">
+                                <div class="card-header bg-white border-bottom-0 pt-4 pb-0 position-relative">
+                                    <div class="d-flex align-items-center">
+                                        <span class="badge bg-success-subtle text-success rounded-pill px-3 py-1 fw-bold me-2">Hoạt động</span>
+                                        <h6 class="mb-0 fw-bold">Kế hoạch Nghỉ Tết - Kỳ 2</h6>
+                                    </div>
+                                    <div class="news-sort-controls position-absolute top-0 end-0 m-2 d-none gap-1 bg-white rounded shadow-sm p-1 z-3">
+                                        <button class="btn btn-sm btn-light border btn-move-up" title="Lên"><i class="bi bi-chevron-up"></i></button>
+                                        <button class="btn btn-sm btn-light border btn-move-down" title="Xuống"><i class="bi bi-chevron-down"></i></button>
+                                    </div>
+                                </div>
+                                <div class="card-body p-3">
+                                    <div class="rounded-3 overflow-hidden position-relative shadow-sm user-select-none">
+                                        <img src="assets/images/NghiTet.jpg" class="img-fluid w-100 news-image clickable-image" alt="Kế hoạch Nghỉ Tết" data-bs-toggle="modal" data-bs-target="#imageViewerModal" data-bs-src="assets/images/NghiTet.jpg" style="cursor: zoom-in;">
+                                    </div>
+                                    <p class="text-muted small mt-2 mb-0 fst-italic text-center"><i class="bi bi-zoom-in me-1"></i>Nhấn vào ảnh để phóng to</p>
+                                </div>
+                            </div>
+                        </div> 
+
                         <div id="news-list-container">
-                            <!-- News Item 1: Announcement Link -->
+                            <!-- News Item 2: Announcement Link -->
                             <div class="card shadow-sm border-0 mb-4 news-card overflow-hidden" id="news-item-announcement">
                                 <div class="card-body p-4 position-relative">
                                     <div class="d-flex align-items-center mb-3">
@@ -715,7 +735,7 @@
                                 </div>
                             </div>
                 
-                            <!-- News Item 2: Handbook Embed -->
+                            <!-- News Item 3: Handbook Embed -->
                             <div class="card shadow-sm border-0 mb-4 news-card overflow-hidden" id="news-item-handbook">
                                 <div class="card-header bg-white border-bottom-0 pt-4 pb-0 position-relative">
                                         <div class="d-flex align-items-center">
@@ -737,29 +757,7 @@
                                         </a>
                                     </p>
                                 </div>
-                            </div>
-                
-                            <!-- News Item 3: Image -->
-                            <div class="card shadow-sm border-0 mb-4 news-card overflow-hidden" id="news-item-holiday">
-                                <div class="card-header bg-white border-bottom-0 pt-4 pb-0 position-relative">
-                                    <div class="d-flex align-items-center">
-                                        <span class="badge bg-success-subtle text-success rounded-pill px-3 py-1 fw-bold me-2">Hoạt động</span>
-                                        <h6 class="mb-0 fw-bold">Kế hoạch Nghỉ Tết - Kỳ 2</h6>
-                                    </div>
-                                    <div class="news-sort-controls position-absolute top-0 end-0 m-2 d-none gap-1 bg-white rounded shadow-sm p-1 z-3">
-                                        <button class="btn btn-sm btn-light border btn-move-up" title="Lên"><i class="bi bi-chevron-up"></i></button>
-                                        <button class="btn btn-sm btn-light border btn-move-down" title="Xuống"><i class="bi bi-chevron-down"></i></button>
-                                    </div>
-                                </div>
-                                <div class="card-body p-3">
-                                    <div class="rounded-3 overflow-hidden position-relative shadow-sm user-select-none">
-                                        <img src="assets/images/NghiTet.jpg" class="img-fluid w-100 news-image clickable-image" alt="Kế hoạch Nghỉ Tết" data-bs-toggle="modal" data-bs-target="#imageViewerModal" data-bs-src="assets/images/NghiTet.jpg" style="cursor: zoom-in;">
-                                    </div>
-                                    <p class="text-muted small mt-2 mb-0 fst-italic text-center"><i class="bi bi-zoom-in me-1"></i>Nhấn vào ảnh để phóng to</p>
-                                </div>
-                            </div>
-                        </div> <!-- End #news-list-container -->
-            
+                            </div><!-- End #news-list-container -->
                     </div>
                 </div>
             </div>
