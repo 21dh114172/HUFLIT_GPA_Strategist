@@ -158,7 +158,9 @@ body {
         background-color: transparent !important;
         color: #6c757d; /* Muted color */
         margin: 0;
+        padding: 8px 0 !important; /* Reset padding to maximize space */
         border-top: 3px solid transparent;
+        width: 100%; /* Ensure full width usage */
     }
     
     #mobile-bottom-tab .nav-link.active {
@@ -1116,5 +1118,22 @@ body {
 .news-sort-mode #toggle-sort-news-btn {
     background-color: #0d6efd;
     color: white;
+}
+
+
+/* Extra Small Screen Optimization for Bottom Nav */
+@media (max-width: 370px) {
+    #mobile-bottom-tab .nav-link span {
+        font-size: 0.6rem !important;
+        letter-spacing: -0.5px; /* Condense text slightly */
+    }
+    #mobile-bottom-tab .nav-link i {
+        font-size: 1.2rem !important;
+        margin-bottom: 2px !important;
+    }
+    #mobile-bottom-tab .nav-link {
+        padding-top: 6px !important;
+        padding-bottom: 6px !important;
+    }
 }
 
