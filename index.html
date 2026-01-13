@@ -747,8 +747,21 @@
                                         </div>
                                 </div>
                                 <div class="card-body p-3">
-                                    <div class="rounded-3 overflow-hidden border shadow-sm" style="height: 500px;">
-                                        <iframe allowfullscreen="allowfullscreen" scrolling="no" class="fp-iframe w-100 h-100 border-0" src="https://heyzine.com/flip-book/feafd1ca30.html"></iframe>
+                                    <div class="rounded-3 overflow-hidden border shadow-sm position-relative" style="height: 500px;">
+                                        <!-- Placeholder with Load Button -->
+                                        <div id="handbook-placeholder" class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center bg-light z-2">
+                                            <div class="bg-white p-4 rounded-circle shadow-sm mb-3">
+                                                <i class="bi bi-book-half display-4 text-primary"></i>
+                                            </div>
+                                            <h6 class="fw-bold text-secondary mb-3">Sổ tay Sinh viên</h6>
+                                            <button id="load-handbook-btn" class="btn btn-primary rounded-pill px-4 shadow-sm fw-medium">
+                                                <i class="bi bi-eye-fill me-2"></i>Xem Sổ tay
+                                            </button>
+                                            <p class="text-muted small mt-2 mb-0 fst-italic">Nhấn để tải nội dung</p>
+                                        </div>
+
+                                        <!-- Iframe (Initially Hidden) -->
+                                        <iframe id="handbook-iframe" allowfullscreen="allowfullscreen" scrolling="no" class="fp-iframe w-100 h-100 border-0" data-src="https://heyzine.com/flip-book/feafd1ca30.html"></iframe>
                                     </div>
                                     <p class="text-muted small mt-2 mb-0 text-center">
                                         <a href="https://heyzine.com/flip-book/feafd1ca30.html" target="_blank" class="text-decoration-none">

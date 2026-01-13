@@ -1397,6 +1397,29 @@ function escapeHtml(text) {
 // ==========================================
 
 export function initNewsTab() {
+    // Handbook Lazy Load
+    const loadHandbookBtn = document.getElementById('load-handbook-btn');
+    const handbookPlaceholder = document.getElementById('handbook-placeholder');
+    const handbookIframe = document.getElementById('handbook-iframe');
+
+    if (loadHandbookBtn && handbookPlaceholder && handbookIframe) {
+        loadHandbookBtn.addEventListener('click', () => {
+            // Load iframe src
+            const src = handbookIframe.getAttribute('data-src');
+            if (src) {
+                handbookIframe.src = src;
+            }
+            
+            // Hide placeholder with animation
+            handbookPlaceholder.style.transition = 'opacity 0.3s ease';
+            handbookPlaceholder.style.opacity = '0';
+            
+            setTimeout(() => {
+                handbookPlaceholder.style.display = 'none';
+            }, 300);
+        });
+    }
+
     const imageViewerModal = document.getElementById('imageViewerModal');
     if (imageViewerModal) {
         imageViewerModal.addEventListener('show.bs.modal', event => {

@@ -1,6 +1,6 @@
 import { initCourseGradeTab, initTargetGPATab, initManualCalcTab, initContactButton, initThemeToggle, initUserGuide, fetchVisitCount, initFeedbackForm, initNewsTab } from './ui/events.js';
 import { initGradeScaleTab } from './ui/renderers.js';
-import { initSnowEffect, initChristmasTreeInteraction } from './ui/effects.js';
+
 
 console.log("HUFLIT GPA Strategist loaded (Modular).");
 
@@ -15,8 +15,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initFeedbackForm();
     initNewsTab();
     fetchVisitCount();
-    // initSnowEffect();
-    // initChristmasTreeInteraction();
 
     // Sync Desktop and Mobile Tabs
     const allNavLinks = document.querySelectorAll('.nav-link[data-bs-toggle="pill"]');
