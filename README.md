@@ -2,6 +2,10 @@
 
 Công cụ tính toán GPA và lập kế hoạch điểm số dành riêng cho sinh viên HUFLIT. Hỗ trợ import bảng điểm từ Portal đào tạo, tính toán điểm thi cuối kỳ, dự đoán GPA mục tiêu và gợi ý môn học lại thông minh.
 
+[![GitHub](https://img.shields.io/badge/GitHub-Repository-blue)](https://github.com/TienxDun/HUFLIT_GPA_Strategist)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![PWA](https://img.shields.io/badge/PWA-Ready-green)](https://tienxdun.github.io/HUFLIT_GPA_Strategist/)
+
 ## ✨ Tính năng chính
 
 ### 1. 🎯 Lộ trình GPA (Target GPA)
@@ -39,62 +43,30 @@ Tính toán điểm thi cuối kỳ cần đạt dựa trên điểm quá trình
 ### 4. 📋 Thang điểm chuẩn HUFLIT
 - Tích hợp sẵn thang điểm quy đổi (A, B+, B, C+...) theo quy chế mới nhất.
 - Phân loại học lực dựa trên GPA tích lũy.
+- Thời gian biểu học tập chi tiết theo tiết.
 
-### 5. 🌙 Chế độ tối/sáng
+### 5. 📰 Tin tức & Tài liệu
+- **Tin tức cập nhật**: Thông báo hoạt động, kế hoạch nghỉ lễ, thông báo rèn luyện.
+- **Sổ tay Sinh viên**: Cẩm nang Đại học HUFLIT với lazy loading để tiết kiệm băng thông.
+- **Hình ảnh phóng to**: Nhấn vào ảnh để xem chi tiết.
+
+### 6. 🌙 Chế độ tối/sáng
 - Chuyển đổi giữa giao diện sáng và tối.
 - Lưu trữ tùy chọn trong trình duyệt.
 
-### 6. 📖 Hướng dẫn sử dụng tích hợp
+### 7. 📖 Hướng dẫn sử dụng tích hợp
 - Modal hướng dẫn chi tiết cho từng tab.
 - Tự động hiển thị lần đầu truy cập.
 - Yêu cầu xác nhận để đóng.
 
-### 7. 📱 Responsive Design
+### 8. 📱 Responsive Design & PWA
 - Tương thích hoàn toàn với mobile và desktop.
 - Giao diện tối ưu cho từng kích thước màn hình.
+- Progressive Web App (PWA) - cài đặt như ứng dụng native.
 
-## 🔄 Luồng hoạt động chính
-
-### 1. Tính toán Lộ trình GPA (Target GPA)
-
-```mermaid
-graph TD
-    A[Bắt đầu] --> B[Nhập GPA & Tín chỉ hiện tại]
-    B --> C[Nhập GPA Mục tiêu]
-    C --> D[Nhập Tín chỉ còn lại]
-    D --> E{Cần học cải thiện?}
-    E -- Có --> F[Thêm môn học lại]
-    E -- Không --> G[Tính GPA cần đạt]
-    F --> G
-    G --> H{Yêu cầu > 4.0?}
-    H -- Có --> I[Cảnh báo: Không khả thi]
-    H -- Không --> J[Hiển thị GPA cần đạt]
-    I --> K[Gợi ý học lại thêm]
-```
-
-### 2. Nhập liệu & Tính GPA Thủ công
-
-```mermaid
-graph TD
-    A[Bắt đầu] --> B{Phương thức nhập}
-    B -- Import --> C[Dán dữ liệu từ Portal]
-    C --> D[Tự động phân tích & điền]
-    B -- Thủ công --> E[Thêm Học kỳ & Môn học]
-    D --> F[Tính GPA thời gian thực]
-    E --> F
-    F --> G[Hiển thị GPA & Xếp loại]
-    G --> H[Đồng bộ sang tab Lộ trình]
-```
-
-### 3. Dự báo điểm thi (Course Grade)
-
-```mermaid
-graph TD
-    A["Chọn tỷ lệ (vd: 40/60)"] --> B["Nhập điểm quá trình"]
-    B --> C["Tính điểm tích lũy"]
-    C --> D["Tính điểm thi cần đạt"]
-    D --> E["Hiển thị mục tiêu cho A, B, C..."]
-```
+### 9. 💬 Góp ý & Cộng đồng
+- Form gửi góp ý với phân loại (tính năng mới, báo lỗi, cải tiến).
+- Hiển thị cộng đồng ý kiến công khai.
 
 ## 🛠 Công nghệ sử dụng
 
@@ -103,7 +75,9 @@ graph TD
 - **Storage**: LocalStorage cho dữ liệu cá nhân
 - **Icons**: Bootstrap Icons
 - **Fonts**: Google Fonts (Inter)
-- **Responsive**: Bootstrap Grid System
+- **Analytics**: GoatCounter (Privacy-focused)
+- **PWA**: Service Worker (Manifest-based)
+- **Build**: No build process - Direct deployment
 
 ## 🚀 Cách sử dụng
 
@@ -117,38 +91,39 @@ graph TD
 
 ```
 HUFLIT_GPA_Strategist/
-├── index.html          # Giao diện chính
-├── css/                # Stylesheets
-│   ├── main.css        # CSS chính
-│   ├── components/     # CSS cho các component
-│   ├── layouts/        # CSS bố cục
-│   └── themes/         # CSS giao diện (Dark/Light)
-├── js/                 # Mã nguồn JavaScript
-│   ├── main.js         # Entry point
-│   ├── core/           # Logic tính toán & Hằng số
-│   ├── state/          # Quản lý trạng thái (Store)
-│   └── ui/             # Xử lý giao diện & Sự kiện
-├── assets/             # Tài nguyên tĩnh
-│   └── images/         # Hình ảnh
-├── manifest.json       # PWA manifest
-├── 404.html            # Trang 404
-├── LICENSE             # Giấy phép
-└── README.md           # Tài liệu này
+├── index.html              # Giao diện chính (Single Page Application)
+├── css/
+│   └── main.css            # CSS chính với tối ưu animation
+├── js/                     # Mã nguồn JavaScript (ES6 Modules)
+│   ├── main.js             # Entry point: Khởi tạo ứng dụng
+│   ├── core/               # Business Logic & Constants
+│   │   ├── constants.js    # Hằng số (Thang điểm, Config)
+│   │   ├── calculator.js   # Các hàm tính toán thuần túy
+│   │   └── utils.js        # Hàm tiện ích (Parser, Format)
+│   ├── state/              # State Management
+│   │   └── store.js        # Central Store & Observer pattern
+│   └── ui/                 # User Interface Logic
+│       ├── events.js       # Event Listeners & Controller Logic
+│       ├── renderers.js    # DOM Manipulation & HTML Generation
+│       └── effects.js      # Visual Effects (Disabled)
+├── assets/                 # Tài nguyên tĩnh
+│   └── images/             # Hình ảnh & screenshots
+├── manifest.json           # PWA manifest
+├── ARCHITECTURE.md         # Tài liệu kiến trúc kỹ thuật
+├── LICENSE                 # Giấy phép MIT
+└── README.md               # Tài liệu này
 ```
-
-## 🤝 Đóng góp
-
-Mọi đóng góp đều được chào đón! Vui lòng tạo issue hoặc pull request trên GitHub.
 
 ## 📞 Liên hệ
 
 - **Tác giả**: Tiến Dũng 
 - **Facebook**: [tienxdun](https://www.facebook.com/tienxdun/)
 - **GitHub**: [TienxDun](https://github.com/TienxDun)
+- **Email**: tienxdun@gmail.com
 
 ---
 
-*Công cụ này được phát triển với mục đích hỗ trợ học tập cho các sinh viên trường Đại học Ngoại ngữ - Tin học TP.HCM (HUFLIT).* 
+*Công cụ này được phát triển với mục đích hỗ trợ học tập cho các sinh viên trường Đại học Ngoại ngữ - Tin học TP.HCM (HUFLIT).*
 
 ## Giấy phép
 
