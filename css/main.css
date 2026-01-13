@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+﻿@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
     --primary-color: #d32f2f; /* HUFLIT red-ish color */
@@ -957,3 +957,12 @@ body {
     }
 }
 
+
+ @ k e y f r a m e s   p u l s e - g l o w   { 
+         0 %   {   t r a n s f o r m :   t r a n s l a t e ( - 5 0 % ,   - 5 0 % )   s c a l e ( 0 . 8 ) ;   o p a c i t y :   0 . 5 ;   } 
+         5 0 %   {   t r a n s f o r m :   t r a n s l a t e ( - 5 0 % ,   - 5 0 % )   s c a l e ( 1 . 2 ) ;   o p a c i t y :   0 . 8 ;   } 
+         1 0 0 %   {   t r a n s f o r m :   t r a n s l a t e ( - 5 0 % ,   - 5 0 % )   s c a l e ( 0 . 8 ) ;   o p a c i t y :   0 . 5 ;   } 
+ } 
+ 
+ 
+ 

@@ -1413,9 +1413,10 @@ export function initNewsTab() {
             // Hide placeholder with animation
             handbookPlaceholder.style.transition = 'opacity 0.3s ease';
             handbookPlaceholder.style.opacity = '0';
+            handbookPlaceholder.style.pointerEvents = 'none'; // Disable interactions immediately
             
             setTimeout(() => {
-                handbookPlaceholder.style.display = 'none';
+                handbookPlaceholder.remove(); // Completely remove from DOM
             }, 300);
         });
     }

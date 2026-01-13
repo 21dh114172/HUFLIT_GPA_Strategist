@@ -749,15 +749,26 @@
                                 <div class="card-body p-3">
                                     <div class="rounded-3 overflow-hidden border shadow-sm position-relative" style="height: 500px;">
                                         <!-- Placeholder with Load Button -->
-                                        <div id="handbook-placeholder" class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center bg-light z-2">
-                                            <div class="bg-white p-4 rounded-circle shadow-sm mb-3">
-                                                <i class="bi bi-book-half display-4 text-primary"></i>
+                                        <div id="handbook-placeholder" class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center bg-white z-2">
+                                            
+                                            <div class="mb-3">
+                                                <div class="bg-primary-subtle p-3 rounded-circle d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                                                    <i class="bi bi-journal-bookmark-fill display-6 text-primary"></i>
+                                                </div>
                                             </div>
-                                            <h6 class="fw-bold text-secondary mb-3">Sổ tay Sinh viên</h6>
-                                            <button id="load-handbook-btn" class="btn btn-primary rounded-pill px-4 shadow-sm fw-medium">
-                                                <i class="bi bi-eye-fill me-2"></i>Xem Sổ tay
+
+                                            <h5 class="fw-bold text-dark mb-2">Sổ tay Sinh viên</h5>
+                                            <p class="text-secondary mb-4 text-center px-4 small" style="max-width: 350px;">
+                                                Tra cứu quy chế, chuẩn đầu ra và hướng dẫn học vụ.
+                                            </p>
+
+                                            <button id="load-handbook-btn" class="btn btn-outline-primary rounded-pill px-4 fw-medium hover-scale">
+                                                <i class="bi bi-eye me-2"></i>Xem Sổ tay
                                             </button>
-                                            <p class="text-muted small mt-2 mb-0 fst-italic">Nhấn để tải nội dung</p>
+                                            
+                                            <p class="text-muted small mt-3 mb-0" style="font-size: 0.75rem;">
+                                                <i class="bi bi-cloud-arrow-down me-1"></i>Nhấn để tải nội dung
+                                            </p>
                                         </div>
 
                                         <!-- Iframe (Initially Hidden) -->
@@ -1227,25 +1238,6 @@ Năm học: 2023-2024 - Học kỳ: HK01
             </div>
         </div>
     </div>
-
-    <!-- Christmas Tree Animation (Disabled) -->
-    <!-- 
-    <div class="christmas-tree-container">
-        <div class="christmas-tree">
-            <div class="star"></div>
-            <div class="tree-layer top"></div>
-            <div class="tree-layer middle"></div>
-            <div class="tree-layer bottom"></div>
-            <div class="tree-log"></div>
-            <div class="ornament o1"></div>
-            <div class="ornament o2"></div>
-            <div class="ornament o3"></div>
-            <div class="ornament o4"></div>
-            <div class="ornament o5"></div>
-            <div class="snow-ground"></div>
-        </div>
-    </div> 
-    -->
 
     <!-- App Scripts -->
     <script type="module" src="js/main.js"></script>
