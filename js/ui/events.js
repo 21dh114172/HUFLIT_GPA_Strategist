@@ -1500,3 +1500,77 @@ export function initNewsTab() {
     }
 }
 
+export function initGradeScaleSort() {
+    const toggleSortBtn = document.getElementById('toggle-sort-scale-btn');
+    const scaleContainer = document.getElementById('scale-list-container');
+    const ORDER_KEY = 'HUFLIT_SCALE_ORDER';
+
+    // 1. Load saved order
+    const savedOrder = JSON.parse(localStorage.getItem(ORDER_KEY) || '[]');
+    if (savedOrder.length > 0 && scaleContainer) {
+        const currentItems = Array.from(scaleContainer.children);
+        const itemMap = new Map(currentItems.map(item => [item.id, item]));
+        
+        // Clear container
+        scaleContainer.innerHTML = '';
+        
+        // Append in saved order
+        savedOrder.forEach(id => {
+            const item = itemMap.get(id);
+            if (item) {
+                scaleContainer.appendChild(item);
+                itemMap.delete(id);
+            }
+        });
+
+        // Append remaining items (new ones)
+        itemMap.forEach(item => scaleContainer.appendChild(item));
+    }
+
+    // 2. Toggle sort mode
+    if (toggleSortBtn && scaleContainer) {
+        toggleSortBtn.addEventListener('click', () => {
+            scaleContainer.classList.toggle('scale-sort-mode');
+            toggleSortBtn.classList.toggle('active');
+            
+            // Toggle button appearance
+            if (scaleContainer.classList.contains('scale-sort-mode')) {
+                toggleSortBtn.classList.remove('btn-outline-primary');
+                toggleSortBtn.classList.add('btn-primary');
+            } else {
+                toggleSortBtn.classList.add('btn-outline-primary');
+                toggleSortBtn.classList.remove('btn-primary');
+            }
+        });
+
+        // 3. Handle move
+        scaleContainer.addEventListener('click', (e) => {
+            const btn = e.target.closest('button');
+            if (!btn) return;
+
+            const card = btn.closest('.scale-card');
+            if (!card) return;
+
+            if (btn.classList.contains('btn-move-up')) {
+                const prev = card.previousElementSibling;
+                if (prev) {
+                    scaleContainer.insertBefore(card, prev);
+                    saveOrder();
+                }
+            } else if (btn.classList.contains('btn-move-down')) {
+                const next = card.nextElementSibling;
+                if (next) {
+                    scaleContainer.insertBefore(next, card);
+                    saveOrder();
+                }
+            }
+        });
+    }
+
+    function saveOrder() {
+        if (!scaleContainer) return;
+        const newOrder = Array.from(scaleContainer.children).map(item => item.id);
+        localStorage.setItem(ORDER_KEY, JSON.stringify(newOrder));
+    }
+}
+

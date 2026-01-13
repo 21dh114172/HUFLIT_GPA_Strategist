@@ -1,4 +1,4 @@
-import { initCourseGradeTab, initTargetGPATab, initManualCalcTab, initContactButton, initThemeToggle, initUserGuide, fetchVisitCount, initFeedbackForm, initNewsTab } from './ui/events.js';
+import { initCourseGradeTab, initTargetGPATab, initManualCalcTab, initContactButton, initThemeToggle, initUserGuide, fetchVisitCount, initFeedbackForm, initNewsTab, initGradeScaleSort } from './ui/events.js';
 import { initGradeScaleTab } from './ui/renderers.js';
 
 
@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initUserGuide();
     initFeedbackForm();
     initNewsTab();
+    initGradeScaleSort();
     fetchVisitCount();
 
     // Sync Desktop and Mobile Tabs
