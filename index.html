@@ -537,6 +537,52 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- 3. Thang xếp loại điểm rèn luyện -->
+                        <div class="card shadow-sm border-0 flex-grow-1">
+                            <div class="card-header bg-white border-bottom-0 pt-4 pb-2">
+                                <h5 class="card-title fw-bold text-primary mb-0"><i class="bi bi-star me-2"></i>Thang xếp loại điểm rèn luyện</h5>
+                                <p class="text-muted small mt-1 mb-0">Phân loại dựa trên điểm rèn luyện</p>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0">
+                                        <thead class="bg-light small text-secondary">
+                                            <tr>
+                                                <th class="ps-4">Xếp loại</th>
+                                                <th class="text-end pe-4">Khoảng điểm</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="border-top-0">
+                                            <tr>
+                                                <td class="ps-4 fw-bold text-success">Xuất sắc</td>
+                                                <td class="text-end pe-4 small text-secondary fw-medium">90 - 100 điểm</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="ps-4 fw-bold text-primary">Tốt</td>
+                                                <td class="text-end pe-4 small text-secondary fw-medium">80 - dưới 90 điểm</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="ps-4 fw-bold text-info-emphasis">Khá</td>
+                                                <td class="text-end pe-4 small text-secondary fw-medium">65 - dưới 80 điểm</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="ps-4 fw-bold text-warning-emphasis">Trung bình</td>
+                                                <td class="text-end pe-4 small text-secondary fw-medium">50 - dưới 65 điểm</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="ps-4 fw-bold text-secondary">Yếu</td>
+                                                <td class="text-end pe-4 small text-secondary fw-medium">35 - dưới 50 điểm</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="ps-4 fw-bold text-danger">Kém</td>
+                                                <td class="text-end pe-4 small text-secondary fw-medium">Dưới 35 điểm</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Right Column: Schedule (Full Height) -->
@@ -735,6 +781,26 @@
                                     <p class="card-text text-secondary mb-0">
                                         Thông báo việc xét học bổng Tân sinh viên HUFLIT năm học 2025 – 2026 nhằm tạo thêm động lực, khích lệ sinh viên không ngừng nỗ lực học tập...
                                     </p>
+                                </div>
+                            </div>
+
+                            <!-- News Item: Scholarship Effort and Talent -->
+                            <div class="card shadow-sm border-0 mb-4 news-card overflow-hidden" id="news-item-scholarship-effort-talent">
+                                <div class="card-header bg-white border-bottom-0 pt-4 pb-0 position-relative">
+                                    <div class="d-flex align-items-center">
+                                        <span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-1 fw-bold me-2">Học bổng</span>
+                                        <h6 class="mb-0 fw-bold">Học bổng Nỗ lực và Nhân tài</h6>
+                                    </div>
+                                    <div class="news-sort-controls position-absolute top-0 end-0 m-2 d-none gap-1 bg-white rounded shadow-sm p-1 z-3">
+                                        <button class="btn btn-sm btn-light border btn-move-up" title="Lên"><i class="bi bi-chevron-up"></i></button>
+                                        <button class="btn btn-sm btn-light border btn-move-down" title="Xuống"><i class="bi bi-chevron-down"></i></button>
+                                    </div>
+                                </div>
+                                <div class="card-body p-3">
+                                    <div class="rounded-3 overflow-hidden position-relative shadow-sm user-select-none">
+                                        <img src="assets/images/HocBong.png" class="img-fluid w-100 news-image clickable-image" alt="Học bổng Nỗ lực và Nhân tài" data-bs-toggle="modal" data-bs-target="#imageViewerModal" data-bs-src="assets/images/HocBong.png" style="cursor: zoom-in;">
+                                    </div>
+                                    <p class="text-muted small mt-2 mb-0 fst-italic text-center"><i class="bi bi-zoom-in me-1"></i>Nhấn vào ảnh để phóng to</p>
                                 </div>
                             </div>
 
@@ -1172,7 +1238,7 @@ Năm học: 2023-2024 - Học kỳ: HK01
                     <div class="d-flex align-items-center bg-warning-subtle border border-warning rounded p-2" id="guideCheckContainer">
                         <input class="form-check-input m-0 me-2" type="checkbox" id="guideUnderstandCheck">
                         <label class="form-check-label small fw-bold text-dark lh-1" for="guideUnderstandCheck">
-                            Tôi đã biết cách mở lại hướng dẫn này ở nút Liên hệ <i class="bi bi-chat-text-fill text-primary"></i>
+                            Mở lại hướng dẫn này ở nút Liên hệ <i class="bi bi-chat-text-fill text-primary"></i>
                         </label>
                     </div>
                     <button type="button" class="btn btn-primary" id="guideConfirmBtn" data-bs-dismiss="modal">Đã hiểu</button>

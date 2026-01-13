@@ -757,6 +757,12 @@ body {
         font-size: 1.2rem;
         margin-bottom: 0.25rem !important;
     }
+
+    /* Limit modal body height on mobile to prevent overflow */
+    #userGuideModal .modal-body {
+        max-height: 55vh;
+        overflow-y: auto;
+    }
 }
 
 /* Dark Mode Overrides */
