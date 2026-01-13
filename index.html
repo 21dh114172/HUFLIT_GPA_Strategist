@@ -1171,16 +1171,8 @@ Năm học: 2023-2024 - Học kỳ: HK01
     </div>
 
     <!-- Contact Floating Button -->
-    <div id="contact-floating-wrapper" class="position-fixed bottom-0 end-0 m-4 d-flex flex-column align-items-end gap-3" style="z-index: 1050;">
-        <!-- Feedback Button (Desktop Only) -->
-        <button class="btn btn-success rounded-circle shadow d-none d-lg-flex align-items-center justify-content-center floating-feedback-btn" 
-                data-bs-toggle="modal" data-bs-target="#feedbackModal"
-                title="Góp ý tính năng"
-                style="width: 50px; height: 50px;">
-            <i class="bi bi-lightbulb-fill fs-5"></i>
-        </button>
-
-        <!-- Contact Button Wrapper -->
+    <div id="contact-floating-wrapper" class="position-fixed bottom-0 end-0 m-3 d-flex flex-row-reverse align-items-end gap-2" style="z-index: 1050;">
+        <!-- Contact Button Wrapper (Large Icon - Right) -->
         <div class="position-relative">
             <button type="button" id="close-contact-btn" class="btn btn-sm btn-light rounded-circle shadow position-absolute top-0 start-100 translate-middle border d-flex align-items-center justify-content-center" 
                     style="width: 24px; height: 24px; padding: 0; z-index: 1051;"
@@ -1193,6 +1185,14 @@ Năm học: 2023-2024 - Học kỳ: HK01
                 <i class="bi bi-chat-text-fill"></i>
             </button>
         </div>
+
+        <!-- Feedback Button (Small Icon - Left) -->
+        <button class="btn btn-success rounded-circle shadow d-none d-lg-flex align-items-center justify-content-center floating-feedback-btn" 
+                data-bs-toggle="modal" data-bs-target="#feedbackModal"
+                title="Góp ý tính năng"
+                style="width: 50px; height: 50px;">
+            <i class="bi bi-lightbulb-fill fs-5"></i>
+        </button>
     </div>
 
     <!-- Contact Modal -->
