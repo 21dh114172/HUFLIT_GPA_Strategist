@@ -991,3 +991,41 @@ body {
     }
 }
 
+
+/* Ultra Wide Screen Optimization */
+@media (min-width: 1600px) {
+    .container {
+        max-width: 1600px;
+    }
+}
+
+/* Standard Desktop Optimization (1200px - 1440px) */
+@media (min-width: 1200px) and (max-width: 1439px) {
+    .container {
+        max-width: 1140px;
+    }
+    .card-body.p-4 {
+        padding: 1.5rem !important;
+    }
+}
+
+/* Large Desktop Optimization (1440px - 1600px) */
+@media (min-width: 1440px) and (max-width: 1599px) {
+    .container {
+        max-width: 1380px;
+    }
+}
+
+/* Enhanced Mobile Adjustments */
+@media (max-width: 576px) {
+    .btn-segmented {
+        font-size: 0.8rem;
+        padding: 8px 4px;
+    }
+    .form-text {
+        font-size: 0.7rem;
+    }
+    .display-1 {
+        font-size: 3.5rem;
+    }
+}
