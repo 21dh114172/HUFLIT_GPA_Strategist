@@ -49,10 +49,33 @@ body {
 
 /* Optimize Navbar for smaller desktops (992px - 1200px) */
 @media (min-width: 992px) and (max-width: 1200px) {
+    /* Allow container to use more width */
+    .navbar .container {
+        max-width: 100%;
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
     .nav-pills .nav-link {
-        padding: 8px 10px;
-        margin: 0 2px;
-        font-size: 0.9rem;
+        padding: 6px 8px; /* Tighter padding */
+        margin: 0 1px; /* Tighter margin */
+        font-size: 0.8rem; /* Smaller font */
+        white-space: nowrap; /* Prevent wrapping */
+    }
+
+    /* Hide icons to save space if needed */
+    .nav-pills .nav-link i {
+        display: none;
+    }
+
+    .navbar-brand {
+        font-size: 1.05rem; /* Compact Brand Text */
+        gap: 5px;
+        margin-right: 10px; /* Reduce margin to menu */
+    }
+
+    .navbar-brand i {
+        font-size: 1.2rem; /* Compact Brand Icon */
     }
 }
 
