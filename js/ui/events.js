@@ -44,6 +44,27 @@ export function initManualCalcTab() {
             const targetGpaInput = document.getElementById('current-gpa');
             const targetCreditsInput = document.getElementById('current-credits');
             const goalGpaInput = document.getElementById('target-gpa');
+            const newCreditsInput = document.getElementById('new-credits');
+
+            // 1. Calculate Remaining Credits (courses without valid grades)
+            const { semesters } = getManualState();
+            let remainingCredits = 0;
+            
+            if (semesters && semesters.length > 0) {
+                semesters.forEach(sem => {
+                    if (sem.courses && sem.courses.length > 0) {
+                        sem.courses.forEach(course => {
+                            // Check if grade is valid (in GRADE_SCALE) or has a value
+                            // Assuming empty grade or grade not in scale means "not yet studied" or "no score"
+                            const hasValidGrade = course.grade && GRADE_SCALE.some(g => g.grade === course.grade);
+                            
+                            if (!hasValidGrade) {
+                                remainingCredits += parseFloat(course.credits) || 0;
+                            }
+                        });
+                    }
+                });
+            }
 
             if (targetGpaInput && targetCreditsInput) {
                 targetGpaInput.value = gpa;
@@ -52,6 +73,28 @@ export function initManualCalcTab() {
                 // Trigger input event to save state
                 targetGpaInput.dispatchEvent(new Event('input'));
                 targetCreditsInput.dispatchEvent(new Event('input'));
+
+                // Apply Remaining Credits
+                if (newCreditsInput) {
+                    newCreditsInput.value = remainingCredits > 0 ? remainingCredits : '';
+                    newCreditsInput.dispatchEvent(new Event('input'));
+                    
+                    // Ensure "New Credits" mode is visible if we have data
+                    const newCreditsGroup = document.getElementById('new-credits-group');
+                    const totalCreditsGroup = document.getElementById('total-credits-group');
+                    
+                    if (remainingCredits > 0 && newCreditsGroup && totalCreditsGroup) {
+                        newCreditsGroup.classList.remove('d-none');
+                        totalCreditsGroup.classList.add('d-none');
+                        // Update state to reflect 'new' mode if needed, usually handled by toggle listeners 
+                        // but dispatching input on newCreditsInput should update the state model.
+                    }
+                    
+                    if (remainingCredits > 0) {
+                        newCreditsInput.classList.add('is-valid');
+                        setTimeout(() => newCreditsInput.classList.remove('is-valid'), 2000);
+                    }
+                }
 
                 // Auto-suggest Target GPA
                 if (goalGpaInput) {
@@ -83,7 +126,7 @@ export function initManualCalcTab() {
                 targetCreditsInput.classList.add('is-valid');
                 
                 // Focus on New Credits Input (or Total Credits if active)
-                const newCreditsInput = document.getElementById('new-credits');
+                // const newCreditsInput = document.getElementById('new-credits'); // Already defined above
                 const totalCreditsInput = document.getElementById('total-credits');
                 
                 if (newCreditsInput && newCreditsInput.offsetParent !== null) {
