@@ -167,6 +167,12 @@ body {
 
 /* Mobile & Tablet Bottom Nav Styles */
 @media (max-width: 991.98px) {
+    /* Remove default navbar padding to save space */
+    .navbar.fixed-bottom {
+        padding-top: 0 !important;
+        padding-bottom: 0 !important; /* We rely on valid safe-area padding if needed via inline style, or just tight fit */
+    }
+    
     body {
         padding-bottom: 90px; /* Space for bottom nav */
     }
