@@ -1021,10 +1021,67 @@ body {
 }
 
 
-/* Ultra Wide Screen Optimization */
-@media (min-width: 1600px) {
+/* Ultra Wide Screen Optimization (1600px - 2500px) */
+@media (min-width: 1600px) and (max-width: 2499px) {
     .container {
         max-width: 1600px;
+    }
+}
+
+/* Super High Resolution Optimization (2500px+) - e.g. 2800px width */
+@media (min-width: 2500px) {
+    .container {
+        max-width: 2400px;
+    }
+    
+    body {
+        font-size: 1.15rem; /* Slight scale up for better readability */
+    }
+    
+    /* Scale Headings */
+    h5, .h5 { font-size: 1.5rem; }
+    h6, .h6 { font-size: 1.2rem; }
+    
+    /* Scale Inputs & Buttons */
+    .form-control, .form-select, .btn {
+        font-size: 1.15rem;
+        padding: 0.6rem 1rem;
+    }
+    
+    .input-group-text {
+        font-size: 1.15rem;
+    }
+
+    .small, small, .text-muted.small {
+        font-size: 0.95rem !important;
+    }
+    
+    .display-1 {
+        font-size: 6rem; /* Bigger GPA number */
+    }
+    
+    /* Navbar Scaling */
+    .navbar-brand {
+        font-size: 1.6rem;
+    }
+    
+    .navbar-brand i {
+        font-size: 2rem;
+    }
+    
+    .nav-pills .nav-link {
+        font-size: 1.1rem;
+        padding: 10px 20px;
+    }
+
+    /* Adjust Sticky Top for taller navbar */
+    .sticky-lg-top {
+        top: 100px !important;
+    }
+    
+    /* Card spacing */
+    .card-body {
+        padding: 2rem !important;
     }
 }
 
