@@ -3,6 +3,7 @@ import { getManualState, setManualState, addManualSemester, removeManualSemester
 import { calculateManualGPA, calculateTargetResult, generateRetakeSuggestions, generateGradeCombinations } from '../core/calculator.js';
 import { renderManualSemesters } from './renderers.js';
 import { parsePortalText } from '../core/utils.js';
+import { generateShareUrl } from '../core/share.js';
 
 // ==========================================
 // GLOBAL HELPERS
@@ -398,6 +399,7 @@ export function initTargetGPATab() {
     const btnSwitchToNew = document.getElementById('btn-switch-to-new');
     const newCreditsGroup = document.getElementById('new-credits-group');
     const totalCreditsGroup = document.getElementById('total-credits-group');
+    const shareTargetBtn = document.getElementById('share-target-btn');
 
     // Subscribe to store changes
     subscribe(() => {
@@ -552,6 +554,10 @@ export function initTargetGPATab() {
 
         const result = calculateTargetResult(currentGPA, currentCredits, targetGPA, newCredits, state.retakes);
         
+        // Show share button
+        const shareBtn = document.getElementById('share-target-btn');
+        if (shareBtn) shareBtn.classList.remove('d-none');
+
         // Render Result
         const targetResultContainer = document.getElementById('target-result-container');
         if (targetResultContainer) {
@@ -796,6 +802,28 @@ export function initTargetGPATab() {
             }
         }
     });
+
+    if (shareTargetBtn) {
+        shareTargetBtn.addEventListener('click', () => {
+            const state = getTargetState();
+            const shareUrl = generateShareUrl(state);
+            
+            // Copy to clipboard
+            navigator.clipboard.writeText(shareUrl).then(() => {
+                const originalText = shareTargetBtn.innerHTML;
+                shareTargetBtn.innerHTML = '<i class="bi bi-check-lg me-1"></i>Đã chép!';
+                shareTargetBtn.classList.replace('btn-outline-primary', 'btn-success');
+                
+                setTimeout(() => {
+                    shareTargetBtn.innerHTML = originalText;
+                    shareTargetBtn.classList.replace('btn-success', 'btn-outline-primary');
+                }, 2000);
+            }).catch(err => {
+                console.error('Không thể sao chép: ', err);
+                alert('Không thể sao chép liên kết. Bạn có thể chép thủ công từ thanh địa chỉ.');
+            });
+        });
+    }
 }
 
 function addRetakeItemUI(savedData = null) {
@@ -812,7 +840,9 @@ function addRetakeItemUI(savedData = null) {
         <div class="input-group flex-grow-1" style="min-width: 0;">
             <span class="input-group-text bg-light text-muted small px-2">Điểm cũ</span>
             <select class="form-select retake-old-grade" aria-label="Old Grade" style="text-overflow: ellipsis;">
-                ${GRADE_SCALE.map(g => `<option value="${g.gpa}" ${Math.abs(g.gpa - defaultGrade) < 0.01 ? 'selected' : ''}>${g.grade} (${g.gpa})</option>`).join('')}
+                ${GRADE_SCALE
+                    .filter(g => !['A+', 'A', 'B+', 'B'].includes(g.grade))
+                    .map(g => `<option value="${g.gpa}" ${Math.abs(g.gpa - defaultGrade) < 0.01 ? 'selected' : ''}>${g.grade} (${g.gpa})</option>`).join('')}
             </select>
         </div>
         <div class="input-group flex-nowrap" style="width: 90px; flex-shrink: 0;">

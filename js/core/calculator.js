@@ -57,21 +57,27 @@ export function calculateManualGPA(semesters, initialGPA, initialCredits) {
             const gpa = gradeInfo ? gradeInfo.gpa : 0;
             const credits = parseFloat(course.credits) || 0;
 
-            // Add current course - F grades don't count towards total credits
-            totalPoints += gpa * credits;
-            if (gpa > 0) {
-                totalCredits += credits;
-            }
-
-            // Handle Retake Logic
+            // Handle Retake Logic (Improvement)
             if (course.isRetake) {
                 const oldGradeInfo = GRADE_SCALE.find(g => g.grade === course.oldGrade);
                 const oldGpa = oldGradeInfo ? oldGradeInfo.gpa : 0;
                 
-                // Subtract old course effect - only if old grade was passing
-                totalPoints -= oldGpa * credits;
-                if (oldGpa > 0) {
-                    totalCredits -= credits;
+                // "Điểm cao hơn trong các lần học là điểm chính thức của học phần"
+                // Only update if the new grade is strictly better than the old one
+                if (gpa > oldGpa) {
+                    totalPoints += (gpa - oldGpa) * credits;
+                    
+                    // If it was an F (0 credits counted) and now it's a pass
+                    if (oldGpa === 0 && gpa > 0) {
+                        totalCredits += credits;
+                    }
+                }
+                // If gpa <= oldGpa, the official grade remains the old one, no change to totals
+            } else {
+                // Regular course (first attempt)
+                totalPoints += gpa * credits;
+                if (gpa > 0) {
+                    totalCredits += credits;
                 }
             }
         });
@@ -97,9 +103,13 @@ export function generateRetakeSuggestions(deficitPoints, targetGPA, manualSemest
     
     manualSemesters.forEach(sem => {
         sem.courses.forEach(course => {
-            // Skip if grade is A or A+ (GPA 4.0)
+            // "Sinh viên được đăng ký học lại để cải thiện điểm (trừ học phần đã được điểm A, B+, B)"
             const gradeInfo = GRADE_SCALE.find(g => g.grade === course.grade);
-            if (!gradeInfo || gradeInfo.gpa >= 4.0) return;
+            if (!gradeInfo) return;
+
+            // Skip if grade is A, A+, B+, or B
+            const nonImprovable = ['A+', 'A', 'B+', 'B'];
+            if (nonImprovable.includes(gradeInfo.grade)) return;
             
             // Skip if ignored (name contains *)
             if (course.name && course.name.includes('*')) return;

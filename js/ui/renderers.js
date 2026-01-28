@@ -57,21 +57,23 @@ export function renderManualSemesters() {
             const gpa = gradeInfo ? gradeInfo.gpa : 0;
             const credits = parseFloat(course.credits) || 0;
 
-            // Add current course
-            runningTotalPoints += gpa * credits;
-            if (gpa > 0) {
-                runningTotalCredits += credits;
-            }
-
-            // Handle Retake Logic
             if (course.isRetake) {
                 const oldGradeInfo = GRADE_SCALE.find(g => g.grade === course.oldGrade);
                 const oldGpa = oldGradeInfo ? oldGradeInfo.gpa : 0;
                 
-                // Subtract old course effect
-                runningTotalPoints -= oldGpa * credits;
-                if (oldGpa > 0) {
-                    runningTotalCredits -= credits;
+                // "Điểm cao hơn trong các lần học là điểm chính thức của học phần"
+                if (gpa > oldGpa) {
+                    runningTotalPoints += (gpa - oldGpa) * credits;
+                    
+                    if (oldGpa === 0 && gpa > 0) {
+                        runningTotalCredits += credits;
+                    }
+                }
+            } else {
+                // Add current course
+                runningTotalPoints += gpa * credits;
+                if (gpa > 0) {
+                    runningTotalCredits += credits;
                 }
             }
         });
@@ -191,7 +193,9 @@ export function renderManualSemesters() {
                                                 <select class="form-select form-select-xs manual-input" style="font-size: 0.75rem; padding: 2px;"
                                                     data-sem-id="${sem.id}" data-course-id="${course.id}" data-field="oldGrade">
                                                     <option value="" disabled>Điểm cũ</option>
-                                                    ${GRADE_SCALE.map(g => `<option value="${g.grade}" ${course.oldGrade === g.grade ? 'selected' : ''}>${g.grade}</option>`).join('')}
+                                                    ${GRADE_SCALE
+                                                        .filter(g => !['A+', 'A', 'B+', 'B'].includes(g.grade))
+                                                        .map(g => `<option value="${g.grade}" ${course.oldGrade === g.grade ? 'selected' : ''}>${g.grade}</option>`).join('')}
                                                 </select>
                                             ` : ''}
                                         </div>
