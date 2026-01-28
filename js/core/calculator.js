@@ -310,6 +310,34 @@ export function generateGradeCombinations(credits, targetPoints) {
     return combinations.sort((a, b) => a.totalPoints - b.totalPoints);
 }
 
+/**
+ * Tạo kịch bản điểm số dễ hiểu (số môn)
+ */
+export function generateScenarioText(combination) {
+    if (!combination) return null;
+    
+    const { g1, c1, g2, c2 } = combination;
+    
+    // Giả định trung bình 1 môn là 3 tín chỉ
+    const AVG_CREDITS_PER_COURSE = 3;
+    
+    const textParts = [];
+    
+    if (c1 > 0) {
+        const num1 = Math.round(c1 / AVG_CREDITS_PER_COURSE) || 1;
+        textParts.push(`<span class="fw-bold text-primary">${num1} môn ${g1.grade}</span>`);
+    }
+    
+    if (c2 > 0) {
+        const num2 = Math.round(c2 / AVG_CREDITS_PER_COURSE) || 1;
+        textParts.push(`<span class="fw-bold text-primary">${num2} môn ${g2.grade}</span>`);
+    }
+    
+    if (textParts.length === 0) return "Duy trì phong độ hiện tại.";
+    
+    return `Bạn cần đạt khoảng ${textParts.join(' và ')} trong các học kỳ tới.`;
+}
+
 function getGradeColor(grade) {
     if (grade.startsWith('A')) return 'success';
     if (grade.startsWith('B')) return 'primary';

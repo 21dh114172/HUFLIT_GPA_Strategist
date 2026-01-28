@@ -1,44 +1,101 @@
 import { GRADE_SCALE } from '../core/constants.js';
-import { calculateYearlyStats, getYearInfo } from '../core/calculator.js';
-import { getManualState } from '../state/store.js';
+import { calculateYearlyStats, getYearInfo, calculateManualGPA } from '../core/calculator.js';
+import { getManualState, getTargetState } from '../state/store.js';
 
 export function initGradeScaleTab() {
     const tableBody = document.getElementById('grade-scale-table-body');
-    if (!tableBody) return;
+    const classificationBody = document.getElementById('classification-table-body');
+    if (!tableBody && !classificationBody) return;
 
-    const html = GRADE_SCALE.map(item => {
-        let badgeColor = 'bg-secondary';
-        let rank = 'Kém';
-        let rowClass = '';
+    const { semesters, initialGpa: manualGpa, initialCredits: manualCredits } = getManualState();
+    const { gpa: manualCalcGpa } = calculateManualGPA(semesters, parseFloat(manualGpa) || 0, parseFloat(manualCredits) || 0);
+    
+    const targetState = getTargetState();
+    const targetTabGpa = parseFloat(targetState.currentGpa) || 0;
+    
+    // Choose the GPA to highlight (Preferred: Manual tab if it has credits)
+    const totalManualCredits = semesters.reduce((sum, sem) => sum + sem.courses.reduce((s, c) => s + (parseFloat(c.credits) || 0), 0), 0) + (parseFloat(manualCredits) || 0);
+    
+    let currentGPA = 0;
+    let hasData = false;
 
-        if (item.grade.startsWith('A')) { badgeColor = 'bg-success'; rank = 'Xuất sắc'; rowClass = 'table-success'; }
-        else if (item.grade.startsWith('B')) { badgeColor = 'bg-primary'; rank = 'Giỏi'; }
-        else if (item.grade.startsWith('C')) { badgeColor = 'bg-info text-dark'; rank = 'Khá'; }
-        else if (item.grade.startsWith('D')) { badgeColor = 'bg-warning text-dark'; rank = 'Trung bình'; }
-        else { badgeColor = 'bg-danger'; rank = 'Kém'; rowClass = 'table-danger'; }
+    if (totalManualCredits > 0) {
+        currentGPA = parseFloat(manualCalcGpa.toFixed(2));
+        hasData = true;
+    } else if (targetTabGpa > 0) {
+        currentGPA = parseFloat(targetTabGpa.toFixed(2));
+        hasData = true;
+    }
 
-        // Modern, minimal row design
-        return `
-            <tr class="align-middle">
-                <td class="ps-4 py-3">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="rounded-4 d-flex align-items-center justify-content-center text-white fw-bold shadow-sm ${badgeColor}" 
-                             style="width: 40px; height: 40px; font-size: 1.1rem;">
-                            ${item.grade}
+    // 1. Render Classification Table
+    if (classificationBody) {
+        const classifications = [
+            { label: 'Xuất sắc', min: 3.60, max: 4.00, color: 'success' },
+            { label: 'Giỏi', min: 3.20, max: 3.59, color: 'primary' },
+            { label: 'Khá', min: 2.50, max: 3.19, color: 'info' },
+            { label: 'Trung bình', min: 2.00, max: 2.49, color: 'warning' },
+            { label: 'Yếu', min: 1.00, max: 1.99, color: 'secondary' },
+            { label: 'Kém', min: 0.00, max: 0.99, color: 'danger' }
+        ];
+
+        classificationBody.innerHTML = classifications.map(c => {
+            const isActive = hasData && currentGPA >= c.min && currentGPA <= (c.max + 0.001);
+            const rowClass = isActive ? `table-${c.color} animate-pulse shadow-sm` : '';
+            const badge = isActive ? `<span class="badge bg-white text-${c.color} ms-2 px-2 py-1 border border-${c.color} shadow-sm" style="font-size: 0.7rem; font-weight: 800;">BẠN ĐANG Ở ĐÂY <i class="bi bi-geo-alt-fill"></i></span>` : '';
+            
+            let textColorClass = `text-${c.color}`;
+            if (c.color === 'info' || c.color === 'warning') textColorClass += '-emphasis';
+
+            return `
+                <tr class="transition-all ${rowClass}">
+                    <td class="ps-4 py-3 fw-bold ${textColorClass}">${c.label}${badge}</td>
+                    <td class="text-end pe-4 small text-secondary fw-medium">${c.min.toFixed(2)} - ${c.max.toFixed(2)}</td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    // 2. Render Credit Grade Scale Table
+    if (tableBody) {
+        const scaleData = [
+            { grade: 'A+', h10: '9.0 - 10', gpa: 4.0, color: 'success' },
+            { grade: 'A', h10: '8.5 - 8.9', gpa: 4.0, color: 'success' },
+            { grade: 'B+', h10: '8.0 - 8.4', gpa: 3.5, color: 'primary' },
+            { grade: 'B', h10: '7.0 - 7.9', gpa: 3.0, color: 'primary' },
+            { grade: 'C+', h10: '6.0 - 6.9', gpa: 2.5, color: 'info' },
+            { grade: 'C', h10: '5.5 - 5.9', gpa: 2.0, color: 'info' },
+            { grade: 'D+', h10: '5.0 - 5.4', gpa: 1.5, color: 'warning' },
+            { grade: 'D', h10: '4.0 - 4.9', gpa: 1.0, color: 'warning' },
+            { grade: 'F', h10: '< 4.0', gpa: 0, color: 'danger' }
+        ];
+
+        tableBody.innerHTML = scaleData.map((item, index) => {
+            let isActive = false;
+            if (hasData) {
+                if (index === 0) isActive = currentGPA === 4.0;
+                else {
+                    const prevGpa = scaleData[index-1].gpa;
+                    isActive = currentGPA >= item.gpa && currentGPA < prevGpa;
+                }
+            }
+
+            const rowClass = isActive ? `table-${item.color} animate-pulse shadow-sm` : '';
+            const highlightBadge = isActive ? `<span class="badge bg-white text-${item.color} ms-2 px-2 py-1 border border-${item.color} shadow-sm" style="font-size: 0.65rem; font-weight: 800;">MỨC HIỆN TẠI</span>` : '';
+
+            return `
+                <tr class="align-middle ${rowClass} transition-all">
+                    <td class="ps-4 py-3">
+                        <div class="d-flex align-items-center gap-2">
+                             <span class="fw-bold text-${item.color}">${item.grade}</span>
+                             ${highlightBadge}
                         </div>
-                        <div class="d-flex flex-column">
-                            <span class="fw-bold text-dark">${item.min.toFixed(1)} - ${item.max.toFixed(1)}</span>
-                        </div>
-                    </div>
-                </td>
-                <td class="text-end pe-4">
-                    <span class="fw-bold text-primary fs-5">${item.gpa.toFixed(1)}</span>
-                </td>
-            </tr>
-        `;
-    }).join('');
-
-    tableBody.innerHTML = html;
+                    </td>
+                    <td class="text-center small text-secondary fw-medium">${item.h10}</td>
+                    <td class="text-end pe-4 fw-bold text-primary">${item.gpa.toFixed(1)}</td>
+                </tr>
+            `;
+        }).join('');
+    }
 }
 
 export function renderManualSemesters() {
@@ -130,7 +187,7 @@ export function renderManualSemesters() {
         }
         
         return `
-        <div class="card shadow-sm mb-3">
+        <div class="card shadow-sm mb-3 ani-fade-in-up hover-translate-y" style="animation-delay: ${index * 0.1}s">
             <div class="card-header bg-white d-flex justify-content-between align-items-center">
                 <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-2">
                     <span class="fw-bold">${sem.name}</span>

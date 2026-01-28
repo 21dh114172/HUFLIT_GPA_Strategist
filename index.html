@@ -177,8 +177,8 @@
             <div class="tab-pane fade show active" id="pills-target" role="tabpanel" tabindex="0">
                 <div class="row g-4">
                     <!-- Left Column: Inputs -->
-                    <div class="col-lg-5 col-xxl-4">
-                        <div class="card shadow-sm border-0 h-100">
+                    <div class="col-lg-5 col-xxl-4 ani-fade-in-up delay-100">
+                        <div class="card shadow-sm border-0 h-100 hover-translate-y">
                             <div class="card-header bg-white border-bottom-0 pt-4 pb-2">
                                 <h5 class="card-title fw-bold text-primary mb-0"><i class="bi bi-input-cursor-text me-2"></i>Thông tin hiện tại</h5>
                                 <p class="text-muted small mt-1 mb-0">Nhập điểm số hiện tại và mục tiêu của bạn</p>
@@ -284,8 +284,8 @@
                     </div>
 
                     <!-- Right Column: Results -->
-                    <div class="col-lg-7 col-xxl-8">
-                        <div class="card shadow-sm border-0 h-100">
+                    <div class="col-lg-7 col-xxl-8 ani-fade-in-up delay-200">
+                        <div class="card shadow-sm border-0 h-100 hover-translate-y">
                             <div class="card-header bg-white border-bottom-0 pt-4 pb-2">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
@@ -313,8 +313,8 @@
             <div class="tab-pane fade" id="pills-manual" role="tabpanel" tabindex="0">
                 <div class="row g-4">
                     <!-- Left Column: Summary (Sticky) -->
-                    <div class="col-lg-4 col-xxl-3 order-last order-lg-first">
-                        <div class="card shadow-sm border-primary sticky-lg-top" style="top: 90px; z-index: 100;">
+                    <div class="col-lg-4 col-xxl-3 order-last order-lg-first ani-fade-in-up delay-200">
+                        <div class="card shadow-sm border-primary sticky-lg-top hover-translate-y" style="top: 90px; z-index: 100;">
                             <div class="card-header bg-primary text-white">
                                 <h5 class="card-title mb-0"><i class="bi bi-calculator me-2"></i>Tổng kết</h5>
                             </div>
@@ -361,7 +361,7 @@
                     </div>
 
                     <!-- Right Column: Semester List -->
-                    <div class="col-lg-8 col-xxl-9 order-first order-lg-last">
+                    <div class="col-lg-8 col-xxl-9 order-first order-lg-last ani-fade-in-up delay-100">
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <h5 class="fw-bold text-primary mb-0">Danh sách học kỳ</h5>
                             <button class="btn btn-success btn-sm shadow-sm" data-bs-toggle="modal" data-bs-target="#importModal">
@@ -384,8 +384,8 @@
             <div class="tab-pane fade" id="pills-course" role="tabpanel" tabindex="0">
                 <div class="row g-3">
                     <!-- Left Column: Controls -->
-                    <div class="col-lg-5">
-                        <div class="card shadow-sm border-0">
+                    <div class="col-lg-5 ani-fade-in-up delay-100">
+                        <div class="card shadow-sm border-0 hover-translate-y">
                             <div class="card-header bg-white border-bottom-0 pt-3 pb-2">
                                 <h5 class="card-title fw-bold text-primary mb-0"><i class="bi bi-sliders me-2"></i>Cấu hình môn học</h5>
                                 <p class="text-muted small mt-1 mb-0">Nhập điểm quá trình và chọn tỷ lệ</p>
@@ -449,8 +449,8 @@
                     </div>
         
                     <!-- Right Column: Results -->
-                    <div class="col-lg-7">
-                        <div class="card shadow-sm border-0">
+                    <div class="col-lg-7 ani-fade-in-up delay-200">
+                        <div class="card shadow-sm border-0 hover-translate-y">
                             <div class="card-header bg-white border-bottom-0 pt-3 pb-2">
                                 <h5 class="card-title fw-bold text-primary mb-0"><i class="bi bi-bullseye me-2"></i>Mục tiêu điểm thi</h5>
                                 <p class="text-muted small mt-1 mb-0">Điểm cần đạt cho từng mức điểm tổng kết</p>
@@ -484,11 +484,11 @@
                 
                 <div class="row g-4">
                     <!-- Left Column: Grade Scale & Classification -->
-                    <div class="col-lg-5 order-last order-lg-first">
+                    <div class="col-lg-5 order-last order-lg-first ani-fade-in-up delay-200">
                         
                         <div class="d-flex flex-column gap-4" id="scale-list-container">
                             <!-- 1. Xếp loại Học lực (Moved to top) -->
-                            <div class="card shadow-sm border-0 scale-card position-relative" id="scale-item-classification">
+                            <div class="card shadow-sm border-0 scale-card position-relative hover-translate-y" id="scale-item-classification">
                                 <div class="scale-sort-controls position-absolute top-0 end-0 m-2 d-none gap-1 bg-white rounded shadow-sm p-1 z-3">
                                     <button class="btn btn-sm btn-light border btn-move-up" title="Lên"><i class="bi bi-chevron-up"></i></button>
                                     <button class="btn btn-sm btn-light border btn-move-down" title="Xuống"><i class="bi bi-chevron-down"></i></button>
@@ -506,7 +506,7 @@
                                                 <th class="text-end pe-4">GPA</th>
                                             </tr>
                                         </thead>
-                                        <tbody class="border-top-0">
+                                        <tbody class="border-top-0" id="classification-table-body">
                                             <tr>
                                                 <td class="ps-4 fw-bold text-success">Xuất sắc</td>
                                                 <td class="text-end pe-4 small text-secondary fw-medium">3.60 - 4.00</td>
@@ -538,7 +538,7 @@
                         </div>
 
                         <!-- 2. Thang điểm Tín chỉ -->
-                        <div class="card shadow-sm border-0 flex-grow-1 scale-card position-relative" id="scale-item-grade-scale">
+                        <div class="card shadow-sm border-0 flex-grow-1 scale-card position-relative hover-translate-y" id="scale-item-grade-scale">
                              <div class="scale-sort-controls position-absolute top-0 end-0 m-2 d-none gap-1 bg-white rounded shadow-sm p-1 z-3">
                                 <button class="btn btn-sm btn-light border btn-move-up" title="Lên"><i class="bi bi-chevron-up"></i></button>
                                 <button class="btn btn-sm btn-light border btn-move-down" title="Xuống"><i class="bi bi-chevron-down"></i></button>
@@ -557,7 +557,7 @@
                                                 <th class="text-end pe-4">GPA</th>
                                             </tr>
                                         </thead>
-                                        <tbody class="border-top-0">
+                                        <tbody class="border-top-0" id="grade-scale-table-body">
                                             <tr>
                                                 <td class="ps-4 fw-bold text-success">A+</td>
                                                 <td class="text-center small text-secondary fw-medium">9.0 - 10</td>
@@ -610,7 +610,7 @@
                         </div>
 
                         <!-- 3. Thang xếp loại điểm rèn luyện -->
-                        <div class="card shadow-sm border-0 flex-grow-1 scale-card position-relative" id="scale-item-training-point">
+                        <div class="card shadow-sm border-0 flex-grow-1 scale-card position-relative hover-translate-y" id="scale-item-training-point">
                             <div class="scale-sort-controls position-absolute top-0 end-0 m-2 d-none gap-1 bg-white rounded shadow-sm p-1 z-3">
                                 <button class="btn btn-sm btn-light border btn-move-up" title="Lên"><i class="bi bi-chevron-up"></i></button>
                                 <button class="btn btn-sm btn-light border btn-move-down" title="Xuống"><i class="bi bi-chevron-down"></i></button>
@@ -798,8 +798,8 @@
                 </div> <!-- End col-lg-5 -->
 
                     <!-- Right Column: Schedule (Full Height) -->
-                    <div class="col-lg-7 order-first order-lg-last">
-                        <div class="card shadow-sm border-0 d-none d-lg-block">
+                    <div class="col-lg-7 order-first order-lg-last ani-fade-in-up delay-100">
+                        <div class="card shadow-sm border-0 d-none d-lg-block hover-translate-y">
                             <div class="card-header bg-white border-bottom-0 pt-4 pb-2">
                                 <h5 class="card-title fw-bold text-primary mb-0"><i class="bi bi-calendar-week me-2"></i>Thời gian biểu</h5>
                                 <p class="text-muted small mt-1 mb-0">Lịch học chi tiết theo tiết</p>
@@ -945,10 +945,18 @@
                                 <h4 class="fw-bold text-primary mb-0 lh-sm" style="font-size: clamp(1.1rem, 4vw, 1.5rem);">Tin tức & Thông báo</h4>
                              </div>
                         </div>
+
+                        <!-- News Filter Buttons -->
+                        <div class="d-flex flex-wrap gap-2 mb-4 news-filters">
+                            <button class="btn btn-sm btn-primary rounded-pill px-3 filter-btn active" data-filter="all">Tất cả</button>
+                            <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 filter-btn" data-filter="announcement">Thông báo</button>
+                            <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 filter-btn" data-filter="handbook">Tài liệu</button>
+                            <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 filter-btn" data-filter="calendar">Kế hoạch</button>
+                        </div>
                         
                         <div class="news-bento-grid">
                             <!-- Item 1: Holiday (Large) -->
-                            <div class="bento-item item-large" id="bento-holiday">
+                            <div class="bento-item item-large news-card" data-category="announcement" id="bento-holiday">
                                 <div class="bento-img-container">
                                     <img src="assets/images/NghiTet.jpg" class="news-image clickable-image" 
                                          alt="Kế hoạch Nghỉ Tết" data-bs-toggle="modal" 
@@ -965,7 +973,7 @@
                             </div>
 
                             <!-- Item 2: Announcement (Medium) -->
-                            <div class="bento-item" id="bento-announcement">
+                            <div class="bento-item news-card" data-category="announcement" id="bento-announcement">
                                 <div class="bento-content">
                                     <div class="mb-2">
                                         <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-1 fw-bold">Thông báo</span>
@@ -973,7 +981,7 @@
                                     </div>
                                     <h5 class="bento-title">
                                         <a href="https://portal.huflit.edu.vn/News/Detail/3794/Thong-bao-ve-viec-to-chuc-hoat-dong-ren-luyen-hoc-ky-2-nam-hoc-2025-2026" 
-                                           target="_blank" class="text-decoration-none text-dark stretched-link">
+                                           target="_blank" rel="noopener noreferrer" class="text-decoration-none text-dark stretched-link">
                                            Tổ chức hoạt động rèn luyện
                                         </a>
                                     </h5>
@@ -984,7 +992,7 @@
                             </div>
                 
                             <!-- Item 3: Handbook (Medium) -->
-                            <div class="bento-item" id="bento-handbook">
+                            <div class="bento-item news-card" data-category="handbook" id="bento-handbook">
                                 <div class="bento-content h-100 d-flex flex-column">
                                     <div class="mb-2">
                                         <span class="badge bg-info-subtle text-info-emphasis rounded-pill px-3 py-1 fw-bold">Tài liệu</span>
@@ -1009,12 +1017,25 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- Info Alert -->
-                        <div class="alert alert-light border mt-4 small text-secondary">
-                            <i class="bi bi-info-circle me-2"></i>
-                            Thông tin được cập nhật từ website và Portal chính thức của HUFLIT.
+                            <!-- Item 4: Academic Calendar (Medium) -->
+                            <div class="bento-item news-card" data-category="calendar" id="bento-calendar">
+                                <div class="bento-content h-100 d-flex flex-column">
+                                    <div class="mb-2">
+                                        <span class="badge bg-success-subtle text-success rounded-pill px-3 py-1 fw-bold">Kế hoạch</span>
+                                        <span class="text-muted small ms-2"><i class="bi bi-calendar3 me-1"></i>2025 - 2026</span>
+                                    </div>
+                                    <h5 class="bento-title">Biểu đồ Kế hoạch năm học</h5>
+                                    <p class="bento-desc mb-3">
+                                        Lịch học tập, thời gian đăng ký môn học và các mốc thời gian quan trọng trong năm học 2025-2026 dành cho sinh viên.
+                                    </p>
+                                    <div class="mt-auto">
+                                        <a href="assets/images/Biểu đồ KH năm học 25 26 (18.12.2025).pdf" target="_blank" class="btn btn-sm btn-outline-success w-100 rounded-pill fw-medium">
+                                            <i class="bi bi-file-earmark-pdf-fill me-1"></i>Xem file PDF
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

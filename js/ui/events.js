@@ -1,7 +1,8 @@
 import { GRADE_SCALE, IMGUR_CLIENT_ID } from '../core/constants.js';
 import { getManualState, setManualState, addManualSemester, removeManualSemester, updateManualCourse, addManualCourse, removeManualCourse, loadManualStateFromStorage, getTargetState, setTargetState, loadTargetStateFromStorage, subscribe } from '../state/store.js';
-import { calculateManualGPA, calculateTargetResult, generateRetakeSuggestions, generateGradeCombinations } from '../core/calculator.js';
+import { calculateManualGPA, calculateTargetResult, generateRetakeSuggestions, generateGradeCombinations, generateScenarioText } from '../core/calculator.js';
 import { renderManualSemesters } from './renderers.js';
+import { animateValue } from './effects.js';
 import { parsePortalText } from '../core/utils.js';
 import { generateShareUrl } from '../core/share.js';
 
@@ -371,7 +372,8 @@ function updateManualCalculationDisplay() {
     const manualRankDisplay = document.getElementById('manual-rank');
 
     if (manualGpaDisplay) {
-        manualGpaDisplay.textContent = gpa.toFixed(2);
+        const currentVal = parseFloat(manualGpaDisplay.textContent) || 0;
+        animateValue(manualGpaDisplay, currentVal, gpa, 800, 2);
         manualGpaDisplay.className = `display-1 fw-bold mb-2 ${gpa >= 3.2 ? 'text-success' : (gpa >= 2.5 ? 'text-primary' : 'text-danger')}`;
     }
     if (manualCreditsDisplay) manualCreditsDisplay.textContent = totalCredits;
@@ -596,8 +598,9 @@ export function initTargetGPATab() {
                 statusBadgeClass = 'bg-warning-subtle text-warning-emphasis border-warning-subtle';
             }
 
-            // 2. Generate Combinations
+            // 2. Generate Combinations & Scenario
             let combinationsHTML = '';
+            let scenarioHTML = '';
             let displayedCount = 0;
             let totalCount = 0;
             
@@ -608,6 +611,22 @@ export function initTargetGPATab() {
                 displayedCount = topCombinations.length;
                 
                 if (totalCount > 0) {
+                    // Generate Scenario Text from the first (easiest/closest) combination
+                    const scenarioText = generateScenarioText(topCombinations[0]);
+                    scenarioHTML = `
+                        <div class="alert alert-primary border-0 shadow-sm rounded-3 mb-4 py-3 ani-fade-in-up">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-primary text-white rounded-circle me-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 40px; height: 40px;">
+                                    <i class="bi bi-lightbulb-fill"></i>
+                                </div>
+                                <div>
+                                    <h6 class="fw-bold mb-1">Kịch bản gợi ý</h6>
+                                    <p class="mb-0 small">${scenarioText}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
                     combinationsHTML = topCombinations.map(c => `
                         <div class="bg-light rounded-3 p-2 p-md-3 border transition-all">
                             <div class="d-flex justify-content-between align-items-center mb-2">
@@ -653,8 +672,8 @@ export function initTargetGPATab() {
                         <i class="bi ${statusIcon} fs-2"></i>
                     </div>
                     <h6 class="text-uppercase text-secondary fw-bold small letter-spacing-1 mb-2">GPA Trung bình cần đạt</h6>
-                    <div class="display-1 fw-bold text-${statusColor}-emphasis mb-2" style="letter-spacing: -2px;">
-                        ${result.requiredGPA > 0 ? result.requiredGPA.toFixed(2) : (result.requiredGPA <= 0 && result.requiredPoints <= 0.01 ? 'Đạt' : '---')}
+                    <div class="display-1 fw-bold text-${statusColor}-emphasis mb-2" id="animated-required-gpa" style="letter-spacing: -2px;">
+                        0.00
                     </div>
                     <p class="text-muted fw-medium mb-0">cho <span class="fw-bold text-dark">${creditsToStudy}</span> tín chỉ tiếp theo</p>
                     <div class="mt-3">
@@ -664,8 +683,10 @@ export function initTargetGPATab() {
                     </div>
                 </div>
 
+                ${scenarioHTML}
+
                 ${result.requiredGPA > 0 && result.requiredGPA <= 4.0 ? `
-                <div class="px-2 px-md-3 pb-3 bg-white border-top mt-4">
+                <div class="px-2 px-md-3 pb-3 bg-white border-top mt-2">
                     <div class="pt-3 mb-3 d-flex align-items-center justify-content-between">
                         <p class="small fw-bold text-secondary text-uppercase mb-0 d-flex align-items-center">
                             <i class="bi bi-layers me-2"></i>Các phương án khả thi
@@ -805,6 +826,20 @@ export function initTargetGPATab() {
                             </div>
                         </div>
                     `;
+                }
+            }
+
+            // Hiệu ứng "Count-up" cho GPA trung bình cần đạt
+            const gpaTargetEl = document.getElementById('animated-required-gpa');
+            if (gpaTargetEl) {
+                const targetValue = result.requiredGPA > 0 ? result.requiredGPA : 0;
+                // Nếu giá trị > 0 mới chạy hiệu ứng, nếu là "Đạt" hoặc "---" thì đã set ở HTML
+                if (result.requiredGPA > 0) {
+                    animateValue(gpaTargetEl, 0, targetValue, 1200, 2);
+                } else if (result.requiredGPA <= 0 && result.requiredPoints <= 0.01) {
+                    gpaTargetEl.innerHTML = 'Đạt';
+                } else {
+                    gpaTargetEl.innerHTML = '---';
                 }
             }
         }
@@ -1477,6 +1512,38 @@ function escapeHtml(text) {
 // ==========================================
 
 export function initNewsTab() {
+    // News Filter Logic
+    const filterBtns = document.querySelectorAll('.news-filters .filter-btn');
+    const newsCards = document.querySelectorAll('.news-card');
+
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const filter = btn.dataset.filter;
+            
+            // Update UI: Active Button
+            filterBtns.forEach(b => {
+                b.classList.replace('btn-primary', 'btn-outline-secondary');
+                b.classList.remove('active');
+            });
+            btn.classList.replace('btn-outline-secondary', 'btn-primary');
+            btn.classList.add('active');
+
+            // Apply Filter
+            newsCards.forEach(card => {
+                const category = card.dataset.category;
+                if (filter === 'all' || category === filter) {
+                    card.style.display = 'flex';
+                    // Re-trigger animation
+                    card.style.animation = 'none';
+                    card.offsetHeight; // force reflow
+                    card.style.animation = null;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    });
+
     // Handbook Lazy Load
     const loadHandbookBtn = document.getElementById('load-handbook-btn');
     const handbookPlaceholder = document.getElementById('handbook-placeholder');

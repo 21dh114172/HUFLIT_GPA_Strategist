@@ -1,45 +1,36 @@
 export function initSnowEffect() {
     // Disabled
-    /*
-    const snowContainer = document.createElement('div');
-    snowContainer.id = 'snow-container';
-    document.body.appendChild(snowContainer);
+}
 
-    const maxSnowflakes = 50;
-    const snowflakes = [];
-
-    function createSnowflake() {
-        if (snowflakes.length >= maxSnowflakes) return;
-
-        const snowflake = document.createElement('div');
-        snowflake.classList.add('snowflake');
-        snowflake.innerHTML = '❄';
+/**
+ * Hiệu ứng chạy số tự động từ giá trị cũ đến giá trị mới
+ * @param {HTMLElement} element - Phần tử chứa số
+ * @param {number} start - Giá trị bắt đầu
+ * @param {number} end - Giá trị kết thúc
+ * @param {number} duration - Thời gian chạy (ms)
+ * @param {number} decimals - Số chữ số thập phân
+ */
+export function animateValue(element, start, end, duration = 1000, decimals = 2) {
+    if (!element) return;
+    
+    let startTimestamp = null;
+    const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        const value = progress * (end - start) + start;
         
-        const startX = Math.random() * window.innerWidth;
-        const duration = Math.random() * 3 + 2; // 2-5 seconds
-        const size = Math.random() * 10 + 10; // 10-20px
-        const opacity = Math.random() * 0.5 + 0.3;
-
-        snowflake.style.left = `${startX}px`;
-        snowflake.style.animationDuration = `${duration}s`;
-        snowflake.style.fontSize = `${size}px`;
-        snowflake.style.opacity = opacity;
-
-        snowContainer.appendChild(snowflake);
-        snowflakes.push(snowflake);
-
-        // Remove snowflake after animation
-        setTimeout(() => {
-            snowflake.remove();
-            const index = snowflakes.indexOf(snowflake);
-            if (index > -1) {
-                snowflakes.splice(index, 1);
-            }
-        }, duration * 1000);
-    }
-
-    setInterval(createSnowflake, 200);
-    */
+        // Format based on value
+        if (isNaN(value)) {
+            element.innerHTML = end;
+            return;
+        }
+        
+        element.innerHTML = value.toFixed(decimals);
+        if (progress < 1) {
+            window.requestAnimationFrame(step);
+        }
+    };
+    window.requestAnimationFrame(step);
 }
 
 export function initChristmasTreeInteraction() {

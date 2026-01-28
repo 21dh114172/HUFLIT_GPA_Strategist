@@ -1,7 +1,7 @@
 import { initCourseGradeTab, initTargetGPATab, initManualCalcTab, initContactButton, initThemeToggle, initUserGuide, fetchVisitCount, initFeedbackForm, initNewsTab, initGradeScaleSort } from './ui/events.js';
 import { initGradeScaleTab } from './ui/renderers.js';
 import { decodeState } from './core/share.js';
-import { setTargetState } from './state/store.js';
+import { setTargetState, subscribe } from './state/store.js';
 
 
 console.log("HUFLIT GPA Strategist loaded (Modular).");
@@ -28,6 +28,11 @@ document.addEventListener('DOMContentLoaded', () => {
     initNewsTab();
     initGradeScaleSort();
     fetchVisitCount();
+
+    // Re-render scale tab when state changes (to update highlight)
+    subscribe(() => {
+        initGradeScaleTab();
+    });
 
     // Auto-calculate if shared data is present
     if (sharedData) {
