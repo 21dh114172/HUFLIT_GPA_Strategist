@@ -12,25 +12,36 @@ export function initSnowEffect() {
  */
 export function animateValue(element, start, end, duration = 1000, decimals = 2) {
     if (!element) return;
-    
+
     let startTimestamp = null;
     const step = (timestamp) => {
         if (!startTimestamp) startTimestamp = timestamp;
         const progress = Math.min((timestamp - startTimestamp) / duration, 1);
         const value = progress * (end - start) + start;
-        
+
         // Format based on value
         if (isNaN(value)) {
             element.innerHTML = end;
             return;
         }
-        
+
         element.innerHTML = value.toFixed(decimals);
         if (progress < 1) {
             window.requestAnimationFrame(step);
         }
     };
     window.requestAnimationFrame(step);
+}
+
+/**
+ * Kích hoạt rung phản hồi (Haptic Feedback) trên thiết bị di động
+ * @param {number} duration - Thời gian rung (ms), mặc định 10ms (rung nhẹ)
+ */
+export function triggerHapticFeedback(duration = 10) {
+    // Chỉ rung nếu thiết bị hỗ trợ và người dùng đang thao tác
+    if (navigator.vibrate) {
+        navigator.vibrate(duration);
+    }
 }
 
 export function initChristmasTreeInteraction() {

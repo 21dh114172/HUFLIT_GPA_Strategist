@@ -25,8 +25,11 @@
         content="Công cụ tối ưu giúp sinh viên HUFLIT tính GPA, dự đoán điểm cần đạt và gợi ý môn học lại thông minh.">
     <meta property="twitter:image" content="assets/images/ava.jpg">
 
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <link rel="icon" type="image/jpeg" sizes="192x192" href="assets/images/ava.jpg">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
+      <rect width='100' height='100' rx='25' fill='black'/>
+      <text x='50%' y='68%' font-family='sans-serif' font-size='60' font-weight='800' fill='white' text-anchor='middle'>D</text>
+      <path d='M80 20 L83 28 L91 31 L83 34 L80 42 L77 34 L69 31 L77 28 Z' fill='%23fef08a'/>
+    </svg>">
     <link rel="apple-touch-icon" href="assets/images/ava.jpg">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0d6efd">
@@ -69,7 +72,7 @@
 <body>
 
     <!-- Header: Sticky Navbar -->
-    <nav class="navbar navbar-expand-md navbar-light fixed-top bg-white shadow-sm">
+    <nav class="navbar navbar-expand-md navbar-light fixed-top shadow-sm">
         <div class="container">
             <a class="navbar-brand fw-bold text-primary" href="#">
                 <i class="bi bi-mortarboard-fill me-2"></i>
@@ -93,23 +96,29 @@
 
                 <!-- Desktop Menu (Hidden on Mobile) -->
                 <div class="d-none d-lg-flex align-items-center">
-                    <ul class="nav nav-pills" id="pills-tab" role="tablist">
+                    <ul class="nav nav-pills flex-nowrap" id="pills-tab" role="tablist">
                         <li class="nav-item" role="presentation">
                             <button class="nav-link active" id="pills-target-tab" data-bs-toggle="pill"
                                 data-bs-target="#pills-target" type="button" role="tab">
-                                <i class="bi bi-graph-up-arrow me-1"></i> Lộ trình GPA
+                                <i class="bi bi-graph-up-arrow me-1"></i>
+                                <span class="d-none d-xl-inline">Lộ trình GPA</span>
+                                <span class="d-inline d-xl-none">Lộ trình</span>
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link" id="pills-manual-tab" data-bs-toggle="pill"
                                 data-bs-target="#pills-manual" type="button" role="tab">
-                                <i class="bi bi-calculator me-1"></i> Tính GPA Thủ công
+                                <i class="bi bi-calculator me-1"></i>
+                                <span class="d-none d-xl-inline">Tính GPA Thủ công</span>
+                                <span class="d-inline d-xl-none">Thủ công</span>
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link" id="pills-course-tab" data-bs-toggle="pill"
                                 data-bs-target="#pills-course" type="button" role="tab">
-                                <i class="bi bi-journal-check me-1"></i> Tính điểm Môn học
+                                <i class="bi bi-journal-check me-1"></i>
+                                <span class="d-none d-xl-inline">Tính điểm Môn học</span>
+                                <span class="d-inline d-xl-none">Môn học</span>
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
@@ -138,7 +147,7 @@
     </nav>
 
     <!-- Bottom Navigation for Mobile (Visible only on Mobile) -->
-    <nav class="navbar fixed-bottom navbar-light bg-white border-top d-lg-none shadow-lg"
+    <nav class="navbar fixed-bottom navbar-light border-top d-lg-none shadow-lg"
         style="padding-bottom: env(safe-area-inset-bottom); z-index: 1040;">
         <div class="container-fluid px-0">
             <ul class="nav nav-pills nav-fill w-100" id="mobile-bottom-tab" role="tablist">
@@ -204,7 +213,7 @@
                     <!-- Left Column: Inputs -->
                     <div class="col-lg-5 col-xxl-4 ani-fade-in-up delay-100">
                         <div class="card shadow-sm border-0 h-100 hover-translate-y">
-                            <div class="card-header bg-white border-bottom-0 pt-4 pb-2">
+                            <div class="card-header border-bottom-0 pt-4 pb-2">
                                 <h5 class="card-title fw-bold text-primary mb-0"><i
                                         class="bi bi-input-cursor-text me-2"></i>Thông tin hiện tại</h5>
                                 <p class="text-muted small mt-1 mb-0">Nhập điểm số hiện tại và mục tiêu của bạn</p>
@@ -348,24 +357,22 @@
                     <!-- Right Column: Results -->
                     <div class="col-lg-7 col-xxl-8 ani-fade-in-up delay-200">
                         <div class="card shadow-sm border-0 h-100 hover-translate-y">
-                            <div class="card-header bg-white border-bottom-0 pt-4 pb-2">
-                                <div
-                                    class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2">
-                                    <div class="mb-1 mb-sm-0">
-                                        <h5 class="card-title fw-bold text-primary mb-0"><i
+                            <div class="card-header border-bottom-0 pt-4 pb-2">
+                                <div class="d-flex justify-content-between align-items-center gap-3">
+                                    <div style="min-width: 0;">
+                                        <h5 class="card-title fw-bold text-primary mb-0 text-truncate"><i
                                                 class="bi bi-lightning-charge me-2"></i>Kết quả dự báo</h5>
-                                        <p class="text-muted small mt-1 mb-0">Phân tích khả năng đạt mục tiêu của bạn
+                                        <p class="text-muted small mt-1 mb-0 text-truncate">Phân tích khả năng đạt mục
+                                            tiêu
                                         </p>
                                     </div>
-                                    <div
-                                        class="d-flex gap-2 w-100 w-sm-auto justify-content-start justify-content-sm-end">
-                                        <button
-                                            class="btn btn-sm btn-outline-success rounded-pill d-none flex-fill flex-sm-none"
+                                    <div class="d-flex gap-2 flex-shrink-0">
+                                        <button class="btn btn-sm btn-outline-success rounded-pill d-none text-nowrap"
                                             id="export-pdf-btn">
-                                            <i class="bi bi-file-earmark-pdf me-1"></i>Xuất PDF
+                                            <i class="bi bi-file-earmark-pdf me-1"></i><span
+                                                class="d-none d-sm-inline">Xuất </span>PDF
                                         </button>
-                                        <button
-                                            class="btn btn-sm btn-outline-primary rounded-pill d-none flex-fill flex-sm-none"
+                                        <button class="btn btn-sm btn-outline-primary rounded-pill d-none text-nowrap"
                                             id="share-target-btn">
                                             <i class="bi bi-share me-1"></i>Chia sẻ
                                         </button>
@@ -395,8 +402,9 @@
                         <div class="sticky-lg-top" style="top: 90px; z-index: 100;">
                             <!-- Summary Card -->
                             <div class="card shadow-sm border-primary hover-translate-y mb-3">
-                                <div class="card-header bg-primary text-white py-3">
-                                    <h5 class="card-title fw-bold mb-0"><i class="bi bi-calculator me-2"></i>Tổng kết
+                                <div class="card-header py-3">
+                                    <h5 class="card-title fw-bold text-primary mb-0"><i
+                                            class="bi bi-calculator me-2"></i>Tổng kết
                                     </h5>
                                 </div>
                                 <div class="card-body">
@@ -448,7 +456,7 @@
 
                             <!-- GPA Progress Chart Card -->
                             <div class="card shadow-sm border-primary ani-fade-in-up delay-300 hover-translate-y">
-                                <div class="card-header bg-white border-bottom py-3">
+                                <div class="card-header border-bottom py-3">
                                     <h6 class="card-title fw-bold text-primary mb-0"><i
                                             class="bi bi-graph-up me-2"></i>Biến động GPA</h6>
                                     <p class="text-muted small mt-1 mb-0">Theo dõi tiến trình học tập</p>
@@ -488,7 +496,7 @@
                     <!-- Left Column: Controls -->
                     <div class="col-lg-5 ani-fade-in-up delay-100">
                         <div class="card shadow-sm border-0 hover-translate-y">
-                            <div class="card-header bg-white border-bottom-0 pt-3 pb-2">
+                            <div class="card-header border-bottom-0 pt-3 pb-2">
                                 <h5 class="card-title fw-bold text-primary mb-0"><i class="bi bi-sliders me-2"></i>Cấu
                                     hình môn học</h5>
                                 <p class="text-muted small mt-1 mb-0">Nhập điểm quá trình và chọn tỷ lệ</p>
@@ -576,7 +584,7 @@
                     <!-- Right Column: Results -->
                     <div class="col-lg-7 ani-fade-in-up delay-200">
                         <div class="card shadow-sm border-0 hover-translate-y">
-                            <div class="card-header bg-white border-bottom-0 pt-3 pb-2">
+                            <div class="card-header border-bottom-0 pt-3 pb-2">
                                 <h5 class="card-title fw-bold text-primary mb-0"><i class="bi bi-bullseye me-2"></i>Mục
                                     tiêu điểm thi</h5>
                                 <p class="text-muted small mt-1 mb-0">Điểm cần đạt cho từng mức điểm tổng kết</p>
@@ -626,7 +634,7 @@
                                     <button class="btn btn-sm btn-light border btn-move-down" title="Xuống"><i
                                             class="bi bi-chevron-down"></i></button>
                                 </div>
-                                <div class="card-header bg-white border-bottom-0 pt-4 pb-2">
+                                <div class="card-header border-bottom-0 pt-4 pb-2">
                                     <h5 class="card-title fw-bold text-primary mb-0"><i class="bi bi-award me-2"></i>Xếp
                                         loại Học lực</h5>
                                     <p class="text-muted small mt-1 mb-0">Phân loại dựa trên điểm trung bình tích lũy
@@ -688,7 +696,7 @@
                                     <button class="btn btn-sm btn-light border btn-move-down" title="Xuống"><i
                                             class="bi bi-chevron-down"></i></button>
                                 </div>
-                                <div class="card-header bg-white border-bottom-0 pt-4 pb-2">
+                                <div class="card-header border-bottom-0 pt-4 pb-2">
                                     <h5 class="card-title fw-bold text-primary mb-0"><i
                                             class="bi bi-table me-2"></i>Thang điểm Tín chỉ</h5>
                                     <p class="text-muted small mt-1 mb-0">Quy đổi điểm số theo quy chế tín chỉ</p>
@@ -772,7 +780,7 @@
                                     <button class="btn btn-sm btn-light border btn-move-down" title="Xuống"><i
                                             class="bi bi-chevron-down"></i></button>
                                 </div>
-                                <div class="card-header bg-white border-bottom-0 pt-4 pb-2">
+                                <div class="card-header border-bottom-0 pt-4 pb-2">
                                     <h5 class="card-title fw-bold text-primary mb-0"><i
                                             class="bi bi-star me-2"></i>Thang xếp loại điểm rèn luyện</h5>
                                     <p class="text-muted small mt-1 mb-0">Phân loại dựa trên điểm rèn luyện</p>
@@ -1203,15 +1211,21 @@
                         </div>
 
                         <!-- News Filter Buttons -->
-                        <div class="d-flex flex-wrap gap-2 mb-4 news-filters">
-                            <button class="btn btn-sm btn-primary rounded-pill px-3 filter-btn active"
-                                data-filter="all">Tất cả</button>
-                            <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 filter-btn"
-                                data-filter="announcement">Thông báo</button>
-                            <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 filter-btn"
-                                data-filter="handbook">Tài liệu</button>
-                            <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 filter-btn"
-                                data-filter="calendar">Kế hoạch</button>
+                        <div class="news-filters-wrapper mb-4">
+                            <div class="d-flex flex-nowrap gap-1 news-filters overflow-auto p-1 glass-pill-container">
+                                <button class="btn btn-sm filter-btn active" data-filter="all">
+                                    <i class="bi bi-grid-fill me-1"></i>Tất cả
+                                </button>
+                                <button class="btn btn-sm filter-btn" data-filter="announcement">
+                                    <i class="bi bi-megaphone-fill me-1"></i>Thông báo
+                                </button>
+                                <button class="btn btn-sm filter-btn" data-filter="handbook">
+                                    <i class="bi bi-file-text-fill me-1"></i>Tài liệu
+                                </button>
+                                <button class="btn btn-sm filter-btn" data-filter="calendar">
+                                    <i class="bi bi-calendar-event-fill me-1"></i>Kế hoạch
+                                </button>
+                            </div>
                         </div>
 
                         <div class="news-bento-grid">

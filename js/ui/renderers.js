@@ -187,7 +187,7 @@ export function renderManualSemesters() {
 
         return `
         <div class="card shadow-sm mb-3 ani-fade-in-up hover-translate-y" style="animation-delay: ${index * 0.1}s">
-            <div class="card-header bg-white d-flex justify-content-between align-items-start align-items-md-center py-2 px-3">
+            <div class="card-header d-flex justify-content-between align-items-start align-items-md-center py-2 px-3">
                 <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-1 gap-md-2" style="min-width: 0; flex: 1;">
                     <span class="fw-bold text-primary text-truncate">${sem.name}</span>
                     <div class="d-flex gap-1 flex-wrap semester-header-badges">

@@ -1519,6 +1519,64 @@ body {
 
 
 
+/* News Filter Styles - Modern Glass Pill Design */
+.glass-pill-container {
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: 50rem;
+    width: fit-content;
+    max-width: 100%;
+}
+
+[data-bs-theme="dark"] .glass-pill-container {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.news-filters {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.news-filters::-webkit-scrollbar {
+    display: none;
+}
+
+.news-filters .filter-btn {
+    white-space: nowrap;
+    flex-shrink: 0;
+    border-radius: 50rem;
+    padding: 0.4rem 1.2rem;
+    border: none;
+    color: #6c757d;
+    font-weight: 500;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+    background: transparent;
+}
+
+.news-filters .filter-btn:hover {
+    color: var(--primary-color);
+}
+
+.news-filters .filter-btn.active {
+    background: #ffffff !important;
+    color: var(--primary-color) !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+[data-bs-theme="dark"] .news-filters .filter-btn {
+    color: #ffffff;
+}
+
+[data-bs-theme="dark"] .news-filters .filter-btn.active {
+    background: rgba(255, 255, 255, 0.2) !important;
+    color: #ffffff !important;
+}
+
 /* News Tab Styles */
 .news-card {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -1763,4 +1821,231 @@ body {
         font-size: 0.7rem !important;
         padding: 0.25rem 0.5rem !important;
     }
+}
+
+/*
+ * ==========================================
+ * MODERN GLASSMORPHISM UI UPGRADES
+ * ==========================================
+ */
+
+:root {
+    /* Gradient Background for Cards */
+    --glass-card-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(230, 242, 255, 0.7));
+    --glass-card-border: 1px solid rgba(255, 255, 255, 0.8);
+    --glass-card-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+    --glass-blur: blur(10px);
+}
+
+[data-bs-theme="dark"] {
+    --glass-card-bg: linear-gradient(135deg, rgba(30, 30, 45, 0.8), rgba(20, 20, 30, 0.6));
+    --glass-card-border: 1px solid rgba(255, 255, 255, 0.1);
+    --glass-card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+}
+
+/* 1. Body Background Enhancement */
+body {
+    background: radial-gradient(circle at 10% 20%, rgb(242, 246, 255) 0%, rgb(235, 250, 255) 90%);
+    min-height: 100vh;
+}
+
+[data-bs-theme="dark"] body {
+    background: radial-gradient(circle at 50% 50%, #1a1a2e 0%, #16213e 100%) !important;
+}
+
+/* 2. Glass Cards */
+.card {
+    background: var(--glass-card-bg) !important;
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: var(--glass-card-border) !important;
+    box-shadow: var(--glass-card-shadow) !important;
+}
+
+.card-header {
+    background-color: transparent !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+}
+
+/* 3. Glass Inputs */
+.form-control,
+.form-select,
+.input-group-text,
+.input-group-text.bg-light {
+    background: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.01), 0 2px 5px rgba(0, 0, 0, 0.03);
+    color: #333;
+    font-weight: 500;
+}
+
+/* Focus State for Inputs */
+.form-control:focus,
+.form-select:focus {
+    background: #ffffff !important;
+    border-color: #8bb9fe !important;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15), 0 4px 10px rgba(13, 110, 253, 0.1) !important;
+}
+
+/* Adjust Input Group Text */
+.input-group-text {
+    background: rgba(240, 248, 255, 0.9) !important;
+    border-right: 1px solid rgba(0, 0, 0, 0.1) !important;
+    color: var(--primary-color) !important;
+    font-weight: 600;
+}
+
+[data-bs-theme="dark"] .form-control,
+[data-bs-theme="dark"] .form-select,
+[data-bs-theme="dark"] .input-group-text {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    color: #e1e1e1 !important;
+}
+
+[data-bs-theme="dark"] .form-control:focus,
+[data-bs-theme="dark"] .form-select:focus {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+    border-color: var(--primary-color) !important;
+}
+
+/* Navbar Glass Effect */
+.navbar.fixed-top,
+.navbar.fixed-bottom {
+    background: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+[data-bs-theme="dark"] .navbar.fixed-top,
+[data-bs-theme="dark"] .navbar.fixed-bottom {
+    background: rgba(15, 15, 25, 0.85) !important;
+    border-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Interactive Grade Scale Cards */
+.grade-scale-card {
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    background: rgba(255, 255, 255, 0.4);
+}
+
+.grade-scale-card:hover {
+    transform: translateX(5px);
+    background: rgba(255, 255, 255, 0.7);
+}
+
+/* Base Active State */
+.grade-scale-card.active-scale {
+    background: white !important;
+    border-width: 2px;
+    transform: scale(1.02);
+    z-index: 10;
+}
+
+/* Color-specific Glows */
+.grade-scale-card.active-scale.glow-success {
+    border-color: var(--bs-success);
+    box-shadow: 0 0 20px rgba(25, 135, 84, 0.3), inset 0 0 10px rgba(25, 135, 84, 0.1);
+}
+
+.grade-scale-card.active-scale.glow-primary {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 20px rgba(13, 110, 253, 0.3), inset 0 0 10px rgba(13, 110, 253, 0.1);
+}
+
+.grade-scale-card.active-scale.glow-info {
+    border-color: var(--bs-info);
+    box-shadow: 0 0 20px rgba(13, 202, 240, 0.3), inset 0 0 10px rgba(13, 202, 240, 0.1);
+}
+
+.grade-scale-card.active-scale.glow-warning {
+    border-color: var(--bs-warning);
+    box-shadow: 0 0 20px rgba(255, 193, 7, 0.3), inset 0 0 10px rgba(255, 193, 7, 0.1);
+}
+
+.grade-scale-card.active-scale.glow-danger {
+    border-color: var(--bs-danger);
+    box-shadow: 0 0 20px rgba(220, 53, 69, 0.3), inset 0 0 10px rgba(220, 53, 69, 0.1);
+}
+
+.grade-scale-card.active-scale.glow-secondary {
+    border-color: var(--bs-secondary);
+    box-shadow: 0 0 20px rgba(108, 117, 125, 0.3), inset 0 0 10px rgba(108, 117, 125, 0.1);
+}
+
+/* 4. Glass Navigation Menu (Desktop) */
+.nav-pills .nav-link {
+    color: #6c757d;
+    background: transparent;
+    border: 1px solid transparent;
+    transition: all 0.3s ease;
+    border-radius: 50rem;
+    /* Pill shape */
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+}
+
+.nav-pills .nav-link:hover {
+    color: var(--primary-color);
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
+.nav-pills .nav-link.active {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(230, 242, 255, 0.8)) !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.9) !important;
+    color: var(--primary-color) !important;
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.15);
+    font-weight: 600;
+}
+
+/* Theme Toggle Glass Style */
+#theme-toggle-desktop {
+    background: rgba(255, 255, 255, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(5px);
+    color: #6c757d;
+    transition: all 0.3s ease;
+}
+
+#theme-toggle-desktop:hover {
+    background: rgba(255, 255, 255, 0.8);
+    color: var(--primary-color);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Dark Mode Navigation Overrides */
+[data-bs-theme="dark"] .nav-pills .nav-link {
+    color: #a0a0a0;
+}
+
+[data-bs-theme="dark"] .nav-pills .nav-link:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+}
+
+[data-bs-theme="dark"] .nav-pills .nav-link.active {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05)) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+[data-bs-theme="dark"] #theme-toggle-desktop {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #a0a0a0;
+}
+
+[data-bs-theme="dark"] #theme-toggle-desktop:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
 }

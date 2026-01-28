@@ -2,7 +2,7 @@ import { GRADE_SCALE, IMGUR_CLIENT_ID } from '../core/constants.js';
 import { getManualState, setManualState, addManualSemester, removeManualSemester, updateManualCourse, addManualCourse, removeManualCourse, loadManualStateFromStorage, getTargetState, setTargetState, loadTargetStateFromStorage, subscribe } from '../state/store.js';
 import { calculateManualGPA, calculateTargetResult, generateRetakeSuggestions, generateGradeCombinations, generateScenarioText } from '../core/calculator.js';
 import { renderManualSemesters } from './renderers.js';
-import { animateValue } from './effects.js';
+import { animateValue, triggerHapticFeedback } from './effects.js';
 import { parsePortalText } from '../core/utils.js';
 import { generateShareUrl } from '../core/share.js';
 
@@ -177,6 +177,7 @@ export function initManualCalcTab() {
             name: nextName,
             courses: []
         });
+        triggerHapticFeedback(20);
     });
 
     resetManualBtn.addEventListener('click', () => {
@@ -222,6 +223,7 @@ export function initManualCalcTab() {
                     val += delta;
                     if (val < 0) val = 0;
                     updateManualCourse(semId, courseId, 'credits', val);
+                    triggerHapticFeedback();
                 }
             }
             return;
@@ -256,6 +258,7 @@ export function initManualCalcTab() {
             }
             const semId = confirmBtn.dataset.id;
             removeManualSemester(semId);
+            triggerHapticFeedback(25);
             return;
         }
 
@@ -270,6 +273,7 @@ export function initManualCalcTab() {
                 isRetake: false,
                 oldGrade: 'D'
             });
+            triggerHapticFeedback();
         }
 
         // Delete Course
@@ -277,6 +281,7 @@ export function initManualCalcTab() {
             const semId = target.closest('.delete-course-btn').dataset.semId;
             const courseId = target.closest('.delete-course-btn').dataset.courseId;
             removeManualCourse(semId, courseId);
+            triggerHapticFeedback(15);
         }
     });
 
@@ -289,6 +294,7 @@ export function initManualCalcTab() {
             const value = target.type === 'checkbox' ? target.checked : target.value;
 
             updateManualCourse(semId, courseId, field, value);
+            triggerHapticFeedback();
         }
     });
 
@@ -544,6 +550,7 @@ export function initTargetGPATab() {
     });
 
     calcTargetBtn.addEventListener('click', () => {
+        triggerHapticFeedback(30);
         const state = getTargetState();
         const currentGPA = parseFloat(state.currentGpa) || 0;
         const currentCredits = parseFloat(state.currentCredits) || 0;
@@ -689,7 +696,7 @@ export function initTargetGPATab() {
                 ${scenarioHTML}
 
                 ${result.requiredGPA > 0 && result.requiredGPA <= 4.0 ? `
-                <div class="px-2 px-md-3 pb-3 bg-white border-top mt-2">
+                <div class="px-2 px-md-3 pb-3 border-top mt-2">
                     <div class="pt-3 mb-3 d-flex align-items-center justify-content-between">
                         <p class="small fw-bold text-secondary text-uppercase mb-0 d-flex align-items-center">
                             <i class="bi bi-layers me-2"></i>Các phương án khả thi
