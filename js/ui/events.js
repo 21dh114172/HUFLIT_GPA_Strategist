@@ -561,7 +561,7 @@ export function initTargetGPATab() {
         // Render Result
         const targetResultContainer = document.getElementById('target-result-container');
         if (targetResultContainer) {
-            targetResultContainer.className = 'card-body d-flex flex-column p-4';
+            targetResultContainer.className = 'card-body d-flex flex-column p-3 p-md-4';
             
             // 1. Determine Status
             let statusIcon = 'bi-check-circle-fill';
@@ -598,37 +598,44 @@ export function initTargetGPATab() {
 
             // 2. Generate Combinations
             let combinationsHTML = '';
-            let combinationsCount = 0;
+            let displayedCount = 0;
+            let totalCount = 0;
             
             if (result.requiredGPA > 0 && result.requiredGPA <= 4.0 && creditsToStudy > 0) {
                 const combinations = generateGradeCombinations(creditsToStudy, result.requiredPoints);
-                combinationsCount = combinations.length;
+                totalCount = combinations.length;
+                const topCombinations = combinations.slice(0, 10);
+                displayedCount = topCombinations.length;
                 
-                if (combinations.length > 0) {
-                    combinationsHTML = combinations.slice(0, 10).map(c => `
-                        <div class="bg-light rounded-3 p-3 border transition-all">
+                if (totalCount > 0) {
+                    combinationsHTML = topCombinations.map(c => `
+                        <div class="bg-light rounded-3 p-2 p-md-3 border transition-all">
                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="badge bg-white text-dark border shadow-sm text-uppercase">Kết hợp ${c.g1.grade} &amp; ${c.g2.grade}</span>
-                                <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle" title="Tổng điểm đạt được / Điểm cần thiết">
-                                    ${c.totalPoints.toFixed(2)} / ${result.requiredPoints.toFixed(2)} điểm
-                                </span>
+                                <span class="badge bg-white text-dark border-0 shadow-sm text-uppercase small px-2">Kết hợp ${c.g1.grade} &amp; ${c.g2.grade}</span>
+                                <div class="text-success fw-bold small">
+                                    <i class="bi bi-record-fill me-1"></i>${c.totalPoints.toFixed(2)}đ
+                                </div>
                             </div>
-                            <div class="d-flex gap-2 align-items-stretch">
-                                <div class="flex-grow-1 p-2 rounded border bg-white position-relative overflow-hidden" style="flex-basis: 0;">
-                                    <div class="position-absolute top-0 start-0 bottom-0 bg-${c.g1.color}-subtle" style="width: 4px;"></div>
-                                    <div class="d-flex justify-content-between align-items-baseline ps-2">
-                                        <span class="fw-bold text-${c.g1.color}">${c.g1.grade}</span>
-                                        <span class="small fw-medium text-secondary">${c.c1} TC</span>
+                            <div class="row g-2 align-items-stretch">
+                                <div class="col-5">
+                                    <div class="p-2 rounded border bg-white position-relative overflow-hidden h-100">
+                                        <div class="position-absolute top-0 start-0 bottom-0 bg-${c.g1.color}" style="width: 3px; opacity: 0.8;"></div>
+                                        <div class="d-flex justify-content-between align-items-center ps-1">
+                                            <span class="fw-bold fs-5 text-${c.g1.color}">${c.g1.grade}</span>
+                                            <span class="badge bg-light text-secondary border-0 p-1 small">${c.c1} TC</span>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="d-flex align-items-center text-muted">
-                                    <i class="bi bi-plus-lg small"></i>
+                                <div class="col-2 d-flex align-items-center justify-content-center text-muted small">
+                                    <i class="bi bi-plus-lg"></i>
                                 </div>
-                                <div class="flex-grow-1 p-2 rounded border bg-white position-relative overflow-hidden" style="flex-basis: 0;">
-                                    <div class="position-absolute top-0 start-0 bottom-0 bg-${c.g2.color}-subtle" style="width: 4px;"></div>
-                                    <div class="d-flex justify-content-between align-items-baseline ps-2">
-                                        <span class="fw-bold text-${c.g2.color}">${c.g2.grade}</span>
-                                        <span class="small fw-medium text-secondary">${c.c2} TC</span>
+                                <div class="col-5">
+                                    <div class="p-2 rounded border bg-white position-relative overflow-hidden h-100">
+                                        <div class="position-absolute top-0 start-0 bottom-0 bg-${c.g2.color}" style="width: 3px; opacity: 0.8;"></div>
+                                        <div class="d-flex justify-content-between align-items-center ps-1">
+                                            <span class="fw-bold fs-5 text-${c.g2.color}">${c.g2.grade}</span>
+                                            <span class="badge bg-light text-secondary border-0 p-1 small">${c.c2} TC</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -658,14 +665,14 @@ export function initTargetGPATab() {
                 </div>
 
                 ${result.requiredGPA > 0 && result.requiredGPA <= 4.0 ? `
-                <div class="px-3 pb-3 bg-white border-top mt-4">
+                <div class="px-2 px-md-3 pb-3 bg-white border-top mt-4">
                     <div class="pt-3 mb-3 d-flex align-items-center justify-content-between">
                         <p class="small fw-bold text-secondary text-uppercase mb-0 d-flex align-items-center">
                             <i class="bi bi-layers me-2"></i>Các phương án khả thi
                         </p>
-                        <span class="badge bg-light text-secondary rounded-pill border">${combinationsCount} tổ hợp</span>
+                        <span class="badge bg-light text-secondary rounded-pill border">${displayedCount} tổ hợp</span>
                     </div>
-                    <div class="d-flex flex-column gap-3 overflow-auto pe-1 custom-scrollbar" style="max-height: 400px;">
+                    <div class="d-flex flex-column gap-2 gap-md-3 overflow-auto pe-1 custom-scrollbar" style="max-height: 500px;">
                         ${combinationsHTML}
                     </div>
                     <div class="mt-2 small text-muted text-center fst-italic">Danh sách sắp xếp theo mức độ đạt được từ dễ - khó</div>

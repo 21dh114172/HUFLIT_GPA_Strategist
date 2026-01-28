@@ -63,6 +63,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
             });
+
+            // Cuộn lên đầu trang khi chuyển tab
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
         });
     });
 });
