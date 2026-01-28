@@ -83,13 +83,19 @@ export function removeManualCourse(semId, courseId) {
     }
 }
 
+// Optimization: Debounce storage saving
+let saveManualTimeout = null;
 function saveManualStateToStorage() {
-    const state = {
-        semesters: manualSemesters,
-        initialGpa: manualInitialGpa,
-        initialCredits: manualInitialCredits
-    };
-    localStorage.setItem('manualState', JSON.stringify(state));
+    if (saveManualTimeout) clearTimeout(saveManualTimeout);
+    saveManualTimeout = setTimeout(() => {
+        const state = {
+            semesters: manualSemesters,
+            initialGpa: manualInitialGpa,
+            initialCredits: manualInitialCredits
+        };
+        localStorage.setItem('manualState', JSON.stringify(state));
+        console.log("Manual state saved (debounced)");
+    }, 500);
 }
 
 export function loadManualStateFromStorage() {
@@ -122,8 +128,13 @@ export function setTargetState(newState) {
     notify();
 }
 
+let saveTargetTimeout = null;
 function saveTargetStateToStorage() {
-    localStorage.setItem('targetState', JSON.stringify(targetState));
+    if (saveTargetTimeout) clearTimeout(saveTargetTimeout);
+    saveTargetTimeout = setTimeout(() => {
+        localStorage.setItem('targetState', JSON.stringify(targetState));
+        console.log("Target state saved (debounced)");
+    }, 500);
 }
 
 export function loadTargetStateFromStorage() {

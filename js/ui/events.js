@@ -24,11 +24,19 @@ export function initManualCalcTab() {
 
     if (!addSemesterBtn) return;
 
+    // Optimization: Debounce UI updates to prevent lag during typing
+    let renderTimeout = null;
+    const debouncedRender = () => {
+        if (renderTimeout) cancelAnimationFrame(renderTimeout);
+        renderTimeout = requestAnimationFrame(() => {
+            renderManualSemesters();
+            updateManualCalculationDisplay();
+            console.log("UI Rendered (RAF debounced)");
+        });
+    };
+
     // Subscribe to store changes
-    subscribe(() => {
-        renderManualSemesters();
-        updateManualCalculationDisplay();
-    });
+    subscribe(debouncedRender);
 
     // Initial Load
     loadManualStateFromStorage();

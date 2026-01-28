@@ -17,21 +17,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    initCourseGradeTab();
+    // Lazy initialization tracking
+    const initializedTabs = new Set(['#pills-target']); // Target tab is active by default
+
+    // Essential initializations
     initTargetGPATab();
-    initManualCalcTab();
-    initGradeScaleTab();
-    initContactButton();
     initThemeToggle();
     initUserGuide();
     initFeedbackForm();
-    initNewsTab();
-    initGradeScaleSort();
     fetchVisitCount();
+    initContactButton();
 
-    // Re-render scale tab when state changes (to update highlight)
+    // Re-render scale tab when state changes (only if already initialized to save performance)
     subscribe(() => {
-        initGradeScaleTab();
+        if (initializedTabs.has('#pills-scale')) {
+            initGradeScaleTab();
+        }
     });
 
     // Auto-calculate if shared data is present
@@ -45,11 +46,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 500);
     }
 
-    // Sync Desktop and Mobile Tabs
+    // Sync Desktop and Mobile Tabs + Lazy Load
     const allNavLinks = document.querySelectorAll('.nav-link[data-bs-toggle="pill"]');
     allNavLinks.forEach(link => {
         link.addEventListener('shown.bs.tab', (e) => {
             const targetId = e.target.getAttribute('data-bs-target');
+            
+            // Lazy load tab-specific logic
+            if (!initializedTabs.has(targetId)) {
+                console.log(`Lazy loading tab: ${targetId}`);
+                if (targetId === '#pills-manual') initManualCalcTab();
+                if (targetId === '#pills-course') initCourseGradeTab();
+                if (targetId === '#pills-scale') {
+                    initGradeScaleTab();
+                    initGradeScaleSort();
+                }
+                if (targetId === '#pills-news') initNewsTab();
+                initializedTabs.add(targetId);
+            }
+
             const correspondingLinks = document.querySelectorAll(`.nav-link[data-bs-toggle="pill"][data-bs-target="${targetId}"]`);
             
             correspondingLinks.forEach(other => {
