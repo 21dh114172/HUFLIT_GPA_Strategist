@@ -1002,6 +1002,11 @@ body {
     }
 }
 
+/* Ngăn xuống dòng trong bảng Xếp loại học lực */
+#classification-table-body td,
+#grade-scale-table-body td {
+    white-space: nowrap;
+}
 
 [data-bs-theme="dark"] .btn-check:not(:checked)+.btn-segmented {
     color: #adb5bd;
@@ -2012,6 +2017,7 @@ body {
     background: rgba(255, 255, 255, 0.4);
     border: 1px solid rgba(255, 255, 255, 0.6);
     backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
     color: #6c757d;
     transition: all 0.3s ease;
 }
