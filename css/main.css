@@ -84,10 +84,153 @@ body {
     padding: 20px 0;
 }
 
-/* Soften Borders (Like Tailwind rounded-xl) */
-.card {
-    border-radius: 1rem !important;
-    border: none;
+/* News Bento Grid Styles */
+.news-bento-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+.bento-item {
+    background: #fff;
+    border-radius: 1.25rem;
+    overflow: hidden;
+    position: relative;
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.bento-item:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 30px rgba(0,0,0,0.1);
+}
+
+.bento-item.item-large {
+    grid-column: span 2;
+}
+
+.bento-img-container {
+    width: 100%;
+    height: 280px;
+    overflow: hidden;
+    position: relative;
+    background: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bento-img-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+}
+
+/* Special handling for Holiday Card to show full image */
+#bento-holiday .bento-img-container {
+    height: auto;
+    min-height: 200px;
+}
+
+#bento-holiday .bento-img-container::after {
+    display: none; /* Remove dark gradient */
+}
+
+#bento-holiday .bento-img-container img {
+    object-fit: contain; /* Show entire image */
+    height: auto;
+    max-height: 400px;
+}
+
+.bento-item:hover .bento-img-container img {
+    transform: scale(1.05);
+}
+
+.bento-badge {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    z-index: 2;
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    padding: 0.4rem 0.7rem !important;
+    font-size: 0.75rem;
+}
+
+.bento-content {
+    padding: 1.25rem 1.5rem;
+    position: relative;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Reset Large Item content to be below the image for clarity */
+.bento-item.item-large .bento-content {
+    position: relative;
+    bottom: auto;
+    left: auto;
+    right: auto;
+    z-index: 2;
+    color: #1a1a1a;
+    background: #fff;
+}
+
+.bento-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: #1a1a1a;
+}
+
+.item-large .bento-title {
+    color: #1a1a1a;
+    font-size: 1.25rem;
+    text-shadow: none;
+}
+
+.bento-item:hover .bento-title {
+    color: var(--primary-color);
+}
+
+.item-large:hover .bento-title {
+    color: #fff;
+}
+
+.bento-desc {
+    color: #666;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+    .news-bento-grid {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+    }
+    .bento-item.item-large {
+        grid-column: span 1;
+    }
+    .bento-img-container {
+        height: 220px;
+    }
+    .item-large .bento-title {
+        font-size: 1.3rem;
+    }
+}
+
+/* Specific item adjustments */
+#bento-announcement {
+    border-top: 4px solid var(--bs-danger);
+}
+
+#bento-handbook {
+    border-top: 4px solid var(--bs-info);
 }
 
 .btn {
