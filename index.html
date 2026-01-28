@@ -1,24 +1,28 @@
 <!DOCTYPE html>
 <html lang="vi" data-bs-theme="light">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Công cụ tính toán GPA, lập kế hoạch điểm số và gợi ý học cải thiện dành riêng cho sinh viên HUFLIT. Hỗ trợ import bảng điểm từ Portal.">
+    <meta name="description"
+        content="Công cụ tính toán GPA, lập kế hoạch điểm số và gợi ý học cải thiện dành riêng cho sinh viên HUFLIT. Hỗ trợ import bảng điểm từ Portal.">
     <meta name="keywords" content="HUFLIT, GPA, Calculator, Tính điểm, Tín chỉ, Sinh viên, Portal, Kế hoạch học tập">
     <meta name="author" content="TienxDun">
-    
+
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://tienxdun.github.io/HUFLIT_GPA_Strategist/">
     <meta property="og:title" content="HUFLIT GPA Strategist - Tính toán & Lập kế hoạch điểm số">
-    <meta property="og:description" content="Công cụ tối ưu giúp sinh viên HUFLIT tính GPA, dự đoán điểm cần đạt và gợi ý môn học lại thông minh.">
+    <meta property="og:description"
+        content="Công cụ tối ưu giúp sinh viên HUFLIT tính GPA, dự đoán điểm cần đạt và gợi ý môn học lại thông minh.">
     <meta property="og:image" content="assets/images/ava.jpg">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://tienxdun.github.io/HUFLIT_GPA_Strategist/">
     <meta property="twitter:title" content="HUFLIT GPA Strategist - Tính toán & Lập kế hoạch điểm số">
-    <meta property="twitter:description" content="Công cụ tối ưu giúp sinh viên HUFLIT tính GPA, dự đoán điểm cần đạt và gợi ý môn học lại thông minh.">
+    <meta property="twitter:description"
+        content="Công cụ tối ưu giúp sinh viên HUFLIT tính GPA, dự đoán điểm cần đạt và gợi ý môn học lại thông minh.">
     <meta property="twitter:image" content="assets/images/ava.jpg">
 
     <link rel="icon" type="image/x-icon" href="favicon.ico">
@@ -27,18 +31,18 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0d6efd">
     <title>HUFLIT GPA Strategist</title>
-    
+
     <!-- Bootstrap 5.3 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    
+
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    
+
     <!-- Google Fonts 'Inter' -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/main.css">
 
@@ -50,10 +54,18 @@
         }
     }
     </script>
-    
+
     <!-- Marked Library for Markdown Parsing -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <!-- Chart.js for GPA Progress Tracking -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- jsPDF and html2canvas for PDF Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
+
 <body>
 
     <!-- Header: Sticky Navbar -->
@@ -63,7 +75,7 @@
                 <i class="bi bi-mortarboard-fill me-2"></i>
                 <span>HUFLIT GPA Strategist</span>
             </a>
-            
+
             <div class="d-flex align-items-center">
                 <!-- Mobile Visit Count -->
                 <div class="d-lg-none visit-count-container me-2" style="display: none;">
@@ -74,7 +86,8 @@
                 </div>
 
                 <!-- Mobile Theme Toggle -->
-                <button class="btn btn-sm btn-light border rounded-circle d-lg-none ms-1" id="theme-toggle-mobile" aria-label="Toggle theme">
+                <button class="btn btn-sm btn-light border rounded-circle d-lg-none ms-1" id="theme-toggle-mobile"
+                    aria-label="Toggle theme">
                     <i class="bi bi-moon-stars-fill"></i>
                 </button>
 
@@ -82,34 +95,40 @@
                 <div class="d-none d-lg-flex align-items-center">
                     <ul class="nav nav-pills" id="pills-tab" role="tablist">
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="pills-target-tab" data-bs-toggle="pill" data-bs-target="#pills-target" type="button" role="tab">
+                            <button class="nav-link active" id="pills-target-tab" data-bs-toggle="pill"
+                                data-bs-target="#pills-target" type="button" role="tab">
                                 <i class="bi bi-graph-up-arrow me-1"></i> Lộ trình GPA
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="pills-manual-tab" data-bs-toggle="pill" data-bs-target="#pills-manual" type="button" role="tab">
+                            <button class="nav-link" id="pills-manual-tab" data-bs-toggle="pill"
+                                data-bs-target="#pills-manual" type="button" role="tab">
                                 <i class="bi bi-calculator me-1"></i> Tính GPA Thủ công
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="pills-course-tab" data-bs-toggle="pill" data-bs-target="#pills-course" type="button" role="tab">
+                            <button class="nav-link" id="pills-course-tab" data-bs-toggle="pill"
+                                data-bs-target="#pills-course" type="button" role="tab">
                                 <i class="bi bi-journal-check me-1"></i> Tính điểm Môn học
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="pills-scale-tab" data-bs-toggle="pill" data-bs-target="#pills-scale" type="button" role="tab">
+                            <button class="nav-link" id="pills-scale-tab" data-bs-toggle="pill"
+                                data-bs-target="#pills-scale" type="button" role="tab">
                                 <i class="bi bi-table me-1"></i> Thang điểm
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="pills-news-tab" data-bs-toggle="pill" data-bs-target="#pills-news" type="button" role="tab">
+                            <button class="nav-link" id="pills-news-tab" data-bs-toggle="pill"
+                                data-bs-target="#pills-news" type="button" role="tab">
                                 <i class="bi bi-newspaper me-1"></i> Tin tức
                             </button>
                         </li>
                     </ul>
-                    
+
                     <!-- Desktop Theme Toggle -->
-                    <button class="btn btn-light border rounded-circle ms-3" id="theme-toggle-desktop" aria-label="Toggle theme">
+                    <button class="btn btn-light border rounded-circle ms-3" id="theme-toggle-desktop"
+                        aria-label="Toggle theme">
                         <i class="bi bi-moon-stars-fill"></i>
                     </button>
                 </div>
@@ -119,40 +138,46 @@
     </nav>
 
     <!-- Bottom Navigation for Mobile (Visible only on Mobile) -->
-    <nav class="navbar fixed-bottom navbar-light bg-white border-top d-lg-none shadow-lg" style="padding-bottom: env(safe-area-inset-bottom); z-index: 1040;">
+    <nav class="navbar fixed-bottom navbar-light bg-white border-top d-lg-none shadow-lg"
+        style="padding-bottom: env(safe-area-inset-bottom); z-index: 1040;">
         <div class="container-fluid px-0">
             <ul class="nav nav-pills nav-fill w-100" id="mobile-bottom-tab" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active d-flex flex-column align-items-center py-2 rounded-0" style="font-size: 0.7rem;" 
-                        id="mobile-pills-target-tab" data-bs-toggle="pill" data-bs-target="#pills-target" type="button" role="tab">
+                    <button class="nav-link active d-flex flex-column align-items-center py-2 rounded-0"
+                        style="font-size: 0.7rem;" id="mobile-pills-target-tab" data-bs-toggle="pill"
+                        data-bs-target="#pills-target" type="button" role="tab">
                         <i class="bi bi-graph-up-arrow fs-4 mb-1"></i>
                         <span>Lộ trình</span>
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link d-flex flex-column align-items-center py-2 rounded-0" style="font-size: 0.7rem;" 
-                        id="mobile-pills-manual-tab" data-bs-toggle="pill" data-bs-target="#pills-manual" type="button" role="tab">
+                    <button class="nav-link d-flex flex-column align-items-center py-2 rounded-0"
+                        style="font-size: 0.7rem;" id="mobile-pills-manual-tab" data-bs-toggle="pill"
+                        data-bs-target="#pills-manual" type="button" role="tab">
                         <i class="bi bi-calculator fs-4 mb-1"></i>
                         <span>Thủ công</span>
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link d-flex flex-column align-items-center py-2 rounded-0" style="font-size: 0.7rem;" 
-                        id="mobile-pills-course-tab" data-bs-toggle="pill" data-bs-target="#pills-course" type="button" role="tab">
+                    <button class="nav-link d-flex flex-column align-items-center py-2 rounded-0"
+                        style="font-size: 0.7rem;" id="mobile-pills-course-tab" data-bs-toggle="pill"
+                        data-bs-target="#pills-course" type="button" role="tab">
                         <i class="bi bi-journal-check fs-4 mb-1"></i>
                         <span>Môn học</span>
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link d-flex flex-column align-items-center py-2 rounded-0" style="font-size: 0.7rem;" 
-                        id="mobile-pills-scale-tab" data-bs-toggle="pill" data-bs-target="#pills-scale" type="button" role="tab">
+                    <button class="nav-link d-flex flex-column align-items-center py-2 rounded-0"
+                        style="font-size: 0.7rem;" id="mobile-pills-scale-tab" data-bs-toggle="pill"
+                        data-bs-target="#pills-scale" type="button" role="tab">
                         <i class="bi bi-table fs-4 mb-1"></i>
                         <span>Thang điểm</span>
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link d-flex flex-column align-items-center py-2 rounded-0" style="font-size: 0.7rem;" 
-                        id="mobile-pills-news-tab" data-bs-toggle="pill" data-bs-target="#pills-news" type="button" role="tab">
+                    <button class="nav-link d-flex flex-column align-items-center py-2 rounded-0"
+                        style="font-size: 0.7rem;" id="mobile-pills-news-tab" data-bs-toggle="pill"
+                        data-bs-target="#pills-news" type="button" role="tab">
                         <i class="bi bi-newspaper fs-4 mb-1"></i>
                         <span>Tin tức</span>
                     </button>
@@ -172,7 +197,7 @@
         </div>
 
         <div class="tab-content" id="pills-tabContent">
-            
+
             <!-- Tab 1: Lộ trình GPA (Target GPA) -->
             <div class="tab-pane fade show active" id="pills-target" role="tabpanel" tabindex="0">
                 <div class="row g-4">
@@ -180,93 +205,129 @@
                     <div class="col-lg-5 col-xxl-4 ani-fade-in-up delay-100">
                         <div class="card shadow-sm border-0 h-100 hover-translate-y">
                             <div class="card-header bg-white border-bottom-0 pt-4 pb-2">
-                                <h5 class="card-title fw-bold text-primary mb-0"><i class="bi bi-input-cursor-text me-2"></i>Thông tin hiện tại</h5>
+                                <h5 class="card-title fw-bold text-primary mb-0"><i
+                                        class="bi bi-input-cursor-text me-2"></i>Thông tin hiện tại</h5>
                                 <p class="text-muted small mt-1 mb-0">Nhập điểm số hiện tại và mục tiêu của bạn</p>
                             </div>
                             <div class="card-body pt-2">
                                 <div class="row g-3 mb-4">
-                                    <div class="col-6">
+                                    <div class="col-12 col-sm-6">
                                         <div class="d-flex justify-content-between align-items-center mb-1">
-                                            <label for="current-gpa" class="form-label fw-medium small text-secondary mb-0">GPA hiện tại</label>
+                                            <label for="current-gpa"
+                                                class="form-label fw-medium small text-secondary mb-0">GPA hiện
+                                                tại</label>
                                         </div>
                                         <div class="input-group">
-                                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-speedometer2"></i></span>
-                                            <input type="number" class="form-control border-start-0 ps-0" id="current-gpa" placeholder="3.2" step="0.01" min="0" max="4.0">
+                                            <span class="input-group-text bg-light border-end-0"><i
+                                                    class="bi bi-speedometer2"></i></span>
+                                            <input type="number" class="form-control border-start-0 ps-0"
+                                                id="current-gpa" placeholder="3.2" step="0.01" min="0" max="4.0">
                                         </div>
                                     </div>
-                                    <div class="col-6">
+                                    <div class="col-12 col-sm-6">
                                         <div class="d-flex justify-content-between align-items-center mb-1">
-                                            <label for="current-credits" class="form-label fw-medium small text-secondary mb-0">Số tín chỉ tích lũy</label>
+                                            <label for="current-credits"
+                                                class="form-label fw-medium small text-secondary mb-0">Số tín chỉ tích
+                                                lũy</label>
                                         </div>
                                         <div class="input-group">
-                                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-stack"></i></span>
-                                            <input type="number" class="form-control border-start-0 ps-0" id="current-credits" placeholder="60" min="0">
+                                            <span class="input-group-text bg-light border-end-0"><i
+                                                    class="bi bi-stack"></i></span>
+                                            <input type="number" class="form-control border-start-0 ps-0"
+                                                id="current-credits" placeholder="60" min="0">
                                         </div>
                                     </div>
-                                    <div class="col-6">
+                                    <div class="col-12 col-sm-6">
                                         <div class="d-flex justify-content-between align-items-center mb-1">
-                                            <label for="target-gpa" class="form-label fw-medium small text-secondary mb-0">GPA Mục tiêu</label>
+                                            <label for="target-gpa"
+                                                class="form-label fw-medium small text-secondary mb-0">GPA Mục
+                                                tiêu</label>
                                         </div>
                                         <div class="input-group">
-                                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-flag"></i></span>
-                                            <input type="number" class="form-control border-start-0 ps-0" id="target-gpa" placeholder="3.6" step="0.01" min="0" max="4.0">
+                                            <span class="input-group-text bg-light border-end-0"><i
+                                                    class="bi bi-flag"></i></span>
+                                            <input type="number" class="form-control border-start-0 ps-0"
+                                                id="target-gpa" placeholder="3.6" step="0.01" min="0" max="4.0">
                                         </div>
-                                        <!-- Spacer for symmetry -->
-                                        <div class="d-flex mt-1" style="visibility: hidden;" aria-hidden="true">
-                                            <button class="btn btn-link p-0 text-decoration-none small text-nowrap" style="font-size: 0.75rem;">&nbsp;</button>
+                                        <!-- Spacer for symmetry (Hidden on mobile) -->
+                                        <div class="d-none d-sm-flex mt-1" style="visibility: hidden;"
+                                            aria-hidden="true">
+                                            <button class="btn btn-link p-0 text-decoration-none small text-nowrap"
+                                                style="font-size: 0.75rem;">&nbsp;</button>
                                         </div>
-                                        <div class="form-text text-muted fst-italic mt-0" style="font-size: 0.65rem;">Điểm TB mong muốn.</div>
+                                        <div class="form-text text-muted fst-italic mt-0" style="font-size: 0.65rem;">
+                                            Điểm TB mong muốn.</div>
                                     </div>
-                                    <div class="col-6">
+                                    <div class="col-12 col-sm-6">
+
                                         <!-- Mode: New Credits -->
                                         <div id="new-credits-group">
-                                            <div class="d-flex justify-content-between align-items-center mb-1 flex-nowrap">
-                                                <label for="new-credits" class="form-label fw-medium small text-secondary mb-0 text-nowrap">Số tín chỉ còn lại</label>
+                                            <div
+                                                class="d-flex justify-content-between align-items-center mb-1 flex-nowrap">
+                                                <label for="new-credits"
+                                                    class="form-label fw-medium small text-secondary mb-0 text-nowrap">Số
+                                                    tín chỉ còn lại</label>
                                             </div>
                                             <div class="input-group">
-                                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-plus-circle"></i></span>
-                                                <input type="number" class="form-control border-start-0 ps-0" id="new-credits" placeholder="15" min="0">
+                                                <span class="input-group-text bg-light border-end-0"><i
+                                                        class="bi bi-plus-circle"></i></span>
+                                                <input type="number" class="form-control border-start-0 ps-0"
+                                                    id="new-credits" placeholder="15" min="0">
                                             </div>
                                             <div class="d-flex justify-content-end mt-1">
-                                                <button type="button" class="btn btn-link p-0 text-decoration-none small text-nowrap" id="btn-switch-to-total" style="font-size: 0.75rem;">
+                                                <button type="button"
+                                                    class="btn btn-link p-0 text-decoration-none small text-nowrap"
+                                                    id="btn-switch-to-total" style="font-size: 0.75rem;">
                                                     <i class="bi bi-arrow-repeat me-1"></i>Đổi sang Tổng TC
                                                 </button>
                                             </div>
-                                            <div class="form-text text-muted fst-italic mt-0 text-end" style="font-size: 0.65rem;">Số tín chỉ còn lại bạn cần học tiếp.</div>
+                                            <div class="form-text text-muted fst-italic mt-0 text-end"
+                                                style="font-size: 0.65rem;">Số tín chỉ còn lại bạn cần học tiếp.</div>
                                         </div>
 
                                         <!-- Mode: Total Credits -->
                                         <div id="total-credits-group" class="d-none">
-                                            <div class="d-flex justify-content-between align-items-center mb-1 flex-nowrap">
-                                                <label for="total-credits" class="form-label fw-medium small text-secondary mb-0 text-nowrap">Tổng tín chỉ</label>
+                                            <div
+                                                class="d-flex justify-content-between align-items-center mb-1 flex-nowrap">
+                                                <label for="total-credits"
+                                                    class="form-label fw-medium small text-secondary mb-0 text-nowrap">Tổng
+                                                    tín chỉ</label>
                                             </div>
                                             <div class="input-group">
-                                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-mortarboard"></i></span>
-                                                <input type="number" class="form-control border-start-0 ps-0" id="total-credits" placeholder="130" min="0">
+                                                <span class="input-group-text bg-light border-end-0"><i
+                                                        class="bi bi-mortarboard"></i></span>
+                                                <input type="number" class="form-control border-start-0 ps-0"
+                                                    id="total-credits" placeholder="130" min="0">
                                             </div>
                                             <div class="d-flex justify-content-end mt-1">
-                                                <button type="button" class="btn btn-link p-0 text-decoration-none small text-nowrap" id="btn-switch-to-new" style="font-size: 0.75rem;">
+                                                <button type="button"
+                                                    class="btn btn-link p-0 text-decoration-none small text-nowrap"
+                                                    id="btn-switch-to-new" style="font-size: 0.75rem;">
                                                     <i class="bi bi-arrow-repeat me-1"></i>Đổi sang TC mới
                                                 </button>
                                             </div>
-                                            <div class="form-text text-muted fst-italic mt-0 text-end" style="font-size: 0.65rem;">Tổng tín chỉ toàn khóa để tốt nghiệp.</div>
+                                            <div class="form-text text-muted fst-italic mt-0 text-end"
+                                                style="font-size: 0.65rem;">Tổng tín chỉ toàn khóa để tốt nghiệp.</div>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="bg-light rounded-3 p-3 mb-4">
-                                    <div class="form-check form-switch d-flex justify-content-between align-items-center ps-0 mb-0">
+                                    <div
+                                        class="form-check form-switch d-flex justify-content-between align-items-center ps-0 mb-0">
                                         <label class="form-check-label fw-bold text-dark" for="retake-toggle">
                                             <i class="bi bi-arrow-repeat me-2 text-primary"></i>Học cải thiện
                                         </label>
-                                        <input class="form-check-input ms-0" type="checkbox" role="switch" id="retake-toggle" style="width: 3em; height: 1.5em;">
+                                        <input class="form-check-input ms-0" type="checkbox" role="switch"
+                                            id="retake-toggle" style="width: 3em; height: 1.5em;">
                                     </div>
 
                                     <!-- Retake Area -->
                                     <div id="retake-area" class="d-none mt-3 pt-3 border-top border-secondary-subtle">
                                         <div class="d-flex justify-content-between align-items-center mb-3">
                                             <small class="text-muted fw-medium">Danh sách môn học lại</small>
-                                            <button class="btn btn-sm btn-white border shadow-sm text-primary fw-medium" id="add-retake-btn">
+                                            <button class="btn btn-sm btn-white border shadow-sm text-primary fw-medium"
+                                                id="add-retake-btn">
                                                 <i class="bi bi-plus-lg me-1"></i>Thêm môn
                                             </button>
                                         </div>
@@ -276,7 +337,8 @@
                                     </div>
                                 </div>
 
-                                <button class="btn btn-primary w-100 py-3 fw-bold shadow-sm rounded-3" id="calc-target-btn">
+                                <button class="btn btn-primary w-100 py-3 fw-bold shadow-sm rounded-3"
+                                    id="calc-target-btn">
                                     <i class="bi bi-calculator-fill me-2"></i>Tính toán Lộ trình
                                 </button>
                             </div>
@@ -287,22 +349,38 @@
                     <div class="col-lg-7 col-xxl-8 ani-fade-in-up delay-200">
                         <div class="card shadow-sm border-0 h-100 hover-translate-y">
                             <div class="card-header bg-white border-bottom-0 pt-4 pb-2">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h5 class="card-title fw-bold text-primary mb-0"><i class="bi bi-lightning-charge me-2"></i>Kết quả dự báo</h5>
-                                        <p class="text-muted small mt-1 mb-0">Phân tích khả năng đạt mục tiêu của bạn</p>
+                                <div
+                                    class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2">
+                                    <div class="mb-1 mb-sm-0">
+                                        <h5 class="card-title fw-bold text-primary mb-0"><i
+                                                class="bi bi-lightning-charge me-2"></i>Kết quả dự báo</h5>
+                                        <p class="text-muted small mt-1 mb-0">Phân tích khả năng đạt mục tiêu của bạn
+                                        </p>
                                     </div>
-                                    <button class="btn btn-sm btn-outline-primary rounded-pill d-none" id="share-target-btn">
-                                        <i class="bi bi-share me-1"></i>Chia sẻ
-                                    </button>
+                                    <div
+                                        class="d-flex gap-2 w-100 w-sm-auto justify-content-start justify-content-sm-end">
+                                        <button
+                                            class="btn btn-sm btn-outline-success rounded-pill d-none flex-fill flex-sm-none"
+                                            id="export-pdf-btn">
+                                            <i class="bi bi-file-earmark-pdf me-1"></i>Xuất PDF
+                                        </button>
+                                        <button
+                                            class="btn btn-sm btn-outline-primary rounded-pill d-none flex-fill flex-sm-none"
+                                            id="share-target-btn">
+                                            <i class="bi bi-share me-1"></i>Chia sẻ
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="card-body d-flex flex-column justify-content-center align-items-center text-center p-4" id="target-result-container">
-                                <div class="bg-light rounded-circle mb-3 d-flex align-items-center justify-content-center" style="width: 100px; height: 100px;">
+                            <div class="card-body d-flex flex-column justify-content-center align-items-center text-center p-4"
+                                id="target-result-container">
+                                <div class="bg-light rounded-circle mb-3 d-flex align-items-center justify-content-center"
+                                    style="width: 100px; height: 100px;">
                                     <i class="bi bi-graph-up-arrow text-secondary" style="font-size: 3rem;"></i>
                                 </div>
                                 <h5 class="fw-bold text-secondary">Chưa có dữ liệu</h5>
-                                <p class="text-muted small" style="max-width: 300px;">Vui lòng nhập thông tin và nhấn "Tính toán Lộ trình" để xem kết quả chi tiết.</p>
+                                <p class="text-muted small" style="max-width: 300px;">Vui lòng nhập thông tin và nhấn
+                                    "Tính toán Lộ trình" để xem kết quả chi tiết.</p>
                             </div>
                         </div>
                     </div>
@@ -314,48 +392,70 @@
                 <div class="row g-4">
                     <!-- Left Column: Summary (Sticky) -->
                     <div class="col-lg-4 col-xxl-3 order-last order-lg-first ani-fade-in-up delay-200">
-                        <div class="card shadow-sm border-primary sticky-lg-top hover-translate-y" style="top: 90px; z-index: 100;">
-                            <div class="card-header bg-primary text-white">
-                                <h5 class="card-title mb-0"><i class="bi bi-calculator me-2"></i>Tổng kết</h5>
-                            </div>
-                            <div class="card-body">
-                                <!-- Initial Data Inputs -->
-                                <div class="mb-3 bg-light p-2 rounded">
-                                    <label class="form-label small fw-bold text-muted mb-1">Dữ liệu ban đầu (Tùy chọn)</label>
-                                    <div class="row g-2">
-                                        <div class="col-6">
-                                            <input type="number" class="form-control form-control-sm" id="manual-initial-gpa" placeholder="GPA cũ" step="0.01" min="0" max="4.0">
-                                        </div>
-                                        <div class="col-6">
-                                            <input type="number" class="form-control form-control-sm" id="manual-initial-credits" placeholder="TC cũ" min="0">
-                                        </div>
-                                    </div>
+                        <div class="sticky-lg-top" style="top: 90px; z-index: 100;">
+                            <!-- Summary Card -->
+                            <div class="card shadow-sm border-primary hover-translate-y mb-3">
+                                <div class="card-header bg-primary text-white py-3">
+                                    <h5 class="card-title fw-bold mb-0"><i class="bi bi-calculator me-2"></i>Tổng kết
+                                    </h5>
                                 </div>
-                                
-                                <div class="text-center">
-                                    <h6 class="text-muted text-uppercase small">GPA Tích lũy Mới</h6>
-                                    <div class="display-1 fw-bold text-primary mb-2" id="manual-gpa">0.00</div>
-                                    
-                                    <div class="row mt-4">
-                                        <div class="col-6 border-end">
-                                            <h6 class="text-muted small">Tổng Tín chỉ</h6>
-                                            <div class="fs-4 fw-bold" id="manual-credits">0</div>
-                                        </div>
-                                        <div class="col-6">
-                                            <h6 class="text-muted small">Xếp loại</h6>
-                                            <div class="fs-4 fw-bold" id="manual-rank">-</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <button class="btn btn-primary w-100 mt-3 mb-2 shadow-sm" id="apply-manual-to-target-btn">
-                                    <i class="bi bi-box-arrow-in-up-right me-2"></i>Dùng làm dữ liệu Lộ trình
-                                </button>
+                                <div class="card-body">
+                                    <!-- Initial Data Inputs -->
+                                    <div class="mb-3 bg-light p-2 rounded">
+                                        <label class="form-label small fw-bold text-muted mb-1">Dữ liệu ban đầu (Tùy
+                                            chọn)</label>
+                                        <div class="row g-2">
+                                            <div class="col-12 col-sm-6">
+                                                <input type="number" class="form-control form-control-sm"
+                                                    id="manual-initial-gpa" placeholder="GPA cũ" step="0.01" min="0"
+                                                    max="4.0">
+                                            </div>
+                                            <div class="col-12 col-sm-6">
+                                                <input type="number" class="form-control form-control-sm"
+                                                    id="manual-initial-credits" placeholder="TC cũ" min="0">
+                                            </div>
 
-                                <hr>
-                                <button class="btn btn-outline-danger btn-sm w-100" id="reset-manual-btn">
-                                    <i class="bi bi-arrow-counterclockwise me-1"></i>Làm mới
-                                </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="text-center">
+                                        <h6 class="text-muted text-uppercase small">GPA Tích lũy Mới</h6>
+                                        <div class="display-1 fw-bold text-primary mb-2" id="manual-gpa">0.00</div>
+
+                                        <div class="row mt-4">
+                                            <div class="col-6 border-end">
+                                                <h6 class="text-muted small">Tổng Tín chỉ</h6>
+                                                <div class="fs-4 fw-bold" id="manual-credits">0</div>
+                                            </div>
+                                            <div class="col-6">
+                                                <h6 class="text-muted small">Xếp loại</h6>
+                                                <div class="fs-4 fw-bold" id="manual-rank">-</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <button class="btn btn-primary w-100 mt-3 mb-2 shadow-sm fw-bold"
+                                        id="apply-manual-to-target-btn">
+                                        <i class="bi bi-box-arrow-in-up-right me-2"></i>Dùng làm dữ liệu Lộ trình
+                                    </button>
+
+                                    <hr>
+                                    <button class="btn btn-outline-danger btn-sm w-100" id="reset-manual-btn">
+                                        <i class="bi bi-arrow-counterclockwise me-1"></i>Làm mới
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- GPA Progress Chart Card -->
+                            <div class="card shadow-sm border-primary ani-fade-in-up delay-300 hover-translate-y">
+                                <div class="card-header bg-white border-bottom py-3">
+                                    <h6 class="card-title fw-bold text-primary mb-0"><i
+                                            class="bi bi-graph-up me-2"></i>Biến động GPA</h6>
+                                    <p class="text-muted small mt-1 mb-0">Theo dõi tiến trình học tập</p>
+                                </div>
+                                <div class="card-body p-3">
+                                    <canvas id="gpa-chart" style="max-height: 180px;"></canvas>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -364,7 +464,8 @@
                     <div class="col-lg-8 col-xxl-9 order-first order-lg-last ani-fade-in-up delay-100">
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <h5 class="fw-bold text-primary mb-0">Danh sách học kỳ</h5>
-                            <button class="btn btn-success btn-sm shadow-sm" data-bs-toggle="modal" data-bs-target="#importModal">
+                            <button class="btn btn-success btn-sm shadow-sm" data-bs-toggle="modal"
+                                data-bs-target="#importModal">
                                 <i class="bi bi-file-earmark-text me-1"></i>Nhập từ Portal
                             </button>
                         </div>
@@ -373,7 +474,8 @@
                             <!-- Semesters will be rendered here -->
                         </div>
 
-                        <button class="btn btn-outline-primary border-dashed w-100 py-3 fw-medium" id="add-semester-btn" style="border-style: dashed; border-width: 2px;">
+                        <button class="btn btn-outline-primary border-dashed w-100 py-3 fw-medium" id="add-semester-btn"
+                            style="border-style: dashed; border-width: 2px;">
                             <i class="bi bi-plus-circle-fill me-2"></i>Thêm Học kỳ mới
                         </button>
                     </div>
@@ -387,72 +489,96 @@
                     <div class="col-lg-5 ani-fade-in-up delay-100">
                         <div class="card shadow-sm border-0 hover-translate-y">
                             <div class="card-header bg-white border-bottom-0 pt-3 pb-2">
-                                <h5 class="card-title fw-bold text-primary mb-0"><i class="bi bi-sliders me-2"></i>Cấu hình môn học</h5>
+                                <h5 class="card-title fw-bold text-primary mb-0"><i class="bi bi-sliders me-2"></i>Cấu
+                                    hình môn học</h5>
                                 <p class="text-muted small mt-1 mb-0">Nhập điểm quá trình và chọn tỷ lệ</p>
                             </div>
                             <div class="card-body pt-1">
                                 <!-- Ratio Selection -->
                                 <div class="mb-3">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <label class="form-label fw-medium small text-secondary mb-0">Tỷ lệ (Quá trình / Cuối kỳ)</label>
-                                        <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none small" data-bs-toggle="modal" data-bs-target="#calculationModal">
+                                        <label class="form-label fw-medium small text-secondary mb-0">Tỷ lệ (Quá trình /
+                                            Cuối kỳ)</label>
+                                        <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none small"
+                                            data-bs-toggle="modal" data-bs-target="#calculationModal">
                                             <i class="bi bi-question-circle me-1"></i>Cách tính?
                                         </button>
                                     </div>
                                     <div class="d-flex bg-light p-1 rounded-3 w-100 border" id="course-ratio-group">
-                                        <input type="radio" class="btn-check" name="btnradio" id="ratio3070" autocomplete="off" value="0.3">
-                                        <label class="btn btn-sm btn-segmented rounded-3 flex-fill text-nowrap border-0 py-2 fw-medium" for="ratio3070">30/70</label>
-                
-                                        <input type="radio" class="btn-check" name="btnradio" id="ratio4060" autocomplete="off" value="0.4" checked>
-                                        <label class="btn btn-sm btn-segmented rounded-3 flex-fill text-nowrap border-0 py-2 fw-medium" for="ratio4060">40/60</label>
-                
-                                        <input type="radio" class="btn-check" name="btnradio" id="ratio5050" autocomplete="off" value="0.5">
-                                        <label class="btn btn-sm btn-segmented rounded-3 flex-fill text-nowrap border-0 py-2 fw-medium" for="ratio5050">50/50</label>
+                                        <input type="radio" class="btn-check" name="btnradio" id="ratio3070"
+                                            autocomplete="off" value="0.3">
+                                        <label
+                                            class="btn btn-sm btn-segmented rounded-3 flex-fill text-nowrap border-0 py-2 fw-medium"
+                                            for="ratio3070">30/70</label>
+
+                                        <input type="radio" class="btn-check" name="btnradio" id="ratio4060"
+                                            autocomplete="off" value="0.4" checked>
+                                        <label
+                                            class="btn btn-sm btn-segmented rounded-3 flex-fill text-nowrap border-0 py-2 fw-medium"
+                                            for="ratio4060">40/60</label>
+
+                                        <input type="radio" class="btn-check" name="btnradio" id="ratio5050"
+                                            autocomplete="off" value="0.5">
+                                        <label
+                                            class="btn btn-sm btn-segmented rounded-3 flex-fill text-nowrap border-0 py-2 fw-medium"
+                                            for="ratio5050">50/50</label>
                                     </div>
                                 </div>
-                
+
                                 <!-- Process Score Input -->
                                 <div class="mb-3">
-                                    <label for="process-score-input" class="form-label fw-medium small text-secondary">Điểm quá trình</label>
+                                    <label for="process-score-input"
+                                        class="form-label fw-medium small text-secondary">Điểm quá trình</label>
                                     <div class="bg-light p-2 rounded-3 border">
                                         <div class="d-flex align-items-center gap-3 mb-2">
                                             <span class="text-muted small"><i class="bi bi-dash-circle"></i></span>
-                                            <input type="range" class="form-range flex-grow-1" min="0" max="10" step="0.1" id="process-score-range" title="Điểm quá trình">
+                                            <input type="range" class="form-range flex-grow-1" min="0" max="10"
+                                                step="0.1" id="process-score-range" title="Điểm quá trình">
                                             <span class="text-muted small"><i class="bi bi-plus-circle"></i></span>
                                         </div>
                                         <div class="input-group input-group-sm">
-                                            <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-pencil"></i></span>
-                                            <input type="number" class="form-control border-start-0 text-center fw-bold text-primary fs-5" style="height: 40px;" min="0" max="10" step="0.1" id="process-score-input">
+                                            <span class="input-group-text bg-white border-end-0 text-muted"><i
+                                                    class="bi bi-pencil"></i></span>
+                                            <input type="number"
+                                                class="form-control border-start-0 text-center fw-bold text-primary fs-5"
+                                                style="height: 40px;" min="0" max="10" step="0.1"
+                                                id="process-score-input">
                                         </div>
                                     </div>
                                 </div>
-                
+
                                 <!-- Accumulated Score -->
-                                <div class="bg-primary-subtle rounded-3 p-2 d-flex align-items-center justify-content-between border border-primary-subtle mb-2">
+                                <div
+                                    class="bg-primary-subtle rounded-3 p-2 d-flex align-items-center justify-content-between border border-primary-subtle mb-2">
                                     <div>
                                         <div class="text-primary fw-bold small text-uppercase mb-1">Điểm đã có</div>
-                                        <div class="text-muted small" style="font-size: 0.75rem;">(Quá trình × Tỷ lệ)</div>
+                                        <div class="text-muted small" style="font-size: 0.75rem;">(Quá trình × Tỷ lệ)
+                                        </div>
                                     </div>
                                     <span class="fw-bold fs-4 text-primary" id="accumulated-score">0.00</span>
                                 </div>
 
                                 <!-- Score Needed to Pass -->
-                                <div class="bg-success-subtle rounded-3 p-2 d-flex align-items-center justify-content-between border border-success-subtle">
+                                <div
+                                    class="bg-success-subtle rounded-3 p-2 d-flex align-items-center justify-content-between border border-success-subtle">
                                     <div>
-                                        <div class="text-success fw-bold small text-uppercase mb-1">Điểm cần qua môn</div>
-                                        <div class="text-muted small" style="font-size: 0.75rem;">(Thi cuối kỳ tối thiểu)</div>
+                                        <div class="text-success fw-bold small text-uppercase mb-1">Điểm cần qua môn
+                                        </div>
+                                        <div class="text-muted small" style="font-size: 0.75rem;">(Thi cuối kỳ tối
+                                            thiểu)</div>
                                     </div>
                                     <span class="fw-bold fs-4 text-success" id="score-to-pass">--</span>
                                 </div>
                             </div>
                         </div>
                     </div>
-        
+
                     <!-- Right Column: Results -->
                     <div class="col-lg-7 ani-fade-in-up delay-200">
                         <div class="card shadow-sm border-0 hover-translate-y">
                             <div class="card-header bg-white border-bottom-0 pt-3 pb-2">
-                                <h5 class="card-title fw-bold text-primary mb-0"><i class="bi bi-bullseye me-2"></i>Mục tiêu điểm thi</h5>
+                                <h5 class="card-title fw-bold text-primary mb-0"><i class="bi bi-bullseye me-2"></i>Mục
+                                    tiêu điểm thi</h5>
                                 <p class="text-muted small mt-1 mb-0">Điểm cần đạt cho từng mức điểm tổng kết</p>
                             </div>
                             <div class="card-body p-0">
@@ -471,337 +597,424 @@
             <!-- Tab 4: Thang điểm (Grade Scale) -->
             <div class="tab-pane fade" id="pills-scale" role="tabpanel" tabindex="0">
                 <div class="d-flex align-items-center justify-content-between mb-4">
-                     <div class="d-flex align-items-center me-2">
-                        <div class="bg-primary bg-opacity-10 rounded-circle me-2 me-md-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 45px; height: 45px; min-width: 45px;">
+                    <div class="d-flex align-items-center me-2">
+                        <div class="bg-primary bg-opacity-10 rounded-circle me-2 me-md-3 d-flex align-items-center justify-content-center flex-shrink-0"
+                            style="width: 45px; height: 45px; min-width: 45px;">
                             <i class="bi bi-table text-primary fs-4"></i>
                         </div>
-                        <h4 class="fw-bold text-primary mb-0 lh-sm" style="font-size: clamp(1.1rem, 4vw, 1.5rem);">Thang điểm HUFLIT</h4>
-                     </div>
-                     <button class="btn btn-outline-primary btn-sm rounded-pill flex-shrink-0" id="toggle-sort-scale-btn">
+                        <h4 class="fw-bold text-primary mb-0 lh-sm" style="font-size: clamp(1.1rem, 4vw, 1.5rem);">Thang
+                            điểm HUFLIT</h4>
+                    </div>
+                    <button class="btn btn-outline-primary btn-sm rounded-pill flex-shrink-0"
+                        id="toggle-sort-scale-btn">
                         <i class="bi bi-arrow-down-up me-1"></i>Sắp xếp
-                     </button>
+                    </button>
                 </div>
-                
+
                 <div class="row g-4">
                     <!-- Left Column: Grade Scale & Classification -->
                     <div class="col-lg-5 order-last order-lg-first ani-fade-in-up delay-200">
-                        
+
                         <div class="d-flex flex-column gap-4" id="scale-list-container">
                             <!-- 1. Xếp loại Học lực (Moved to top) -->
-                            <div class="card shadow-sm border-0 scale-card position-relative hover-translate-y" id="scale-item-classification">
-                                <div class="scale-sort-controls position-absolute top-0 end-0 m-2 d-none gap-1 bg-white rounded shadow-sm p-1 z-3">
-                                    <button class="btn btn-sm btn-light border btn-move-up" title="Lên"><i class="bi bi-chevron-up"></i></button>
-                                    <button class="btn btn-sm btn-light border btn-move-down" title="Xuống"><i class="bi bi-chevron-down"></i></button>
+                            <div class="card shadow-sm border-0 scale-card position-relative hover-translate-y"
+                                id="scale-item-classification">
+                                <div
+                                    class="scale-sort-controls position-absolute top-0 end-0 m-2 d-none gap-1 bg-white rounded shadow-sm p-1 z-3">
+                                    <button class="btn btn-sm btn-light border btn-move-up" title="Lên"><i
+                                            class="bi bi-chevron-up"></i></button>
+                                    <button class="btn btn-sm btn-light border btn-move-down" title="Xuống"><i
+                                            class="bi bi-chevron-down"></i></button>
                                 </div>
                                 <div class="card-header bg-white border-bottom-0 pt-4 pb-2">
-                                    <h5 class="card-title fw-bold text-primary mb-0"><i class="bi bi-award me-2"></i>Xếp loại Học lực</h5>
-                                    <p class="text-muted small mt-1 mb-0">Phân loại dựa trên điểm trung bình tích lũy</p>
+                                    <h5 class="card-title fw-bold text-primary mb-0"><i class="bi bi-award me-2"></i>Xếp
+                                        loại Học lực</h5>
+                                    <p class="text-muted small mt-1 mb-0">Phân loại dựa trên điểm trung bình tích lũy
+                                    </p>
                                 </div>
-                            <div class="card-body p-0">
-                                <div class="table-responsive">
-                                    <table class="table table-hover align-middle mb-0">
-                                        <thead class="bg-light small text-secondary">
-                                            <tr>
-                                                <th class="ps-4">Xếp loại</th>
-                                                <th class="text-end pe-4">GPA</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody class="border-top-0" id="classification-table-body">
-                                            <tr>
-                                                <td class="ps-4 fw-bold text-success">Xuất sắc</td>
-                                                <td class="text-end pe-4 small text-secondary fw-medium">3.60 - 4.00</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="ps-4 fw-bold text-primary">Giỏi</td>
-                                                <td class="text-end pe-4 small text-secondary fw-medium">3.20 - 3.59</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="ps-4 fw-bold text-info-emphasis">Khá</td>
-                                                <td class="text-end pe-4 small text-secondary fw-medium">2.50 - 3.19</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="ps-4 fw-bold text-warning-emphasis">Trung bình</td>
-                                                <td class="text-end pe-4 small text-secondary fw-medium">2.00 - 2.49</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="ps-4 fw-bold text-secondary">Yếu</td>
-                                                <td class="text-end pe-4 small text-secondary fw-medium">1.00 - 1.99</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="ps-4 fw-bold text-danger">Kém</td>
-                                                <td class="text-end pe-4 small text-secondary fw-medium">&lt; 1.00</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                                <div class="card-body p-0">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover align-middle mb-0">
+                                            <thead class="bg-light small text-secondary">
+                                                <tr>
+                                                    <th class="ps-4">Xếp loại</th>
+                                                    <th class="text-end pe-4">GPA</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="border-top-0" id="classification-table-body">
+                                                <tr>
+                                                    <td class="ps-4 fw-bold text-success">Xuất sắc</td>
+                                                    <td class="text-end pe-4 small text-secondary fw-medium">3.60 - 4.00
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="ps-4 fw-bold text-primary">Giỏi</td>
+                                                    <td class="text-end pe-4 small text-secondary fw-medium">3.20 - 3.59
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="ps-4 fw-bold text-info-emphasis">Khá</td>
+                                                    <td class="text-end pe-4 small text-secondary fw-medium">2.50 - 3.19
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="ps-4 fw-bold text-warning-emphasis">Trung bình</td>
+                                                    <td class="text-end pe-4 small text-secondary fw-medium">2.00 - 2.49
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="ps-4 fw-bold text-secondary">Yếu</td>
+                                                    <td class="text-end pe-4 small text-secondary fw-medium">1.00 - 1.99
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="ps-4 fw-bold text-danger">Kém</td>
+                                                    <td class="text-end pe-4 small text-secondary fw-medium">&lt; 1.00
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- 2. Thang điểm Tín chỉ -->
-                        <div class="card shadow-sm border-0 flex-grow-1 scale-card position-relative hover-translate-y" id="scale-item-grade-scale">
-                             <div class="scale-sort-controls position-absolute top-0 end-0 m-2 d-none gap-1 bg-white rounded shadow-sm p-1 z-3">
-                                <button class="btn btn-sm btn-light border btn-move-up" title="Lên"><i class="bi bi-chevron-up"></i></button>
-                                <button class="btn btn-sm btn-light border btn-move-down" title="Xuống"><i class="bi bi-chevron-down"></i></button>
-                            </div>
-                            <div class="card-header bg-white border-bottom-0 pt-4 pb-2">
-                                <h5 class="card-title fw-bold text-primary mb-0"><i class="bi bi-table me-2"></i>Thang điểm Tín chỉ</h5>
-                                <p class="text-muted small mt-1 mb-0">Quy đổi điểm số theo quy chế tín chỉ</p>
-                            </div>
-                            <div class="card-body p-0">
-                                <div class="table-responsive">
-                                    <table class="table table-hover align-middle mb-0">
-                                        <thead class="bg-light small text-secondary">
-                                            <tr>
-                                                <th class="ps-4">Xếp loại</th>
-                                                <th class="text-center">Hệ 10</th>
-                                                <th class="text-end pe-4">GPA</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody class="border-top-0" id="grade-scale-table-body">
-                                            <tr>
-                                                <td class="ps-4 fw-bold text-success">A+</td>
-                                                <td class="text-center small text-secondary fw-medium">9.0 - 10</td>
-                                                <td class="text-end pe-4 small text-secondary fw-medium">4.0</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="ps-4 fw-bold text-success">A</td>
-                                                <td class="text-center small text-secondary fw-medium">8.5 - 8.9</td>
-                                                <td class="text-end pe-4 small text-secondary fw-medium">4.0</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="ps-4 fw-bold text-primary">B+</td>
-                                                <td class="text-center small text-secondary fw-medium">8.0 - 8.4</td>
-                                                <td class="text-end pe-4 small text-secondary fw-medium">3.5</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="ps-4 fw-bold text-primary">B</td>
-                                                <td class="text-center small text-secondary fw-medium">7.0 - 7.9</td>
-                                                <td class="text-end pe-4 small text-secondary fw-medium">3.0</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="ps-4 fw-bold text-info-emphasis">C+</td>
-                                                <td class="text-center small text-secondary fw-medium">6.0 - 6.9</td>
-                                                <td class="text-end pe-4 small text-secondary fw-medium">2.5</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="ps-4 fw-bold text-info-emphasis">C</td>
-                                                <td class="text-center small text-secondary fw-medium">5.5 - 5.9</td>
-                                                <td class="text-end pe-4 small text-secondary fw-medium">2.0</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="ps-4 fw-bold text-warning-emphasis">D+</td>
-                                                <td class="text-center small text-secondary fw-medium">5.0 - 5.4</td>
-                                                <td class="text-end pe-4 small text-secondary fw-medium">1.5</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="ps-4 fw-bold text-warning-emphasis">D</td>
-                                                <td class="text-center small text-secondary fw-medium">4.0 - 4.9</td>
-                                                <td class="text-end pe-4 small text-secondary fw-medium">1.0</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="ps-4 fw-bold text-danger">F</td>
-                                                <td class="text-center small text-secondary fw-medium">&lt; 4.0</td>
-                                                <td class="text-end pe-4 small text-secondary fw-medium">0.0</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                            <!-- 2. Thang điểm Tín chỉ -->
+                            <div class="card shadow-sm border-0 flex-grow-1 scale-card position-relative hover-translate-y"
+                                id="scale-item-grade-scale">
+                                <div
+                                    class="scale-sort-controls position-absolute top-0 end-0 m-2 d-none gap-1 bg-white rounded shadow-sm p-1 z-3">
+                                    <button class="btn btn-sm btn-light border btn-move-up" title="Lên"><i
+                                            class="bi bi-chevron-up"></i></button>
+                                    <button class="btn btn-sm btn-light border btn-move-down" title="Xuống"><i
+                                            class="bi bi-chevron-down"></i></button>
+                                </div>
+                                <div class="card-header bg-white border-bottom-0 pt-4 pb-2">
+                                    <h5 class="card-title fw-bold text-primary mb-0"><i
+                                            class="bi bi-table me-2"></i>Thang điểm Tín chỉ</h5>
+                                    <p class="text-muted small mt-1 mb-0">Quy đổi điểm số theo quy chế tín chỉ</p>
+                                </div>
+                                <div class="card-body p-0">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover align-middle mb-0">
+                                            <thead class="bg-light small text-secondary">
+                                                <tr>
+                                                    <th class="ps-4">Xếp loại</th>
+                                                    <th class="text-center">Hệ 10</th>
+                                                    <th class="text-end pe-4">GPA</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="border-top-0" id="grade-scale-table-body">
+                                                <tr>
+                                                    <td class="ps-4 fw-bold text-success">A+</td>
+                                                    <td class="text-center small text-secondary fw-medium">9.0 - 10</td>
+                                                    <td class="text-end pe-4 small text-secondary fw-medium">4.0</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="ps-4 fw-bold text-success">A</td>
+                                                    <td class="text-center small text-secondary fw-medium">8.5 - 8.9
+                                                    </td>
+                                                    <td class="text-end pe-4 small text-secondary fw-medium">4.0</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="ps-4 fw-bold text-primary">B+</td>
+                                                    <td class="text-center small text-secondary fw-medium">8.0 - 8.4
+                                                    </td>
+                                                    <td class="text-end pe-4 small text-secondary fw-medium">3.5</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="ps-4 fw-bold text-primary">B</td>
+                                                    <td class="text-center small text-secondary fw-medium">7.0 - 7.9
+                                                    </td>
+                                                    <td class="text-end pe-4 small text-secondary fw-medium">3.0</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="ps-4 fw-bold text-info-emphasis">C+</td>
+                                                    <td class="text-center small text-secondary fw-medium">6.0 - 6.9
+                                                    </td>
+                                                    <td class="text-end pe-4 small text-secondary fw-medium">2.5</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="ps-4 fw-bold text-info-emphasis">C</td>
+                                                    <td class="text-center small text-secondary fw-medium">5.5 - 5.9
+                                                    </td>
+                                                    <td class="text-end pe-4 small text-secondary fw-medium">2.0</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="ps-4 fw-bold text-warning-emphasis">D+</td>
+                                                    <td class="text-center small text-secondary fw-medium">5.0 - 5.4
+                                                    </td>
+                                                    <td class="text-end pe-4 small text-secondary fw-medium">1.5</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="ps-4 fw-bold text-warning-emphasis">D</td>
+                                                    <td class="text-center small text-secondary fw-medium">4.0 - 4.9
+                                                    </td>
+                                                    <td class="text-end pe-4 small text-secondary fw-medium">1.0</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="ps-4 fw-bold text-danger">F</td>
+                                                    <td class="text-center small text-secondary fw-medium">&lt; 4.0</td>
+                                                    <td class="text-end pe-4 small text-secondary fw-medium">0.0</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- 3. Thang xếp loại điểm rèn luyện -->
-                        <div class="card shadow-sm border-0 flex-grow-1 scale-card position-relative hover-translate-y" id="scale-item-training-point">
-                            <div class="scale-sort-controls position-absolute top-0 end-0 m-2 d-none gap-1 bg-white rounded shadow-sm p-1 z-3">
-                                <button class="btn btn-sm btn-light border btn-move-up" title="Lên"><i class="bi bi-chevron-up"></i></button>
-                                <button class="btn btn-sm btn-light border btn-move-down" title="Xuống"><i class="bi bi-chevron-down"></i></button>
-                            </div>
-                            <div class="card-header bg-white border-bottom-0 pt-4 pb-2">
-                                <h5 class="card-title fw-bold text-primary mb-0"><i class="bi bi-star me-2"></i>Thang xếp loại điểm rèn luyện</h5>
-                                <p class="text-muted small mt-1 mb-0">Phân loại dựa trên điểm rèn luyện</p>
-                            </div>
-                            <div class="card-body p-0">
-                                <div class="table-responsive">
-                                    <table class="table table-hover align-middle mb-0">
-                                        <thead class="bg-light small text-secondary">
-                                            <tr>
-                                                <th class="ps-4">Xếp loại</th>
-                                                <th class="text-end pe-4">Khoảng điểm</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody class="border-top-0">
-                                            <tr>
-                                                <td class="ps-4 fw-bold text-success">Xuất sắc</td>
-                                                <td class="text-end pe-4 small text-secondary fw-medium">90 - 100 điểm</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="ps-4 fw-bold text-primary">Tốt</td>
-                                                <td class="text-end pe-4 small text-secondary fw-medium">80 - dưới 90 điểm</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="ps-4 fw-bold text-info-emphasis">Khá</td>
-                                                <td class="text-end pe-4 small text-secondary fw-medium">65 - dưới 80 điểm</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="ps-4 fw-bold text-warning-emphasis">Trung bình</td>
-                                                <td class="text-end pe-4 small text-secondary fw-medium">50 - dưới 65 điểm</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="ps-4 fw-bold text-secondary">Yếu</td>
-                                                <td class="text-end pe-4 small text-secondary fw-medium">35 - dưới 50 điểm</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="ps-4 fw-bold text-danger">Kém</td>
-                                                <td class="text-end pe-4 small text-secondary fw-medium">Dưới 35 điểm</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                            <!-- 3. Thang xếp loại điểm rèn luyện -->
+                            <div class="card shadow-sm border-0 flex-grow-1 scale-card position-relative hover-translate-y"
+                                id="scale-item-training-point">
+                                <div
+                                    class="scale-sort-controls position-absolute top-0 end-0 m-2 d-none gap-1 bg-white rounded shadow-sm p-1 z-3">
+                                    <button class="btn btn-sm btn-light border btn-move-up" title="Lên"><i
+                                            class="bi bi-chevron-up"></i></button>
+                                    <button class="btn btn-sm btn-light border btn-move-down" title="Xuống"><i
+                                            class="bi bi-chevron-down"></i></button>
                                 </div>
-                            </div>
-                        </div> <!-- End Card 3 -->
-
-                        <!-- 4. Thời gian biểu (Mobile Only) -->
-                        <div class="card shadow-sm border-0 scale-card d-block d-lg-none position-relative" id="scale-item-schedule">
-                            <div class="scale-sort-controls position-absolute top-0 end-0 m-2 d-none gap-1 bg-white rounded shadow-sm p-1 z-3">
-                                <button class="btn btn-sm btn-light border btn-move-up" title="Lên"><i class="bi bi-chevron-up"></i></button>
-                                <button class="btn btn-sm btn-light border btn-move-down" title="Xuống"><i class="bi bi-chevron-down"></i></button>
-                            </div>
-                            <div class="card-header bg-white border-bottom-0 pt-4 pb-2">
-                                <h5 class="card-title fw-bold text-primary mb-0"><i class="bi bi-calendar-week me-2"></i>Thời gian biểu</h5>
-                                <p class="text-muted small mt-1 mb-0">Lịch học chi tiết theo tiết</p>
-                            </div>
-                            <div class="card-body p-0">
-                                <div class="table-responsive">
-                                    <table class="table table-hover align-middle mb-0 text-center">
-                                        <thead class="bg-light">
-                                            <tr>
-                                                <th style="width: 15%" class="text-secondary text-uppercase small fw-bold">Buổi</th>
-                                                <th style="width: 15%" class="text-secondary text-uppercase small fw-bold">Tiết</th>
-                                                <th style="width: 35%" class="text-secondary text-uppercase small fw-bold"><i class="bi bi-play-circle me-1"></i>Bắt đầu</th>
-                                                <th style="width: 35%" class="text-secondary text-uppercase small fw-bold"><i class="bi bi-stop-circle me-1"></i>Kết thúc</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <!-- Sáng -->
-                                            <tr>
-                                                <td rowspan="7" class="align-middle bg-body-tertiary border-end">
-                                                    <div class="d-flex flex-column align-items-center justify-content-center text-warning">
-                                                        <i class="bi bi-sun-fill fs-4 mb-1"></i>
-                                                        <span class="fw-bold text-uppercase small text-dark">Sáng</span>
-                                                    </div>
-                                                </td>
-                                                <td><span class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle px-3">1</span></td>
-                                                <td class="font-monospace fw-medium text-secondary">06:45</td>
-                                                <td class="font-monospace fw-medium text-secondary">07:35</td>
-                                            </tr>
-                                            <tr>
-                                                <td><span class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle px-3">2</span></td>
-                                                <td class="font-monospace fw-medium text-secondary">07:35</td>
-                                                <td class="font-monospace fw-medium text-secondary">08:25</td>
-                                            </tr>
-                                            <tr>
-                                                <td><span class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle px-3">3</span></td>
-                                                <td class="font-monospace fw-medium text-secondary">08:25</td>
-                                                <td class="font-monospace fw-medium text-secondary">09:15</td>
-                                            </tr>
-                                            <tr class="bg-warning-subtle">
-                                                <td colspan="3" class="py-2 small text-warning-emphasis fw-medium">
-                                                    <i class="bi bi-cup-hot-fill me-2"></i>Giải lao 15 phút
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td><span class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle px-3">4</span></td>
-                                                <td class="font-monospace fw-medium text-secondary">09:30</td>
-                                                <td class="font-monospace fw-medium text-secondary">10:20</td>
-                                            </tr>
-                                            <tr>
-                                                <td><span class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle px-3">5</span></td>
-                                                <td class="font-monospace fw-medium text-secondary">10:20</td>
-                                                <td class="font-monospace fw-medium text-secondary">11:10</td>
-                                            </tr>
-                                            <tr>
-                                                <td><span class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle px-3">6</span></td>
-                                                <td class="font-monospace fw-medium text-secondary">11:10</td>
-                                                <td class="font-monospace fw-medium text-secondary">12:00</td>
-                                            </tr>
-                                            
-                                            <!-- Chiều -->
-                                            <tr>
-                                                <td rowspan="7" class="align-middle bg-body-tertiary border-end">
-                                                    <div class="d-flex flex-column align-items-center justify-content-center text-orange">
-                                                        <i class="bi bi-sunset-fill fs-4 mb-1" style="color: #fd7e14;"></i>
-                                                        <span class="fw-bold text-uppercase small text-dark">Chiều</span>
-                                                    </div>
-                                                </td>
-                                                <td><span class="badge rounded-pill bg-info-subtle text-info-emphasis border border-info-subtle px-3">7</span></td>
-                                                <td class="font-monospace fw-medium text-secondary">12:45</td>
-                                                <td class="font-monospace fw-medium text-secondary">13:35</td>
-                                            </tr>
-                                            <tr>
-                                                <td><span class="badge rounded-pill bg-info-subtle text-info-emphasis border border-info-subtle px-3">8</span></td>
-                                                <td class="font-monospace fw-medium text-secondary">13:35</td>
-                                                <td class="font-monospace fw-medium text-secondary">14:25</td>
-                                            </tr>
-                                            <tr>
-                                                <td><span class="badge rounded-pill bg-info-subtle text-info-emphasis border border-info-subtle px-3">9</span></td>
-                                                <td class="font-monospace fw-medium text-secondary">14:25</td>
-                                                <td class="font-monospace fw-medium text-secondary">15:15</td>
-                                            </tr>
-                                            <tr class="bg-warning-subtle">
-                                                <td colspan="3" class="py-2 small text-warning-emphasis fw-medium">
-                                                    <i class="bi bi-cup-hot-fill me-2"></i>Giải lao 15 phút
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td><span class="badge rounded-pill bg-info-subtle text-info-emphasis border border-info-subtle px-3">10</span></td>
-                                                <td class="font-monospace fw-medium text-secondary">15:30</td>
-                                                <td class="font-monospace fw-medium text-secondary">16:20</td>
-                                            </tr>
-                                            <tr>
-                                                <td><span class="badge rounded-pill bg-info-subtle text-info-emphasis border border-info-subtle px-3">11</span></td>
-                                                <td class="font-monospace fw-medium text-secondary">16:20</td>
-                                                <td class="font-monospace fw-medium text-secondary">17:10</td>
-                                            </tr>
-                                            <tr>
-                                                <td><span class="badge rounded-pill bg-info-subtle text-info-emphasis border border-info-subtle px-3">12</span></td>
-                                                <td class="font-monospace fw-medium text-secondary">17:10</td>
-                                                <td class="font-monospace fw-medium text-secondary">18:00</td>
-                                            </tr>
-
-                                            <!-- Tối -->
-                                            <tr>
-                                                <td rowspan="3" class="align-middle bg-body-tertiary border-end">
-                                                    <div class="d-flex flex-column align-items-center justify-content-center text-primary">
-                                                        <i class="bi bi-moon-stars-fill fs-4 mb-1"></i>
-                                                        <span class="fw-bold text-uppercase small text-dark">Tối</span>
-                                                    </div>
-                                                </td>
-                                                <td><span class="badge rounded-pill bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle px-3">13</span></td>
-                                                <td class="font-monospace fw-medium text-secondary">18:15</td>
-                                                <td class="font-monospace fw-medium text-secondary">19:05</td>
-                                            </tr>
-                                            <tr>
-                                                <td><span class="badge rounded-pill bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle px-3">14</span></td>
-                                                <td class="font-monospace fw-medium text-secondary">19:05</td>
-                                                <td class="font-monospace fw-medium text-secondary">19:55</td>
-                                            </tr>
-                                            <tr>
-                                                <td><span class="badge rounded-pill bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle px-3">15</span></td>
-                                                <td class="font-monospace fw-medium text-secondary">19:55</td>
-                                                <td class="font-monospace fw-medium text-secondary">20:45</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                                <div class="card-header bg-white border-bottom-0 pt-4 pb-2">
+                                    <h5 class="card-title fw-bold text-primary mb-0"><i
+                                            class="bi bi-star me-2"></i>Thang xếp loại điểm rèn luyện</h5>
+                                    <p class="text-muted small mt-1 mb-0">Phân loại dựa trên điểm rèn luyện</p>
                                 </div>
-                            </div>
-                        </div> <!-- End Card 4 (Mobile) -->
-                    </div> <!-- End scale-list-container -->
-                </div> <!-- End col-lg-5 -->
+                                <div class="card-body p-0">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover align-middle mb-0">
+                                            <thead class="bg-light small text-secondary">
+                                                <tr>
+                                                    <th class="ps-4">Xếp loại</th>
+                                                    <th class="text-end pe-4">Khoảng điểm</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="border-top-0">
+                                                <tr>
+                                                    <td class="ps-4 fw-bold text-success">Xuất sắc</td>
+                                                    <td class="text-end pe-4 small text-secondary fw-medium">90 - 100
+                                                        điểm</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="ps-4 fw-bold text-primary">Tốt</td>
+                                                    <td class="text-end pe-4 small text-secondary fw-medium">80 - dưới
+                                                        90 điểm</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="ps-4 fw-bold text-info-emphasis">Khá</td>
+                                                    <td class="text-end pe-4 small text-secondary fw-medium">65 - dưới
+                                                        80 điểm</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="ps-4 fw-bold text-warning-emphasis">Trung bình</td>
+                                                    <td class="text-end pe-4 small text-secondary fw-medium">50 - dưới
+                                                        65 điểm</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="ps-4 fw-bold text-secondary">Yếu</td>
+                                                    <td class="text-end pe-4 small text-secondary fw-medium">35 - dưới
+                                                        50 điểm</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="ps-4 fw-bold text-danger">Kém</td>
+                                                    <td class="text-end pe-4 small text-secondary fw-medium">Dưới 35
+                                                        điểm</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div> <!-- End Card 3 -->
+
+                            <!-- 4. Thời gian biểu (Mobile Only) -->
+                            <div class="card shadow-sm border-0 scale-card d-block d-lg-none position-relative"
+                                id="scale-item-schedule">
+                                <div
+                                    class="scale-sort-controls position-absolute top-0 end-0 m-2 d-none gap-1 bg-white rounded shadow-sm p-1 z-3">
+                                    <button class="btn btn-sm btn-light border btn-move-up" title="Lên"><i
+                                            class="bi bi-chevron-up"></i></button>
+                                    <button class="btn btn-sm btn-light border btn-move-down" title="Xuống"><i
+                                            class="bi bi-chevron-down"></i></button>
+                                </div>
+                                <div class="card-header bg-white border-bottom-0 pt-4 pb-2">
+                                    <h5 class="card-title fw-bold text-primary mb-0"><i
+                                            class="bi bi-calendar-week me-2"></i>Thời gian biểu</h5>
+                                    <p class="text-muted small mt-1 mb-0">Lịch học chi tiết theo tiết</p>
+                                </div>
+                                <div class="card-body p-0">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover align-middle mb-0 text-center">
+                                            <thead class="bg-light">
+                                                <tr>
+                                                    <th style="width: 15%"
+                                                        class="text-secondary text-uppercase small fw-bold">Buổi</th>
+                                                    <th style="width: 15%"
+                                                        class="text-secondary text-uppercase small fw-bold">Tiết</th>
+                                                    <th style="width: 35%"
+                                                        class="text-secondary text-uppercase small fw-bold"><i
+                                                            class="bi bi-play-circle me-1"></i>Bắt đầu</th>
+                                                    <th style="width: 35%"
+                                                        class="text-secondary text-uppercase small fw-bold"><i
+                                                            class="bi bi-stop-circle me-1"></i>Kết thúc</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <!-- Sáng -->
+                                                <tr>
+                                                    <td rowspan="7" class="align-middle bg-body-tertiary border-end">
+                                                        <div
+                                                            class="d-flex flex-column align-items-center justify-content-center text-warning">
+                                                            <i class="bi bi-sun-fill fs-4 mb-1"></i>
+                                                            <span
+                                                                class="fw-bold text-uppercase small text-dark">Sáng</span>
+                                                        </div>
+                                                    </td>
+                                                    <td><span
+                                                            class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle px-3">1</span>
+                                                    </td>
+                                                    <td class="font-monospace fw-medium text-secondary">06:45</td>
+                                                    <td class="font-monospace fw-medium text-secondary">07:35</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><span
+                                                            class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle px-3">2</span>
+                                                    </td>
+                                                    <td class="font-monospace fw-medium text-secondary">07:35</td>
+                                                    <td class="font-monospace fw-medium text-secondary">08:25</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><span
+                                                            class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle px-3">3</span>
+                                                    </td>
+                                                    <td class="font-monospace fw-medium text-secondary">08:25</td>
+                                                    <td class="font-monospace fw-medium text-secondary">09:15</td>
+                                                </tr>
+                                                <tr class="bg-warning-subtle">
+                                                    <td colspan="3" class="py-2 small text-warning-emphasis fw-medium">
+                                                        <i class="bi bi-cup-hot-fill me-2"></i>Giải lao 15 phút
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td><span
+                                                            class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle px-3">4</span>
+                                                    </td>
+                                                    <td class="font-monospace fw-medium text-secondary">09:30</td>
+                                                    <td class="font-monospace fw-medium text-secondary">10:20</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><span
+                                                            class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle px-3">5</span>
+                                                    </td>
+                                                    <td class="font-monospace fw-medium text-secondary">10:20</td>
+                                                    <td class="font-monospace fw-medium text-secondary">11:10</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><span
+                                                            class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle px-3">6</span>
+                                                    </td>
+                                                    <td class="font-monospace fw-medium text-secondary">11:10</td>
+                                                    <td class="font-monospace fw-medium text-secondary">12:00</td>
+                                                </tr>
+
+                                                <!-- Chiều -->
+                                                <tr>
+                                                    <td rowspan="7" class="align-middle bg-body-tertiary border-end">
+                                                        <div
+                                                            class="d-flex flex-column align-items-center justify-content-center text-orange">
+                                                            <i class="bi bi-sunset-fill fs-4 mb-1"
+                                                                style="color: #fd7e14;"></i>
+                                                            <span
+                                                                class="fw-bold text-uppercase small text-dark">Chiều</span>
+                                                        </div>
+                                                    </td>
+                                                    <td><span
+                                                            class="badge rounded-pill bg-info-subtle text-info-emphasis border border-info-subtle px-3">7</span>
+                                                    </td>
+                                                    <td class="font-monospace fw-medium text-secondary">12:45</td>
+                                                    <td class="font-monospace fw-medium text-secondary">13:35</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><span
+                                                            class="badge rounded-pill bg-info-subtle text-info-emphasis border border-info-subtle px-3">8</span>
+                                                    </td>
+                                                    <td class="font-monospace fw-medium text-secondary">13:35</td>
+                                                    <td class="font-monospace fw-medium text-secondary">14:25</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><span
+                                                            class="badge rounded-pill bg-info-subtle text-info-emphasis border border-info-subtle px-3">9</span>
+                                                    </td>
+                                                    <td class="font-monospace fw-medium text-secondary">14:25</td>
+                                                    <td class="font-monospace fw-medium text-secondary">15:15</td>
+                                                </tr>
+                                                <tr class="bg-warning-subtle">
+                                                    <td colspan="3" class="py-2 small text-warning-emphasis fw-medium">
+                                                        <i class="bi bi-cup-hot-fill me-2"></i>Giải lao 15 phút
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td><span
+                                                            class="badge rounded-pill bg-info-subtle text-info-emphasis border border-info-subtle px-3">10</span>
+                                                    </td>
+                                                    <td class="font-monospace fw-medium text-secondary">15:30</td>
+                                                    <td class="font-monospace fw-medium text-secondary">16:20</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><span
+                                                            class="badge rounded-pill bg-info-subtle text-info-emphasis border border-info-subtle px-3">11</span>
+                                                    </td>
+                                                    <td class="font-monospace fw-medium text-secondary">16:20</td>
+                                                    <td class="font-monospace fw-medium text-secondary">17:10</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><span
+                                                            class="badge rounded-pill bg-info-subtle text-info-emphasis border border-info-subtle px-3">12</span>
+                                                    </td>
+                                                    <td class="font-monospace fw-medium text-secondary">17:10</td>
+                                                    <td class="font-monospace fw-medium text-secondary">18:00</td>
+                                                </tr>
+
+                                                <!-- Tối -->
+                                                <tr>
+                                                    <td rowspan="3" class="align-middle bg-body-tertiary border-end">
+                                                        <div
+                                                            class="d-flex flex-column align-items-center justify-content-center text-primary">
+                                                            <i class="bi bi-moon-stars-fill fs-4 mb-1"></i>
+                                                            <span
+                                                                class="fw-bold text-uppercase small text-dark">Tối</span>
+                                                        </div>
+                                                    </td>
+                                                    <td><span
+                                                            class="badge rounded-pill bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle px-3">13</span>
+                                                    </td>
+                                                    <td class="font-monospace fw-medium text-secondary">18:15</td>
+                                                    <td class="font-monospace fw-medium text-secondary">19:05</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><span
+                                                            class="badge rounded-pill bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle px-3">14</span>
+                                                    </td>
+                                                    <td class="font-monospace fw-medium text-secondary">19:05</td>
+                                                    <td class="font-monospace fw-medium text-secondary">19:55</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><span
+                                                            class="badge rounded-pill bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle px-3">15</span>
+                                                    </td>
+                                                    <td class="font-monospace fw-medium text-secondary">19:55</td>
+                                                    <td class="font-monospace fw-medium text-secondary">20:45</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div> <!-- End Card 4 (Mobile) -->
+                        </div> <!-- End scale-list-container -->
+                    </div> <!-- End col-lg-5 -->
 
                     <!-- Right Column: Schedule (Full Height) -->
                     <div class="col-lg-7 order-first order-lg-last ani-fade-in-up delay-100">
                         <div class="card shadow-sm border-0 d-none d-lg-block hover-translate-y">
                             <div class="card-header bg-white border-bottom-0 pt-4 pb-2">
-                                <h5 class="card-title fw-bold text-primary mb-0"><i class="bi bi-calendar-week me-2"></i>Thời gian biểu</h5>
+                                <h5 class="card-title fw-bold text-primary mb-0"><i
+                                        class="bi bi-calendar-week me-2"></i>Thời gian biểu</h5>
                                 <p class="text-muted small mt-1 mb-0">Lịch học chi tiết theo tiết</p>
                             </div>
                             <div class="card-body p-0">
@@ -809,32 +1022,45 @@
                                     <table class="table table-hover align-middle mb-0 text-center">
                                         <thead class="bg-light">
                                             <tr>
-                                                <th style="width: 15%" class="text-secondary text-uppercase small fw-bold">Buổi</th>
-                                                <th style="width: 15%" class="text-secondary text-uppercase small fw-bold">Tiết</th>
-                                                <th style="width: 35%" class="text-secondary text-uppercase small fw-bold"><i class="bi bi-play-circle me-1"></i>Bắt đầu</th>
-                                                <th style="width: 35%" class="text-secondary text-uppercase small fw-bold"><i class="bi bi-stop-circle me-1"></i>Kết thúc</th>
+                                                <th style="width: 15%"
+                                                    class="text-secondary text-uppercase small fw-bold">Buổi</th>
+                                                <th style="width: 15%"
+                                                    class="text-secondary text-uppercase small fw-bold">Tiết</th>
+                                                <th style="width: 35%"
+                                                    class="text-secondary text-uppercase small fw-bold"><i
+                                                        class="bi bi-play-circle me-1"></i>Bắt đầu</th>
+                                                <th style="width: 35%"
+                                                    class="text-secondary text-uppercase small fw-bold"><i
+                                                        class="bi bi-stop-circle me-1"></i>Kết thúc</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <!-- Sáng -->
                                             <tr>
                                                 <td rowspan="7" class="align-middle bg-body-tertiary border-end">
-                                                    <div class="d-flex flex-column align-items-center justify-content-center text-warning">
+                                                    <div
+                                                        class="d-flex flex-column align-items-center justify-content-center text-warning">
                                                         <i class="bi bi-sun-fill fs-4 mb-1"></i>
                                                         <span class="fw-bold text-uppercase small text-dark">Sáng</span>
                                                     </div>
                                                 </td>
-                                                <td><span class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle px-3">1</span></td>
+                                                <td><span
+                                                        class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle px-3">1</span>
+                                                </td>
                                                 <td class="font-monospace fw-medium text-secondary">06:45</td>
                                                 <td class="font-monospace fw-medium text-secondary">07:35</td>
                                             </tr>
                                             <tr>
-                                                <td><span class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle px-3">2</span></td>
+                                                <td><span
+                                                        class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle px-3">2</span>
+                                                </td>
                                                 <td class="font-monospace fw-medium text-secondary">07:35</td>
                                                 <td class="font-monospace fw-medium text-secondary">08:25</td>
                                             </tr>
                                             <tr>
-                                                <td><span class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle px-3">3</span></td>
+                                                <td><span
+                                                        class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle px-3">3</span>
+                                                </td>
                                                 <td class="font-monospace fw-medium text-secondary">08:25</td>
                                                 <td class="font-monospace fw-medium text-secondary">09:15</td>
                                             </tr>
@@ -844,40 +1070,55 @@
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td><span class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle px-3">4</span></td>
+                                                <td><span
+                                                        class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle px-3">4</span>
+                                                </td>
                                                 <td class="font-monospace fw-medium text-secondary">09:30</td>
                                                 <td class="font-monospace fw-medium text-secondary">10:20</td>
                                             </tr>
                                             <tr>
-                                                <td><span class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle px-3">5</span></td>
+                                                <td><span
+                                                        class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle px-3">5</span>
+                                                </td>
                                                 <td class="font-monospace fw-medium text-secondary">10:20</td>
                                                 <td class="font-monospace fw-medium text-secondary">11:10</td>
                                             </tr>
                                             <tr>
-                                                <td><span class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle px-3">6</span></td>
+                                                <td><span
+                                                        class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle px-3">6</span>
+                                                </td>
                                                 <td class="font-monospace fw-medium text-secondary">11:10</td>
                                                 <td class="font-monospace fw-medium text-secondary">12:00</td>
                                             </tr>
-                                            
+
                                             <!-- Chiều -->
                                             <tr>
                                                 <td rowspan="7" class="align-middle bg-body-tertiary border-end">
-                                                    <div class="d-flex flex-column align-items-center justify-content-center text-orange">
-                                                        <i class="bi bi-sunset-fill fs-4 mb-1" style="color: #fd7e14;"></i>
-                                                        <span class="fw-bold text-uppercase small text-dark">Chiều</span>
+                                                    <div
+                                                        class="d-flex flex-column align-items-center justify-content-center text-orange">
+                                                        <i class="bi bi-sunset-fill fs-4 mb-1"
+                                                            style="color: #fd7e14;"></i>
+                                                        <span
+                                                            class="fw-bold text-uppercase small text-dark">Chiều</span>
                                                     </div>
                                                 </td>
-                                                <td><span class="badge rounded-pill bg-info-subtle text-info-emphasis border border-info-subtle px-3">7</span></td>
+                                                <td><span
+                                                        class="badge rounded-pill bg-info-subtle text-info-emphasis border border-info-subtle px-3">7</span>
+                                                </td>
                                                 <td class="font-monospace fw-medium text-secondary">12:45</td>
                                                 <td class="font-monospace fw-medium text-secondary">13:35</td>
                                             </tr>
                                             <tr>
-                                                <td><span class="badge rounded-pill bg-info-subtle text-info-emphasis border border-info-subtle px-3">8</span></td>
+                                                <td><span
+                                                        class="badge rounded-pill bg-info-subtle text-info-emphasis border border-info-subtle px-3">8</span>
+                                                </td>
                                                 <td class="font-monospace fw-medium text-secondary">13:35</td>
                                                 <td class="font-monospace fw-medium text-secondary">14:25</td>
                                             </tr>
                                             <tr>
-                                                <td><span class="badge rounded-pill bg-info-subtle text-info-emphasis border border-info-subtle px-3">9</span></td>
+                                                <td><span
+                                                        class="badge rounded-pill bg-info-subtle text-info-emphasis border border-info-subtle px-3">9</span>
+                                                </td>
                                                 <td class="font-monospace fw-medium text-secondary">14:25</td>
                                                 <td class="font-monospace fw-medium text-secondary">15:15</td>
                                             </tr>
@@ -887,17 +1128,23 @@
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td><span class="badge rounded-pill bg-info-subtle text-info-emphasis border border-info-subtle px-3">10</span></td>
+                                                <td><span
+                                                        class="badge rounded-pill bg-info-subtle text-info-emphasis border border-info-subtle px-3">10</span>
+                                                </td>
                                                 <td class="font-monospace fw-medium text-secondary">15:30</td>
                                                 <td class="font-monospace fw-medium text-secondary">16:20</td>
                                             </tr>
                                             <tr>
-                                                <td><span class="badge rounded-pill bg-info-subtle text-info-emphasis border border-info-subtle px-3">11</span></td>
+                                                <td><span
+                                                        class="badge rounded-pill bg-info-subtle text-info-emphasis border border-info-subtle px-3">11</span>
+                                                </td>
                                                 <td class="font-monospace fw-medium text-secondary">16:20</td>
                                                 <td class="font-monospace fw-medium text-secondary">17:10</td>
                                             </tr>
                                             <tr>
-                                                <td><span class="badge rounded-pill bg-info-subtle text-info-emphasis border border-info-subtle px-3">12</span></td>
+                                                <td><span
+                                                        class="badge rounded-pill bg-info-subtle text-info-emphasis border border-info-subtle px-3">12</span>
+                                                </td>
                                                 <td class="font-monospace fw-medium text-secondary">17:10</td>
                                                 <td class="font-monospace fw-medium text-secondary">18:00</td>
                                             </tr>
@@ -905,22 +1152,29 @@
                                             <!-- Tối -->
                                             <tr>
                                                 <td rowspan="3" class="align-middle bg-body-tertiary border-end">
-                                                    <div class="d-flex flex-column align-items-center justify-content-center text-primary">
+                                                    <div
+                                                        class="d-flex flex-column align-items-center justify-content-center text-primary">
                                                         <i class="bi bi-moon-stars-fill fs-4 mb-1"></i>
                                                         <span class="fw-bold text-uppercase small text-dark">Tối</span>
                                                     </div>
                                                 </td>
-                                                <td><span class="badge rounded-pill bg-dark-subtle text-dark-emphasis border border-dark-subtle px-3">13</span></td>
+                                                <td><span
+                                                        class="badge rounded-pill bg-dark-subtle text-dark-emphasis border border-dark-subtle px-3">13</span>
+                                                </td>
                                                 <td class="font-monospace fw-medium text-secondary">18:15</td>
                                                 <td class="font-monospace fw-medium text-secondary">19:05</td>
                                             </tr>
                                             <tr>
-                                                <td><span class="badge rounded-pill bg-dark-subtle text-dark-emphasis border border-dark-subtle px-3">14</span></td>
+                                                <td><span
+                                                        class="badge rounded-pill bg-dark-subtle text-dark-emphasis border border-dark-subtle px-3">14</span>
+                                                </td>
                                                 <td class="font-monospace fw-medium text-secondary">19:05</td>
                                                 <td class="font-monospace fw-medium text-secondary">19:55</td>
                                             </tr>
                                             <tr>
-                                                <td><span class="badge rounded-pill bg-dark-subtle text-dark-emphasis border border-dark-subtle px-3">15</span></td>
+                                                <td><span
+                                                        class="badge rounded-pill bg-dark-subtle text-dark-emphasis border border-dark-subtle px-3">15</span>
+                                                </td>
                                                 <td class="font-monospace fw-medium text-secondary">19:55</td>
                                                 <td class="font-monospace fw-medium text-secondary">20:45</td>
                                             </tr>
@@ -938,37 +1192,46 @@
                 <div class="row g-4 justify-content-center">
                     <div class="col-lg-8">
                         <div class="d-flex align-items-center justify-content-between mb-4">
-                             <div class="d-flex align-items-center me-2">
-                                <div class="bg-primary bg-opacity-10 rounded-circle me-2 me-md-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 45px; height: 45px; min-width: 45px;">
+                            <div class="d-flex align-items-center me-2">
+                                <div class="bg-primary bg-opacity-10 rounded-circle me-2 me-md-3 d-flex align-items-center justify-content-center flex-shrink-0"
+                                    style="width: 45px; height: 45px; min-width: 45px;">
                                     <i class="bi bi-newspaper text-primary fs-4"></i>
                                 </div>
-                                <h4 class="fw-bold text-primary mb-0 lh-sm" style="font-size: clamp(1.1rem, 4vw, 1.5rem);">Tin tức & Thông báo</h4>
-                             </div>
+                                <h4 class="fw-bold text-primary mb-0 lh-sm"
+                                    style="font-size: clamp(1.1rem, 4vw, 1.5rem);">Tin tức & Thông báo</h4>
+                            </div>
                         </div>
 
                         <!-- News Filter Buttons -->
                         <div class="d-flex flex-wrap gap-2 mb-4 news-filters">
-                            <button class="btn btn-sm btn-primary rounded-pill px-3 filter-btn active" data-filter="all">Tất cả</button>
-                            <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 filter-btn" data-filter="announcement">Thông báo</button>
-                            <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 filter-btn" data-filter="handbook">Tài liệu</button>
-                            <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 filter-btn" data-filter="calendar">Kế hoạch</button>
+                            <button class="btn btn-sm btn-primary rounded-pill px-3 filter-btn active"
+                                data-filter="all">Tất cả</button>
+                            <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 filter-btn"
+                                data-filter="announcement">Thông báo</button>
+                            <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 filter-btn"
+                                data-filter="handbook">Tài liệu</button>
+                            <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 filter-btn"
+                                data-filter="calendar">Kế hoạch</button>
                         </div>
-                        
+
                         <div class="news-bento-grid">
                             <!-- Item 1: Holiday (Large) -->
-                            <div class="bento-item item-large news-card" data-category="announcement" id="bento-holiday">
+                            <div class="bento-item item-large news-card" data-category="announcement"
+                                id="bento-holiday">
                                 <div class="bento-img-container">
-                                    <img src="assets/images/NghiTet.jpg" class="news-image clickable-image" 
-                                         alt="Kế hoạch Nghỉ Tết" data-bs-toggle="modal" 
-                                         data-bs-target="#imageViewerModal" 
-                                         data-bs-src="assets/images/NghiTet.jpg" style="cursor: zoom-in;">
+                                    <img src="assets/images/NghiTet.jpg" class="news-image clickable-image"
+                                        alt="Kế hoạch Nghỉ Tết" data-bs-toggle="modal"
+                                        data-bs-target="#imageViewerModal" data-bs-src="assets/images/NghiTet.jpg"
+                                        style="cursor: zoom-in;">
                                 </div>
-                                <span class="badge bento-badge text-success border border-success-subtle fw-bold shadow-sm">
+                                <span
+                                    class="badge bento-badge text-success border border-success-subtle fw-bold shadow-sm">
                                     <i class="bi bi-calendar-event me-1"></i>Hoạt động
                                 </span>
                                 <div class="bento-content">
                                     <h5 class="bento-title mb-1">Kế hoạch Nghỉ Tết - Kỳ 2</h5>
-                                    <p class="small mb-0 opacity-75"><i class="bi bi-zoom-in me-1"></i>Nhấn vào ảnh để phóng to</p>
+                                    <p class="small mb-0 opacity-75"><i class="bi bi-zoom-in me-1"></i>Nhấn vào ảnh để
+                                        phóng to</p>
                                 </div>
                             </div>
 
@@ -976,44 +1239,57 @@
                             <div class="bento-item news-card" data-category="announcement" id="bento-announcement">
                                 <div class="bento-content">
                                     <div class="mb-2">
-                                        <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-1 fw-bold">Thông báo</span>
-                                        <span class="text-muted small ms-2"><i class="bi bi-clock me-1"></i>HK2 (2025-2026)</span>
+                                        <span
+                                            class="badge bg-danger-subtle text-danger rounded-pill px-3 py-1 fw-bold">Thông
+                                            báo</span>
+                                        <span class="text-muted small ms-2"><i class="bi bi-clock me-1"></i>HK2
+                                            (2025-2026)</span>
                                     </div>
                                     <h5 class="bento-title">
-                                        <a href="https://portal.huflit.edu.vn/News/Detail/3794/Thong-bao-ve-viec-to-chuc-hoat-dong-ren-luyen-hoc-ky-2-nam-hoc-2025-2026" 
-                                           target="_blank" rel="noopener noreferrer" class="text-decoration-none text-dark stretched-link">
-                                           Tổ chức hoạt động rèn luyện
+                                        <a href="https://portal.huflit.edu.vn/News/Detail/3794/Thong-bao-ve-viec-to-chuc-hoat-dong-ren-luyen-hoc-ky-2-nam-hoc-2025-2026"
+                                            target="_blank" rel="noopener noreferrer"
+                                            class="text-decoration-none text-dark stretched-link">
+                                            Tổ chức hoạt động rèn luyện
                                         </a>
                                     </h5>
                                     <p class="bento-desc mb-0">
-                                        Thông tin chi tiết về các hoạt động, quy chế điểm rèn luyện và lịch trình thực hiện trong học kỳ mới. Sinh viên cần theo dõi để đảm bảo quyền lợi.
+                                        Thông tin chi tiết về các hoạt động, quy chế điểm rèn luyện và lịch trình thực
+                                        hiện trong học kỳ mới. Sinh viên cần theo dõi để đảm bảo quyền lợi.
                                     </p>
                                 </div>
                             </div>
-                
+
                             <!-- Item 3: Handbook (Medium) -->
                             <div class="bento-item news-card" data-category="handbook" id="bento-handbook">
                                 <div class="bento-content h-100 d-flex flex-column">
                                     <div class="mb-2">
-                                        <span class="badge bg-info-subtle text-info-emphasis rounded-pill px-3 py-1 fw-bold">Tài liệu</span>
+                                        <span
+                                            class="badge bg-info-subtle text-info-emphasis rounded-pill px-3 py-1 fw-bold">Tài
+                                            liệu</span>
                                     </div>
                                     <h5 class="bento-title mb-3">Cẩm nang Đại học</h5>
-                                    
-                                    <div class="rounded-3 overflow-hidden border shadow-sm position-relative flex-grow-1" style="min-height: 200px;">
+
+                                    <div class="rounded-3 overflow-hidden border shadow-sm position-relative flex-grow-1"
+                                        style="min-height: 200px;">
                                         <!-- Placeholder with Load Button -->
-                                        <div id="handbook-placeholder" class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center bg-white z-2">
+                                        <div id="handbook-placeholder"
+                                            class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center bg-white z-2">
                                             <div class="mb-2">
-                                                <div class="bg-primary-subtle p-2 rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                                <div class="bg-primary-subtle p-2 rounded-circle d-flex align-items-center justify-content-center"
+                                                    style="width: 50px; height: 50px;">
                                                     <i class="bi bi-journal-bookmark-fill fs-4 text-primary"></i>
                                                 </div>
                                             </div>
-                                            <button id="load-handbook-btn" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-medium">
+                                            <button id="load-handbook-btn"
+                                                class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-medium">
                                                 <i class="bi bi-eye me-1"></i>Xem Sổ tay
                                             </button>
                                         </div>
 
                                         <!-- Iframe (Initially Hidden) -->
-                                        <iframe id="handbook-iframe" allowfullscreen="allowfullscreen" scrolling="no" class="fp-iframe w-100 h-100 border-0" data-src="https://heyzine.com/flip-book/feafd1ca30.html"></iframe>
+                                        <iframe id="handbook-iframe" allowfullscreen="allowfullscreen" scrolling="no"
+                                            class="fp-iframe w-100 h-100 border-0"
+                                            data-src="https://heyzine.com/flip-book/feafd1ca30.html"></iframe>
                                     </div>
                                 </div>
                             </div>
@@ -1022,15 +1298,21 @@
                             <div class="bento-item news-card" data-category="calendar" id="bento-calendar">
                                 <div class="bento-content h-100 d-flex flex-column">
                                     <div class="mb-2">
-                                        <span class="badge bg-success-subtle text-success rounded-pill px-3 py-1 fw-bold">Kế hoạch</span>
-                                        <span class="text-muted small ms-2"><i class="bi bi-calendar3 me-1"></i>2025 - 2026</span>
+                                        <span
+                                            class="badge bg-success-subtle text-success rounded-pill px-3 py-1 fw-bold">Kế
+                                            hoạch</span>
+                                        <span class="text-muted small ms-2"><i class="bi bi-calendar3 me-1"></i>2025 -
+                                            2026</span>
                                     </div>
                                     <h5 class="bento-title">Biểu đồ Kế hoạch năm học</h5>
                                     <p class="bento-desc mb-3">
-                                        Lịch học tập, thời gian đăng ký môn học và các mốc thời gian quan trọng trong năm học 2025-2026 dành cho sinh viên.
+                                        Lịch học tập, thời gian đăng ký môn học và các mốc thời gian quan trọng trong
+                                        năm học 2025-2026 dành cho sinh viên.
                                     </p>
                                     <div class="mt-auto">
-                                        <a href="assets/images/Biểu đồ KH năm học 25 26 (18.12.2025).pdf" target="_blank" class="btn btn-sm btn-outline-success w-100 rounded-pill fw-medium">
+                                        <a href="assets/images/Biểu đồ KH năm học 25 26 (18.12.2025).pdf"
+                                            target="_blank"
+                                            class="btn btn-sm btn-outline-success w-100 rounded-pill fw-medium">
                                             <i class="bi bi-file-earmark-pdf-fill me-1"></i>Xem file PDF
                                         </a>
                                     </div>
@@ -1042,7 +1324,7 @@
             </div>
 
         </div>
-        
+
         <!-- Mobile Spacer to prevent content from being hidden behind bottom nav -->
         <div class="d-lg-none" style="height: 120px;"></div>
     </div>
@@ -1052,8 +1334,11 @@
         <div class="modal-dialog modal-dialog-centered modal-xl">
             <div class="modal-content bg-transparent border-0 shadow-none">
                 <div class="modal-body p-0 text-center position-relative">
-                    <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3 z-3 bg-white p-2 rounded" data-bs-dismiss="modal" aria-label="Close" style="opacity: 0.8;"></button>
-                    <img src="" id="imageViewerSrc" class="img-fluid rounded shadow-lg" style="max-height: 90vh;" alt="Preview">
+                    <button type="button"
+                        class="btn-close btn-close-white position-absolute top-0 end-0 m-3 z-3 bg-white p-2 rounded"
+                        data-bs-dismiss="modal" aria-label="Close" style="opacity: 0.8;"></button>
+                    <img src="" id="imageViewerSrc" class="img-fluid rounded shadow-lg" style="max-height: 90vh;"
+                        alt="Preview">
                 </div>
             </div>
         </div>
@@ -1064,23 +1349,28 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold text-primary"><i class="bi bi-cloud-upload me-2"></i>Nhập dữ liệu từ Portal</h5>
+                    <h5 class="modal-title fw-bold text-primary"><i class="bi bi-cloud-upload me-2"></i>Nhập dữ liệu từ
+                        Portal</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <button class="btn btn-outline-primary btn-sm w-100 fw-medium" type="button" data-bs-toggle="collapse" data-bs-target="#importInstructions" aria-expanded="false" aria-controls="importInstructions">
+                        <button class="btn btn-outline-primary btn-sm w-100 fw-medium" type="button"
+                            data-bs-toggle="collapse" data-bs-target="#importInstructions" aria-expanded="false"
+                            aria-controls="importInstructions">
                             <i class="bi bi-images me-1"></i> Xem hướng dẫn lấy dữ liệu
                         </button>
                         <div class="collapse mt-2" id="importInstructions">
                             <div class="card card-body bg-light border-0 p-3">
                                 <div class="mb-3">
                                     <h6 class="fw-bold text-dark small mb-2">1. Truy cập trang Kết quả học tập</h6>
-                                    <img src="assets/images/HD1.png" class="img-fluid rounded shadow-sm border" alt="Hướng dẫn bước 1">
+                                    <img src="assets/images/HD1.png" class="img-fluid rounded shadow-sm border"
+                                        alt="Hướng dẫn bước 1">
                                 </div>
                                 <div>
                                     <h6 class="fw-bold text-dark small mb-2">2. Bôi đen toàn bộ và Copy (Ctrl+C)</h6>
-                                    <img src="assets/images/HD2.png" class="img-fluid rounded shadow-sm border" alt="Hướng dẫn bước 2">
+                                    <img src="assets/images/HD2.png" class="img-fluid rounded shadow-sm border"
+                                        alt="Hướng dẫn bước 2">
                                 </div>
                             </div>
                         </div>
@@ -1110,26 +1400,26 @@ Năm học: 2023-2024 - Học kỳ: HK01
     </div>
 
     <!-- Contact Floating Button -->
-    <div id="contact-floating-wrapper" class="position-fixed bottom-0 end-0 m-3 d-flex flex-row-reverse align-items-end gap-2" style="z-index: 1050;">
+    <div id="contact-floating-wrapper"
+        class="position-fixed bottom-0 end-0 m-2 d-flex flex-row-reverse align-items-end gap-2" style="z-index: 1050;">
         <!-- Contact Button Wrapper (Large Icon - Right) -->
         <div class="position-relative">
-            <button type="button" id="close-contact-btn" class="btn btn-sm btn-light rounded-circle shadow position-absolute top-0 start-100 translate-middle border d-flex align-items-center justify-content-center" 
-                    style="width: 24px; height: 24px; padding: 0; z-index: 1051;"
-                    title="Ẩn nút liên hệ">
+            <button type="button" id="close-contact-btn"
+                class="btn btn-sm btn-light rounded-circle shadow position-absolute top-0 start-100 translate-middle border d-flex align-items-center justify-content-center"
+                style="width: 24px; height: 24px; padding: 0; z-index: 1051;" title="Ẩn nút liên hệ">
                 <i class="bi bi-x"></i>
             </button>
-            <button class="floating-contact-btn" 
-                    data-bs-toggle="modal" data-bs-target="#contactModal"
-                    title="Liên hệ tác giả">
+            <button class="floating-contact-btn" data-bs-toggle="modal" data-bs-target="#contactModal"
+                title="Liên hệ tác giả">
                 <i class="bi bi-chat-text-fill"></i>
             </button>
         </div>
 
         <!-- Feedback Button (Small Icon - Left) -->
-        <button class="btn btn-success rounded-circle shadow d-none d-lg-flex align-items-center justify-content-center floating-feedback-btn" 
-                data-bs-toggle="modal" data-bs-target="#feedbackModal"
-                title="Góp ý tính năng"
-                style="width: 50px; height: 50px;">
+        <button
+            class="btn btn-success rounded-circle shadow d-none d-lg-flex align-items-center justify-content-center floating-feedback-btn"
+            data-bs-toggle="modal" data-bs-target="#feedbackModal" title="Góp ý tính năng"
+            style="width: 50px; height: 50px;">
             <i class="bi bi-lightbulb-fill fs-5"></i>
         </button>
     </div>
@@ -1140,12 +1430,14 @@ Năm học: 2023-2024 - Học kỳ: HK01
             <div class="modal-content contact-modal-content">
                 <!-- Custom Header with Gradient Background -->
                 <div class="contact-modal-header">
-                    <button class="btn btn-light rounded-circle shadow-sm position-absolute top-0 start-0 m-3" id="theme-toggle" aria-label="Toggle Dark Mode" style="width: 40px; height: 40px;">
+                    <button class="btn btn-light rounded-circle shadow-sm position-absolute top-0 start-0 m-3"
+                        id="theme-toggle" aria-label="Toggle Dark Mode" style="width: 40px; height: 40px;">
                         <i class="bi bi-moon-stars-fill"></i>
                     </button>
-                    <button type="button" class="btn-close shadow-sm" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close shadow-sm" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
                 </div>
-                
+
                 <div class="modal-body text-center px-4 pb-4 pt-0">
                     <!-- Avatar overlapping header -->
                     <div class="contact-avatar-container">
@@ -1154,26 +1446,30 @@ Năm học: 2023-2024 - Học kỳ: HK01
                             <i class="bi bi-check-lg"></i>
                         </div>
                     </div>
-                    
+
                     <h4 class="contact-name">Tiến Dũng</h4>
                     <div class="mb-3">
                         <span class="contact-role">K29 IT - HUFLIT</span>
                     </div>
-                    
+
                     <p class="text-muted mb-4 small px-3">
-                        "Mình hy vọng công cụ này sẽ giúp ích được cho mọi người trong hành trình chinh phục tấm bằng đại học tại HUFLIT."
+                        "Mình hy vọng công cụ này sẽ giúp ích được cho mọi người trong hành trình chinh phục tấm bằng
+                        đại học tại HUFLIT."
                     </p>
-                    
+
                     <div class="d-grid gap-2 contact-actions">
-                        <button type="button" class="btn btn-outline-primary rounded-pill" data-bs-toggle="modal" data-bs-target="#userGuideModal">
+                        <button type="button" class="btn btn-outline-primary rounded-pill" data-bs-toggle="modal"
+                            data-bs-target="#userGuideModal">
                             <i class="bi bi-book-half me-2"></i>Xem hướng dẫn sử dụng
                         </button>
 
-                        <button type="button" class="btn btn-outline-success rounded-pill" data-bs-toggle="modal" data-bs-target="#feedbackModal">
+                        <button type="button" class="btn btn-outline-success rounded-pill" data-bs-toggle="modal"
+                            data-bs-target="#feedbackModal">
                             <i class="bi bi-lightbulb-fill me-2"></i>Góp ý tính năng
                         </button>
 
-                        <a href="https://www.facebook.com/tienxdun/" target="_blank" rel="noopener noreferrer" class="btn btn-primary rounded-pill shadow-sm">
+                        <a href="https://www.facebook.com/tienxdun/" target="_blank" rel="noopener noreferrer"
+                            class="btn btn-primary rounded-pill shadow-sm">
                             <i class="bi bi-messenger me-2"></i>Nhắn tin qua Facebook
                         </a>
                     </div>
@@ -1183,152 +1479,202 @@ Năm học: 2023-2024 - Học kỳ: HK01
     </div>
 
     <!-- User Guide Modal -->
-    <div class="modal fade" id="userGuideModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal fade" id="userGuideModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
+        data-bs-keyboard="false">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold"><i class="bi bi-book-half me-2 text-primary"></i>Hướng dẫn sử dụng</h5>
-                    <button type="button" class="btn-close" id="guideHeaderCloseBtn" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title fw-bold"><i class="bi bi-book-half me-2 text-primary"></i>Hướng dẫn sử dụng
+                    </h5>
+                    <button type="button" class="btn-close" id="guideHeaderCloseBtn" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <ul class="nav nav-pills mb-3 guide-nav-pills justify-content-center" id="guideTab" role="tablist">
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="guide-target-tab" data-bs-toggle="pill" data-bs-target="#guide-target" type="button" role="tab">
-                                <i class="bi bi-graph-up-arrow d-block d-sm-inline-block mb-1 mb-sm-0 me-sm-2"></i>Lộ trình GPA
+                            <button class="nav-link active" id="guide-target-tab" data-bs-toggle="pill"
+                                data-bs-target="#guide-target" type="button" role="tab">
+                                <i class="bi bi-graph-up-arrow d-block d-sm-inline-block mb-1 mb-sm-0 me-sm-2"></i>Lộ
+                                trình GPA
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="guide-manual-tab" data-bs-toggle="pill" data-bs-target="#guide-manual" type="button" role="tab">
-                                <i class="bi bi-calculator d-block d-sm-inline-block mb-1 mb-sm-0 me-sm-2"></i>Tính GPA Thủ công
+                            <button class="nav-link" id="guide-manual-tab" data-bs-toggle="pill"
+                                data-bs-target="#guide-manual" type="button" role="tab">
+                                <i class="bi bi-calculator d-block d-sm-inline-block mb-1 mb-sm-0 me-sm-2"></i>Tính GPA
+                                Thủ công
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="guide-course-tab" data-bs-toggle="pill" data-bs-target="#guide-course" type="button" role="tab">
-                                <i class="bi bi-journal-check d-block d-sm-inline-block mb-1 mb-sm-0 me-sm-2"></i>Tính điểm Môn học
+                            <button class="nav-link" id="guide-course-tab" data-bs-toggle="pill"
+                                data-bs-target="#guide-course" type="button" role="tab">
+                                <i class="bi bi-journal-check d-block d-sm-inline-block mb-1 mb-sm-0 me-sm-2"></i>Tính
+                                điểm Môn học
                             </button>
                         </li>
-                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="guide-scale-tab" data-bs-toggle="pill" data-bs-target="#guide-scale" type="button" role="tab">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="guide-scale-tab" data-bs-toggle="pill"
+                                data-bs-target="#guide-scale" type="button" role="tab">
                                 <i class="bi bi-table d-block d-sm-inline-block mb-1 mb-sm-0 me-sm-2"></i>Thang điểm
                             </button>
                         </li>
                     </ul>
                     <div class="tab-content" id="guideTabContent">
                         <div class="tab-pane fade show active" id="guide-target" role="tabpanel">
-                            <h5 class="mb-2 text-primary fw-bold"><i class="bi bi-graph-up-arrow me-2"></i>Lộ trình GPA</h5>
-                            <p class="text-secondary mb-3">Công cụ giúp bạn tính toán điểm số cần đạt trong các môn học còn lại để đạt được mục tiêu GPA mong muốn khi ra trường.</p>
-                            
+                            <h5 class="mb-2 text-primary fw-bold"><i class="bi bi-graph-up-arrow me-2"></i>Lộ trình GPA
+                            </h5>
+                            <p class="text-secondary mb-3">Công cụ giúp bạn tính toán điểm số cần đạt trong các môn học
+                                còn lại để đạt được mục tiêu GPA mong muốn khi ra trường.</p>
+
                             <div class="d-flex flex-column gap-2">
                                 <div class="d-flex">
                                     <div class="flex-shrink-0">
-                                        <span class="badge bg-primary rounded-circle p-2" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">1</span>
+                                        <span class="badge bg-primary rounded-circle p-2"
+                                            style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">1</span>
                                     </div>
                                     <div class="flex-grow-1 ms-3">
                                         <h6 class="fw-bold mb-1">Sao chép bảng điểm</h6>
-                                        <p class="small text-muted mb-0">Truy cập Portal đào tạo -> Kết quả học tập. Nhấn <strong>Ctrl + A</strong> để chọn tất cả, sau đó <strong>Ctrl + C</strong> để sao chép.</p>
+                                        <p class="small text-muted mb-0">Truy cập Portal đào tạo -> Kết quả học tập.
+                                            Nhấn <strong>Ctrl + A</strong> để chọn tất cả, sau đó <strong>Ctrl +
+                                                C</strong> để sao chép.</p>
                                     </div>
                                 </div>
 
                                 <div class="d-flex">
                                     <div class="flex-shrink-0">
-                                        <span class="badge bg-primary rounded-circle p-2" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">2</span>
+                                        <span class="badge bg-primary rounded-circle p-2"
+                                            style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">2</span>
                                     </div>
                                     <div class="flex-grow-1 ms-3">
                                         <h6 class="fw-bold mb-1">Nhập dữ liệu</h6>
-                                        <p class="small text-muted mb-0">Dán (<strong>Ctrl + V</strong>) nội dung vừa sao chép vào ô nhập liệu trên trang web này và bấm nút <strong>"Phân tích bảng điểm"</strong>.</p>
+                                        <p class="small text-muted mb-0">Dán (<strong>Ctrl + V</strong>) nội dung vừa
+                                            sao chép vào ô nhập liệu trên trang web này và bấm nút <strong>"Phân tích
+                                                bảng điểm"</strong>.</p>
                                     </div>
                                 </div>
 
                                 <div class="d-flex">
                                     <div class="flex-shrink-0">
-                                        <span class="badge bg-primary rounded-circle p-2" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">3</span>
+                                        <span class="badge bg-primary rounded-circle p-2"
+                                            style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">3</span>
                                     </div>
                                     <div class="flex-grow-1 ms-3">
                                         <h6 class="fw-bold mb-1">Đặt mục tiêu GPA</h6>
-                                        <p class="small text-muted mb-0">Hệ thống sẽ hiển thị GPA hiện tại. Hãy nhập mức <strong>GPA Mục tiêu</strong> bạn muốn (ví dụ: 3.2, 3.6) để xem cần phấn đấu bao nhiêu.</p>
+                                        <p class="small text-muted mb-0">Hệ thống sẽ hiển thị GPA hiện tại. Hãy nhập mức
+                                            <strong>GPA Mục tiêu</strong> bạn muốn (ví dụ: 3.2, 3.6) để xem cần phấn đấu
+                                            bao nhiêu.
+                                        </p>
                                     </div>
                                 </div>
 
                                 <div class="d-flex">
                                     <div class="flex-shrink-0">
-                                        <span class="badge bg-success rounded-circle p-2" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;"><i class="bi bi-check-lg"></i></span>
+                                        <span class="badge bg-success rounded-circle p-2"
+                                            style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;"><i
+                                                class="bi bi-check-lg"></i></span>
                                     </div>
                                     <div class="flex-grow-1 ms-3">
                                         <h6 class="fw-bold mb-1">Xem kết quả & Gợi ý</h6>
-                                        <p class="small text-muted mb-0">Nhận kết quả về điểm trung bình cần đạt cho các tín chỉ còn lại. Hệ thống cũng sẽ gợi ý các môn điểm thấp nên học cải thiện để tối ưu điểm số.</p>
+                                        <p class="small text-muted mb-0">Nhận kết quả về điểm trung bình cần đạt cho các
+                                            tín chỉ còn lại. Hệ thống cũng sẽ gợi ý các môn điểm thấp nên học cải thiện
+                                            để tối ưu điểm số.</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="tab-pane fade" id="guide-manual" role="tabpanel">
-                            <h5 class="mb-2 text-primary fw-bold"><i class="bi bi-calculator me-2"></i>Tính GPA Thủ công</h5>
-                            <p class="text-secondary mb-3">Công cụ linh hoạt cho phép bạn tự nhập điểm để tính toán GPA cho từng học kỳ hoặc dự tính kết quả học tập.</p>
+                            <h5 class="mb-2 text-primary fw-bold"><i class="bi bi-calculator me-2"></i>Tính GPA Thủ công
+                            </h5>
+                            <p class="text-secondary mb-3">Công cụ linh hoạt cho phép bạn tự nhập điểm để tính toán GPA
+                                cho từng học kỳ hoặc dự tính kết quả học tập.</p>
 
                             <div class="d-flex flex-column gap-2">
                                 <div class="d-flex">
                                     <div class="flex-shrink-0">
-                                        <span class="badge bg-primary rounded-circle p-2" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">1</span>
+                                        <span class="badge bg-primary rounded-circle p-2"
+                                            style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">1</span>
                                     </div>
                                     <div class="flex-grow-1 ms-3">
                                         <h6 class="fw-bold mb-1">Tạo học kỳ & Môn học</h6>
-                                        <p class="small text-muted mb-0">Nhấn nút <strong>"Thêm học kỳ"</strong> để bắt đầu. Trong mỗi học kỳ, nhấn <strong>"Thêm môn học"</strong> tương ứng với số lượng môn bạn muốn tính.</p>
+                                        <p class="small text-muted mb-0">Nhấn nút <strong>"Thêm học kỳ"</strong> để bắt
+                                            đầu. Trong mỗi học kỳ, nhấn <strong>"Thêm môn học"</strong> tương ứng với số
+                                            lượng môn bạn muốn tính.</p>
                                     </div>
                                 </div>
 
                                 <div class="d-flex">
                                     <div class="flex-shrink-0">
-                                        <span class="badge bg-primary rounded-circle p-2" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">2</span>
+                                        <span class="badge bg-primary rounded-circle p-2"
+                                            style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">2</span>
                                     </div>
                                     <div class="flex-grow-1 ms-3">
                                         <h6 class="fw-bold mb-1">Nhập thông tin chi tiết</h6>
-                                        <p class="small text-muted mb-0">Điền <strong>Số tín chỉ</strong> và <strong>Điểm số</strong> cho từng môn. Bạn có thể nhập điểm hệ 10 (ví dụ: 8.5) hoặc chọn điểm chữ (A, B+...).</p>
+                                        <p class="small text-muted mb-0">Điền <strong>Số tín chỉ</strong> và
+                                            <strong>Điểm số</strong> cho từng môn. Bạn có thể nhập điểm hệ 10 (ví dụ:
+                                            8.5) hoặc chọn điểm chữ (A, B+...).
+                                        </p>
                                     </div>
                                 </div>
 
                                 <div class="d-flex">
                                     <div class="flex-shrink-0">
-                                        <span class="badge bg-success rounded-circle p-2" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;"><i class="bi bi-check-lg"></i></span>
+                                        <span class="badge bg-success rounded-circle p-2"
+                                            style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;"><i
+                                                class="bi bi-check-lg"></i></span>
                                     </div>
                                     <div class="flex-grow-1 ms-3">
                                         <h6 class="fw-bold mb-1">Xem kết quả tức thì</h6>
-                                        <p class="small text-muted mb-0">Hệ thống tự động tính <strong>GPA</strong> (điểm TB học kỳ) và <strong>CPA</strong> (điểm TB tích lũy) ngay khi bạn nhập liệu.</p>
+                                        <p class="small text-muted mb-0">Hệ thống tự động tính <strong>GPA</strong>
+                                            (điểm TB học kỳ) và <strong>CPA</strong> (điểm TB tích lũy) ngay khi bạn
+                                            nhập liệu.</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <div class="tab-pane fade" id="guide-course" role="tabpanel">
-                            <h5 class="mb-2 text-primary fw-bold"><i class="bi bi-journal-check me-2"></i>Tính điểm Môn học</h5>
-                            <p class="text-secondary mb-3">Giúp bạn biết chính xác cần thi bao nhiêu điểm để đạt được điểm tổng kết mong muốn (A, B, C...).</p>
+                            <h5 class="mb-2 text-primary fw-bold"><i class="bi bi-journal-check me-2"></i>Tính điểm Môn
+                                học</h5>
+                            <p class="text-secondary mb-3">Giúp bạn biết chính xác cần thi bao nhiêu điểm để đạt được
+                                điểm tổng kết mong muốn (A, B, C...).</p>
 
                             <div class="d-flex flex-column gap-2">
                                 <div class="d-flex">
                                     <div class="flex-shrink-0">
-                                        <span class="badge bg-primary rounded-circle p-2" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">1</span>
+                                        <span class="badge bg-primary rounded-circle p-2"
+                                            style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">1</span>
                                     </div>
                                     <div class="flex-grow-1 ms-3">
                                         <h6 class="fw-bold mb-1">Cấu hình trọng số</h6>
-                                        <p class="small text-muted mb-0">Nhập tỷ lệ phần trăm (%) của <strong>Điểm quá trình</strong> và <strong>Điểm thi</strong> theo đề cương môn học (ví dụ: 40% - 60%).</p>
+                                        <p class="small text-muted mb-0">Nhập tỷ lệ phần trăm (%) của <strong>Điểm quá
+                                                trình</strong> và <strong>Điểm thi</strong> theo đề cương môn học (ví
+                                            dụ: 40% - 60%).</p>
                                     </div>
                                 </div>
 
                                 <div class="d-flex">
                                     <div class="flex-shrink-0">
-                                        <span class="badge bg-primary rounded-circle p-2" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">2</span>
+                                        <span class="badge bg-primary rounded-circle p-2"
+                                            style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">2</span>
                                     </div>
                                     <div class="flex-grow-1 ms-3">
                                         <h6 class="fw-bold mb-1">Nhập điểm hiện có</h6>
-                                        <p class="small text-muted mb-0">Nhập điểm quá trình bạn đã đạt được (hoặc dự kiến).</p>
+                                        <p class="small text-muted mb-0">Nhập điểm quá trình bạn đã đạt được (hoặc dự
+                                            kiến).</p>
                                     </div>
                                 </div>
 
                                 <div class="d-flex">
                                     <div class="flex-shrink-0">
-                                        <span class="badge bg-success rounded-circle p-2" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;"><i class="bi bi-check-lg"></i></span>
+                                        <span class="badge bg-success rounded-circle p-2"
+                                            style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;"><i
+                                                class="bi bi-check-lg"></i></span>
                                     </div>
                                     <div class="flex-grow-1 ms-3">
                                         <h6 class="fw-bold mb-1">Bảng dự tính điểm thi</h6>
-                                        <p class="small text-muted mb-0">Hệ thống sẽ liệt kê danh sách các điểm số bạn cần đạt trong kỳ thi cuối kỳ để đạt được từng mức điểm chữ (A, B+, B...).</p>
+                                        <p class="small text-muted mb-0">Hệ thống sẽ liệt kê danh sách các điểm số bạn
+                                            cần đạt trong kỳ thi cuối kỳ để đạt được từng mức điểm chữ (A, B+, B...).
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -1336,154 +1682,186 @@ Năm học: 2023-2024 - Học kỳ: HK01
 
                         <div class="tab-pane fade" id="guide-scale" role="tabpanel">
                             <h5 class="mb-2 text-primary fw-bold"><i class="bi bi-table me-2"></i>Thang điểm HUFLIT</h5>
-                            <p class="text-secondary mb-3">Bảng tra cứu thang điểm chính thức được áp dụng tại HUFLIT, giúp bạn đối chiếu giữa các hệ điểm.</p>
+                            <p class="text-secondary mb-3">Bảng tra cứu thang điểm chính thức được áp dụng tại HUFLIT,
+                                giúp bạn đối chiếu giữa các hệ điểm.</p>
 
                             <div class="row g-2">
                                 <div class="col-lg-4 col-md-6">
                                     <div class="card bg-light border-0 h-100">
                                         <div class="card-body">
-                                            <h6 class="fw-bold text-primary"><i class="bi bi-123 me-2"></i>Hệ 10 & Điểm Chữ</h6>
-                                            <p class="small text-muted mb-0">Điểm tổng kết môn học (hệ 10) sẽ được quy đổi sang điểm chữ tương ứng. Ví dụ: 8.5 - 10.0 là điểm A.</p>
+                                            <h6 class="fw-bold text-primary"><i class="bi bi-123 me-2"></i>Hệ 10 & Điểm
+                                                Chữ</h6>
+                                            <p class="small text-muted mb-0">Điểm tổng kết môn học (hệ 10) sẽ được quy
+                                                đổi sang điểm chữ tương ứng. Ví dụ: 8.5 - 10.0 là điểm A.</p>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-lg-4 col-md-6">
                                     <div class="card bg-light border-0 h-100">
                                         <div class="card-body">
-                                            <h6 class="fw-bold text-primary"><i class="bi bi-4-square me-2"></i>Quy đổi Hệ 4</h6>
-                                            <p class="small text-muted mb-0">Điểm chữ sẽ được quy đổi sang hệ 4 để tính GPA. Ví dụ: A = 4.0, B+ = 3.5.</p>
+                                            <h6 class="fw-bold text-primary"><i class="bi bi-4-square me-2"></i>Quy đổi
+                                                Hệ 4</h6>
+                                            <p class="small text-muted mb-0">Điểm chữ sẽ được quy đổi sang hệ 4 để tính
+                                                GPA. Ví dụ: A = 4.0, B+ = 3.5.</p>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-lg-4 col-md-6">
                                     <div class="card bg-light border-0 h-100">
                                         <div class="card-body">
-                                            <h6 class="fw-bold text-primary"><i class="bi bi-star me-2"></i>Điểm Rèn luyện</h6>
-                                            <p class="small text-muted mb-0">Đánh giá hoạt động ngoại khóa và rèn luyện. Từ 90 điểm trở lên là Xuất sắc, dưới 35 điểm là Kém.</p>
+                                            <h6 class="fw-bold text-primary"><i class="bi bi-star me-2"></i>Điểm Rèn
+                                                luyện</h6>
+                                            <p class="small text-muted mb-0">Đánh giá hoạt động ngoại khóa và rèn luyện.
+                                                Từ 90 điểm trở lên là Xuất sắc, dưới 35 điểm là Kém.</p>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-12">
-                                    <div class="alert alert-warning border-0 shadow-sm d-flex align-items-center mb-0" role="alert">
+                                    <div class="alert alert-warning border-0 shadow-sm d-flex align-items-center mb-0"
+                                        role="alert">
                                         <i class="bi bi-exclamation-triangle-fill me-3 fs-4"></i>
                                         <div>
                                             <strong>Lưu ý về điểm đạt:</strong>
-                                            <div class="small">Điểm D (4.0 - 5.4) là điểm đạt tối thiểu. Điểm F (< 4.0) là rớt môn và phải học lại.</div>
+                                            <div class="small">Điểm D (4.0 - 5.4) là điểm đạt tối thiểu. Điểm F (< 4.0)
+                                                    là rớt môn và phải học lại.</div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="modal-footer justify-content-between">
-                    <div class="d-flex align-items-center bg-warning-subtle border border-warning rounded p-2" id="guideCheckContainer">
-                        <input class="form-check-input m-0 me-2" type="checkbox" id="guideUnderstandCheck">
-                        <label class="form-check-label small fw-bold text-dark lh-1" for="guideUnderstandCheck">
-                            Mở lại hướng dẫn này ở nút Liên hệ <i class="bi bi-chat-text-fill text-primary"></i>
-                        </label>
+                    <div class="modal-footer justify-content-between">
+                        <div class="d-flex align-items-center bg-warning-subtle border border-warning rounded p-2"
+                            id="guideCheckContainer">
+                            <input class="form-check-input m-0 me-2" type="checkbox" id="guideUnderstandCheck">
+                            <label class="form-check-label small fw-bold text-dark lh-1" for="guideUnderstandCheck">
+                                Mở lại hướng dẫn này ở nút Liên hệ <i class="bi bi-chat-text-fill text-primary"></i>
+                            </label>
+                        </div>
+                        <button type="button" class="btn btn-primary" id="guideConfirmBtn" data-bs-dismiss="modal">Đã
+                            hiểu</button>
                     </div>
-                    <button type="button" class="btn btn-primary" id="guideConfirmBtn" data-bs-dismiss="modal">Đã hiểu</button>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Bootstrap 5.3 JS Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Calculation Method Modal -->
-    <div class="modal fade" id="calculationModal" tabindex="-1" aria-labelledby="calculationModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow">
-                <div class="modal-header border-bottom-0 pb-0">
-                    <h5 class="modal-title fw-bold text-primary" id="calculationModalLabel">Cách tính điểm học phần</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p class="small text-muted mb-3">Ví dụ với tỷ lệ <strong>40% - 60%</strong>:</p>
-                    <div class="text-center mb-3">
-                        <img src="assets/images/CachTinhDiem.png" alt="Cách tính điểm" class="img-fluid rounded-3 shadow-sm border">
+        <!-- Bootstrap 5.3 JS Bundle -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+        <!-- Calculation Method Modal -->
+        <div class="modal fade" id="calculationModal" tabindex="-1" aria-labelledby="calculationModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow">
+                    <div class="modal-header border-bottom-0 pb-0">
+                        <h5 class="modal-title fw-bold text-primary" id="calculationModalLabel">Cách tính điểm học phần
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="alert alert-light border small mb-0">
-                        <p class="mb-1"><strong>Công thức:</strong></p>
-                        <p class="mb-0 fst-italic">Điểm tổng kết = (Điểm quá trình × 0.4) + (Điểm thi cuối kỳ × 0.6)</p>
+                    <div class="modal-body">
+                        <p class="small text-muted mb-3">Ví dụ với tỷ lệ <strong>40% - 60%</strong>:</p>
+                        <div class="text-center mb-3">
+                            <img src="assets/images/CachTinhDiem.png" alt="Cách tính điểm"
+                                class="img-fluid rounded-3 shadow-sm border">
+                        </div>
+                        <div class="alert alert-light border small mb-0">
+                            <p class="mb-1"><strong>Công thức:</strong></p>
+                            <p class="mb-0 fst-italic">Điểm tổng kết = (Điểm quá trình × 0.4) + (Điểm thi cuối kỳ × 0.6)
+                            </p>
+                        </div>
                     </div>
-                </div>
-                <div class="modal-footer border-top-0 pt-0">
-                    <button type="button" class="btn btn-primary rounded-pill px-4" data-bs-dismiss="modal">Đã hiểu</button>
+                    <div class="modal-footer border-top-0 pt-0">
+                        <button type="button" class="btn btn-primary rounded-pill px-4" data-bs-dismiss="modal">Đã
+                            hiểu</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Feedback Modal -->
-    <div class="modal fade" id="feedbackModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content border-0 shadow">
-                <div class="modal-header bg-light pb-0 border-bottom-0">
-                    <ul class="nav nav-tabs border-bottom-0" id="feedbackTab" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active fw-bold" id="feedback-form-tab" data-bs-toggle="tab" data-bs-target="#feedback-form-pane" type="button" role="tab">
-                                <i class="bi bi-pencil-square me-2"></i>Gửi góp ý
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link fw-bold" id="feedback-list-tab" data-bs-toggle="tab" data-bs-target="#feedback-list-pane" type="button" role="tab">
-                                <i class="bi bi-chat-quote-fill me-2"></i>Cộng đồng
-                            </button>
-                        </li>
-                    </ul>
-                    <button type="button" class="btn-close mb-2 me-2" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body p-4 bg-white rounded-bottom">
-                    <div class="tab-content" id="feedbackTabContent">
-                        <!-- Tab 1: Form -->
-                        <div class="tab-pane fade show active" id="feedback-form-pane" role="tabpanel" tabindex="0">
-                            <form id="feedback-form">
-                                <div class="mb-3">
-                                    <label for="feedback-name" class="form-label fw-medium small text-secondary">Tên của bạn (Không bắt buộc)</label>
-                                    <input type="text" class="form-control" id="feedback-name" placeholder="Nhập tên của bạn">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="feedback-type" class="form-label fw-medium small text-secondary">Loại góp ý</label>
-                                    <select class="form-select" id="feedback-type" required>
-                                        <option value="feature_request">Yêu cầu tính năng mới</option>
-                                        <option value="bug_report">Báo lỗi</option>
-                                        <option value="improvement">Đề xuất cải tiến</option>
-                                        <option value="other">Khác</option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="feedback-content" class="form-label fw-medium small text-secondary">Nội dung góp ý <span class="text-danger">*</span></label>
-                                    <textarea class="form-control" id="feedback-content" rows="4" placeholder="Mô tả chi tiết ý tưởng hoặc vấn đề của bạn..." required></textarea>
-                                </div>
-                                <div class="alert alert-light border small text-muted mb-3">
-                                    <i class="bi bi-shield-check me-1"></i> Ý kiến của bạn sẽ được kiểm duyệt trước khi hiển thị công khai.
-                                </div>
-                                <div class="d-flex justify-content-end">
-                                    <button type="button" class="btn btn-secondary btn-sm me-2" data-bs-dismiss="modal">Đóng</button>
-                                    <button type="submit" class="btn btn-success shadow-sm" id="submit-feedback-btn">
-                                        <i class="bi bi-send-fill me-2"></i>Gửi góp ý
+        <!-- Feedback Modal -->
+        <div class="modal fade" id="feedbackModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content border-0 shadow">
+                    <div class="modal-header bg-light pb-0 border-bottom-0">
+                        <ul class="nav nav-tabs border-bottom-0" id="feedbackTab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active fw-bold" id="feedback-form-tab" data-bs-toggle="tab"
+                                    data-bs-target="#feedback-form-pane" type="button" role="tab">
+                                    <i class="bi bi-pencil-square me-2"></i>Gửi góp ý
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link fw-bold" id="feedback-list-tab" data-bs-toggle="tab"
+                                    data-bs-target="#feedback-list-pane" type="button" role="tab">
+                                    <i class="bi bi-chat-quote-fill me-2"></i>Cộng đồng
+                                </button>
+                            </li>
+                        </ul>
+                        <button type="button" class="btn-close mb-2 me-2" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-4 bg-white rounded-bottom">
+                        <div class="tab-content" id="feedbackTabContent">
+                            <!-- Tab 1: Form -->
+                            <div class="tab-pane fade show active" id="feedback-form-pane" role="tabpanel" tabindex="0">
+                                <form id="feedback-form">
+                                    <div class="mb-3">
+                                        <label for="feedback-name" class="form-label fw-medium small text-secondary">Tên
+                                            của bạn (Không bắt buộc)</label>
+                                        <input type="text" class="form-control" id="feedback-name"
+                                            placeholder="Nhập tên của bạn">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="feedback-type"
+                                            class="form-label fw-medium small text-secondary">Loại góp ý</label>
+                                        <select class="form-select" id="feedback-type" required>
+                                            <option value="feature_request">Yêu cầu tính năng mới</option>
+                                            <option value="bug_report">Báo lỗi</option>
+                                            <option value="improvement">Đề xuất cải tiến</option>
+                                            <option value="other">Khác</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="feedback-content"
+                                            class="form-label fw-medium small text-secondary">Nội dung góp ý <span
+                                                class="text-danger">*</span></label>
+                                        <textarea class="form-control" id="feedback-content" rows="4"
+                                            placeholder="Mô tả chi tiết ý tưởng hoặc vấn đề của bạn..."
+                                            required></textarea>
+                                    </div>
+                                    <div class="alert alert-light border small text-muted mb-3">
+                                        <i class="bi bi-shield-check me-1"></i> Ý kiến của bạn sẽ được kiểm duyệt trước
+                                        khi hiển thị công khai.
+                                    </div>
+                                    <div class="d-flex justify-content-end">
+                                        <button type="button" class="btn btn-secondary btn-sm me-2"
+                                            data-bs-dismiss="modal">Đóng</button>
+                                        <button type="submit" class="btn btn-success shadow-sm"
+                                            id="submit-feedback-btn">
+                                            <i class="bi bi-send-fill me-2"></i>Gửi góp ý
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <!-- Tab 2: List -->
+                            <div class="tab-pane fade" id="feedback-list-pane" role="tabpanel" tabindex="0">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="fw-bold text-primary mb-0">Ý kiến từ cộng đồng</h6>
+                                    <button class="btn btn-sm btn-outline-secondary" id="refresh-feedback-btn"
+                                        title="Làm mới">
+                                        <i class="bi bi-arrow-clockwise"></i>
                                     </button>
                                 </div>
-                            </form>
-                        </div>
 
-                        <!-- Tab 2: List -->
-                        <div class="tab-pane fade" id="feedback-list-pane" role="tabpanel" tabindex="0">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h6 class="fw-bold text-primary mb-0">Ý kiến từ cộng đồng</h6>
-                                <button class="btn btn-sm btn-outline-secondary" id="refresh-feedback-btn" title="Làm mới">
-                                    <i class="bi bi-arrow-clockwise"></i>
-                                </button>
-                            </div>
-                            
-                            <div id="feedback-list-container" class="d-flex flex-column gap-3" style="max-height: 400px; overflow-y: auto;">
-                                <!-- Loading State -->
-                                <div class="text-center py-5 text-muted">
-                                    <div class="spinner-border text-primary mb-2" role="status"></div>
-                                    <p class="small mb-0">Đang tải dữ liệu...</p>
+                                <div id="feedback-list-container" class="d-flex flex-column gap-3"
+                                    style="max-height: 400px; overflow-y: auto;">
+                                    <!-- Loading State -->
+                                    <div class="text-center py-5 text-muted">
+                                        <div class="spinner-border text-primary mb-2" role="status"></div>
+                                        <p class="small mb-0">Đang tải dữ liệu...</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1491,13 +1869,12 @@ Năm học: 2023-2024 - Học kỳ: HK01
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- App Scripts -->
-    <script type="module" src="js/main.js"></script>
+        <!-- App Scripts -->
+        <script type="module" src="js/main.js"></script>
 
-    <!-- GoatCounter Analytics -->
-    <script data-goatcounter="https://tienxdun.goatcounter.com/count"
-        async src="//gc.zgo.at/count.js"></script>
+        <!-- GoatCounter Analytics -->
+        <script data-goatcounter="https://tienxdun.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
+
 </html>

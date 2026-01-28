@@ -2,6 +2,8 @@ import { GRADE_SCALE } from '../core/constants.js';
 import { calculateYearlyStats, getYearInfo, calculateManualGPA } from '../core/calculator.js';
 import { getManualState, getTargetState } from '../state/store.js';
 
+let gpaChart = null;
+
 export function initGradeScaleTab() {
     const tableBody = document.getElementById('grade-scale-table-body');
     const classificationBody = document.getElementById('classification-table-body');
@@ -9,13 +11,13 @@ export function initGradeScaleTab() {
 
     const { semesters, initialGpa: manualGpa, initialCredits: manualCredits } = getManualState();
     const { gpa: manualCalcGpa } = calculateManualGPA(semesters, parseFloat(manualGpa) || 0, parseFloat(manualCredits) || 0);
-    
+
     const targetState = getTargetState();
     const targetTabGpa = parseFloat(targetState.currentGpa) || 0;
-    
+
     // Choose the GPA to highlight (Preferred: Manual tab if it has credits)
     const totalManualCredits = semesters.reduce((sum, sem) => sum + sem.courses.reduce((s, c) => s + (parseFloat(c.credits) || 0), 0), 0) + (parseFloat(manualCredits) || 0);
-    
+
     let currentGPA = 0;
     let hasData = false;
 
@@ -42,7 +44,7 @@ export function initGradeScaleTab() {
             const isActive = hasData && currentGPA >= c.min && currentGPA <= (c.max + 0.001);
             const rowClass = isActive ? `table-${c.color} animate-pulse shadow-sm` : '';
             const badge = isActive ? `<span class="badge bg-white text-${c.color} ms-2 px-2 py-1 border border-${c.color} shadow-sm" style="font-size: 0.7rem; font-weight: 800;">BẠN ĐANG Ở ĐÂY <i class="bi bi-geo-alt-fill"></i></span>` : '';
-            
+
             let textColorClass = `text-${c.color}`;
             if (c.color === 'info' || c.color === 'warning') textColorClass += '-emphasis';
 
@@ -74,20 +76,16 @@ export function initGradeScaleTab() {
             if (hasData) {
                 if (index === 0) isActive = currentGPA === 4.0;
                 else {
-                    const prevGpa = scaleData[index-1].gpa;
+                    const prevGpa = scaleData[index - 1].gpa;
                     isActive = currentGPA >= item.gpa && currentGPA < prevGpa;
                 }
             }
 
-            const rowClass = isActive ? `table-${item.color} animate-pulse shadow-sm` : '';
-            const highlightBadge = isActive ? `<span class="badge bg-white text-${item.color} ms-2 px-2 py-1 border border-${item.color} shadow-sm" style="font-size: 0.65rem; font-weight: 800;">MỨC HIỆN TẠI</span>` : '';
-
             return `
-                <tr class="align-middle ${rowClass} transition-all">
+                <tr class="align-middle transition-all">
                     <td class="ps-4 py-3">
                         <div class="d-flex align-items-center gap-2">
                              <span class="fw-bold text-${item.color}">${item.grade}</span>
-                             ${highlightBadge}
                         </div>
                     </td>
                     <td class="text-center small text-secondary fw-medium">${item.h10}</td>
@@ -103,7 +101,7 @@ export function renderManualSemesters() {
     if (!manualSemesterList) return;
 
     const { semesters: manualSemesters, initialGpa, initialCredits } = getManualState();
-    
+
     // Pre-calculate cumulative GPA for each semester
     let runningTotalPoints = (parseFloat(initialGpa) || 0) * (parseFloat(initialCredits) || 0);
     let runningTotalCredits = parseFloat(initialCredits) || 0;
@@ -117,11 +115,11 @@ export function renderManualSemesters() {
             if (course.isRetake) {
                 const oldGradeInfo = GRADE_SCALE.find(g => g.grade === course.oldGrade);
                 const oldGpa = oldGradeInfo ? oldGradeInfo.gpa : 0;
-                
+
                 // "Điểm cao hơn trong các lần học là điểm chính thức của học phần"
                 if (gpa > oldGpa) {
                     runningTotalPoints += (gpa - oldGpa) * credits;
-                    
+
                     if (oldGpa === 0 && gpa > 0) {
                         runningTotalCredits += credits;
                     }
@@ -144,61 +142,62 @@ export function renderManualSemesters() {
 
     manualSemesterList.innerHTML = manualSemesters.map((sem, index) => {
         const semTotalCredits = sem.courses.reduce((sum, c) => sum + (parseFloat(c.credits) || 0), 0);
-        
+
         // Calculate Semester GPA (excluding ungraded and F grades to match Global GPA logic)
         let semGpaPoints = 0;
         let semGpaCredits = 0;
-        
+
         sem.courses.forEach(c => {
             const gradeInfo = GRADE_SCALE.find(g => g.grade === c.grade);
             const gpa = gradeInfo ? gradeInfo.gpa : 0;
             const credits = parseFloat(c.credits) || 0;
-            
+
             if (gradeInfo) {
                 semGpaPoints += gpa * credits;
                 semGpaCredits += credits;
             }
         });
-        
+
         const semGPA = semGpaCredits > 0 ? (semGpaPoints / semGpaCredits).toFixed(2) : '0.00';
         const cumGPA = semesterCumulativeGPAs[index];
-        
+
         // Check if we should show year summary
         let yearSummaryHtml = '';
         const currentYear = getYearInfo(sem.name);
         const nextSem = manualSemesters[index + 1];
         const nextYear = nextSem ? getYearInfo(nextSem.name) : null;
-        
+
         if (!nextYear || nextYear.id !== currentYear.id) {
             // End of year group
             const stat = yearStats[currentYear.id];
             if (stat && stat.credits > 0) {
                 const yearGPA = (stat.points / stat.credits).toFixed(2);
                 yearSummaryHtml = `
-                    <div class="alert alert-info d-flex justify-content-between align-items-center mb-3 shadow-sm border-info-subtle bg-info-subtle text-info-emphasis">
-                        <div class="d-flex align-items-center">
-                            <i class="bi bi-mortarboard-fill me-2 fs-5"></i>
-                            <span class="fw-bold">GPA Trung bình ${stat.label}</span>
+                    <div class="alert alert-info d-flex justify-content-between align-items-center mb-3 shadow-sm border-info-subtle bg-info-subtle text-info-emphasis py-2 px-3">
+                        <div class="d-flex align-items-center overflow-hidden">
+                            <i class="bi bi-mortarboard-fill me-2 text-info opacity-75 d-none d-sm-inline-block"></i>
+                            <span class="fw-bold small text-truncate">GPA trung bình ${stat.label}</span>
                         </div>
-                        <span class="badge bg-info text-dark fs-6 border border-info-subtle year-gpa-badge" data-year-id="${currentYear.id}">GPA ${yearGPA}</span>
+                        <span class="badge bg-info text-dark border border-info-subtle year-gpa-badge ms-2" 
+                              style="font-size: 0.85rem; font-weight: 700;" data-year-id="${currentYear.id}">GPA ${yearGPA}</span>
                     </div>
                 `;
             }
         }
-        
+
         return `
         <div class="card shadow-sm mb-3 ani-fade-in-up hover-translate-y" style="animation-delay: ${index * 0.1}s">
-            <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-2">
-                    <span class="fw-bold">${sem.name}</span>
-                    <div class="d-flex gap-2 flex-wrap">
+            <div class="card-header bg-white d-flex justify-content-between align-items-start align-items-md-center py-2 px-3">
+                <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-1 gap-md-2" style="min-width: 0; flex: 1;">
+                    <span class="fw-bold text-primary text-truncate">${sem.name}</span>
+                    <div class="d-flex gap-1 flex-wrap semester-header-badges">
                         <span class="badge bg-light text-secondary border semester-total-credits" data-sem-id="${sem.id}">${semTotalCredits} TC</span>
                         <span class="badge bg-primary text-white border semester-gpa" data-sem-id="${sem.id}">GPA ${semGPA}</span>
-                        <span class="badge bg-success text-white border semester-cum-gpa" data-sem-id="${sem.id}" title="GPA Tích lũy">GPA tích lũy ${cumGPA}</span>
+                        <span class="badge bg-success text-white border semester-cum-gpa" data-sem-id="${sem.id}" title="GPA Tích lũy"><span class="d-none d-sm-inline">GPA </span>tích lũy ${cumGPA}</span>
                     </div>
                 </div>
-                <div>
-                    <button class="btn btn-sm btn-link text-danger delete-semester-btn" data-id="${sem.id}">
+                <div class="ms-2 flex-shrink-0">
+                    <button class="btn btn-sm btn-link text-danger delete-semester-btn p-1" data-id="${sem.id}" title="Xóa học kỳ">
                         <i class="bi bi-trash"></i>
                     </button>
                 </div>
@@ -208,10 +207,10 @@ export function renderManualSemesters() {
                     <table class="table table-borderless align-middle mb-0">
                         <thead class="text-muted small border-bottom text-nowrap">
                             <tr>
-                                <th style="width: 30%; min-width: 90px;">Môn học</th>
-                                <th style="width: 20%; min-width: 85px;">TC</th>
-                                <th style="width: 25%; min-width: 85px;">Điểm</th>
-                                <th style="width: 20%; min-width: 65px;">Học lại?</th>
+                                <th style="width: 35%">Môn học</th>
+                                <th style="width: 20%; min-width: 70px;">TC</th>
+                                <th style="width: 20%; min-width: 75px;">Điểm</th>
+                                <th style="width: 20%; min-width: 50px;">Lại?</th>
                                 <th style="width: 5%"></th>
                             </tr>
                         </thead>
@@ -251,8 +250,8 @@ export function renderManualSemesters() {
                                                     data-sem-id="${sem.id}" data-course-id="${course.id}" data-field="oldGrade">
                                                     <option value="" disabled>Điểm cũ</option>
                                                     ${GRADE_SCALE
-                                                        .filter(g => !['A+', 'A', 'B+', 'B'].includes(g.grade))
-                                                        .map(g => `<option value="${g.grade}" ${course.oldGrade === g.grade ? 'selected' : ''}>${g.grade}</option>`).join('')}
+                    .filter(g => !['A+', 'A', 'B+', 'B'].includes(g.grade))
+                    .map(g => `<option value="${g.grade}" ${course.oldGrade === g.grade ? 'selected' : ''}>${g.grade}</option>`).join('')}
                                                 </select>
                                             ` : ''}
                                         </div>
@@ -274,5 +273,119 @@ export function renderManualSemesters() {
             </div>
         </div>
         ${yearSummaryHtml}
-    `;}).join('');
+    `;
+    }).join('');
+
+    // Update Chart
+    renderGPAChart(manualSemesters, initialGpa, initialCredits);
+}
+
+export function renderGPAChart(semesters, initialGpa, initialCredits) {
+    const ctx = document.getElementById('gpa-chart');
+    if (!ctx) return;
+
+    if (!semesters || semesters.length === 0) {
+        if (gpaChart) {
+            gpaChart.destroy();
+            gpaChart = null;
+        }
+        return;
+    }
+
+    // Calculate cumulative GPA for each semester (consistent with renderManualSemesters)
+    let runningTotalPoints = (parseFloat(initialGpa) || 0) * (parseFloat(initialCredits) || 0);
+    let runningTotalCredits = parseFloat(initialCredits) || 0;
+
+    const dataPoints = [];
+    const labels = [];
+
+    semesters.forEach(sem => {
+        sem.courses.forEach(course => {
+            const gradeInfo = GRADE_SCALE.find(g => g.grade === course.grade);
+            const gpa = gradeInfo ? gradeInfo.gpa : 0;
+            const credits = parseFloat(course.credits) || 0;
+
+            if (course.isRetake) {
+                const oldGradeInfo = GRADE_SCALE.find(g => g.grade === course.oldGrade);
+                const oldGpa = oldGradeInfo ? oldGradeInfo.gpa : 0;
+                if (gpa > oldGpa) {
+                    runningTotalPoints += (gpa - oldGpa) * credits;
+                    if (oldGpa === 0 && gpa > 0) runningTotalCredits += credits;
+                }
+            } else {
+                runningTotalPoints += gpa * credits;
+                if (gpa > 0) runningTotalCredits += credits;
+            }
+        });
+
+        const cumGPA = runningTotalCredits > 0 ? (runningTotalPoints / runningTotalCredits).toFixed(2) : '0.00';
+        dataPoints.push(parseFloat(cumGPA));
+        labels.push(sem.name.replace('Năm học: ', '').replace(' - Học kỳ: ', ' '));
+    });
+
+    if (gpaChart) {
+        gpaChart.data.labels = labels;
+        gpaChart.data.datasets[0].data = dataPoints;
+        gpaChart.update();
+    } else {
+        // Create new chart
+        const isDarkMode = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+        const textColor = isDarkMode ? '#adb5bd' : '#6c757d';
+        const brandRed = '#d32f2f';
+
+        gpaChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'GPA Tích lũy',
+                    data: dataPoints,
+                    borderColor: brandRed,
+                    backgroundColor: 'rgba(211, 47, 47, 0.1)',
+                    borderWidth: 3,
+                    pointBackgroundColor: brandRed,
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            label: (context) => `GPA: ${context.parsed.y.toFixed(2)}`
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        min: 0,
+                        max: 4.0,
+                        ticks: {
+                            stepSize: 0.5,
+                            color: textColor
+                        },
+                        grid: {
+                            color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)'
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: textColor,
+                            font: { size: 10 }
+                        },
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+    }
 }

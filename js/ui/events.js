@@ -39,7 +39,7 @@ export function initManualCalcTab() {
         applyBtn.addEventListener('click', () => {
             const manualGpaDisplay = document.getElementById('manual-gpa');
             const manualCreditsDisplay = document.getElementById('manual-credits');
-            
+
             const gpa = manualGpaDisplay.textContent;
             const credits = manualCreditsDisplay.textContent;
 
@@ -51,7 +51,7 @@ export function initManualCalcTab() {
             // 1. Calculate Remaining Credits (courses without valid grades)
             const { semesters } = getManualState();
             let remainingCredits = 0;
-            
+
             if (semesters && semesters.length > 0) {
                 semesters.forEach(sem => {
                     if (sem.courses && sem.courses.length > 0) {
@@ -59,7 +59,7 @@ export function initManualCalcTab() {
                             // Check if grade is valid (in GRADE_SCALE) or has a value
                             // Assuming empty grade or grade not in scale means "not yet studied" or "no score"
                             const hasValidGrade = course.grade && GRADE_SCALE.some(g => g.grade === course.grade);
-                            
+
                             if (!hasValidGrade) {
                                 remainingCredits += parseFloat(course.credits) || 0;
                             }
@@ -71,7 +71,7 @@ export function initManualCalcTab() {
             if (targetGpaInput && targetCreditsInput) {
                 targetGpaInput.value = gpa;
                 targetCreditsInput.value = credits;
-                
+
                 // Trigger input event to save state
                 targetGpaInput.dispatchEvent(new Event('input'));
                 targetCreditsInput.dispatchEvent(new Event('input'));
@@ -80,18 +80,18 @@ export function initManualCalcTab() {
                 if (newCreditsInput) {
                     newCreditsInput.value = remainingCredits > 0 ? remainingCredits : '';
                     newCreditsInput.dispatchEvent(new Event('input'));
-                    
+
                     // Ensure "New Credits" mode is visible if we have data
                     const newCreditsGroup = document.getElementById('new-credits-group');
                     const totalCreditsGroup = document.getElementById('total-credits-group');
-                    
+
                     if (remainingCredits > 0 && newCreditsGroup && totalCreditsGroup) {
                         newCreditsGroup.classList.remove('d-none');
                         totalCreditsGroup.classList.add('d-none');
                         // Update state to reflect 'new' mode if needed, usually handled by toggle listeners 
                         // but dispatching input on newCreditsInput should update the state model.
                     }
-                    
+
                     if (remainingCredits > 0) {
                         newCreditsInput.classList.add('is-valid');
                         setTimeout(() => newCreditsInput.classList.remove('is-valid'), 2000);
@@ -102,7 +102,7 @@ export function initManualCalcTab() {
                 if (goalGpaInput) {
                     const currentGpaVal = parseFloat(gpa);
                     let suggestedTarget = '';
-                    
+
                     if (currentGpaVal < 2.0) suggestedTarget = '2.0';
                     else if (currentGpaVal < 2.5) suggestedTarget = '2.5';
                     else if (currentGpaVal < 3.2) suggestedTarget = '3.2';
@@ -111,7 +111,7 @@ export function initManualCalcTab() {
 
                     goalGpaInput.value = suggestedTarget;
                     goalGpaInput.dispatchEvent(new Event('input'));
-                    
+
                     goalGpaInput.classList.add('is-valid');
                     setTimeout(() => goalGpaInput.classList.remove('is-valid'), 2000);
                 }
@@ -122,15 +122,15 @@ export function initManualCalcTab() {
                     const tab = bootstrap.Tab.getOrCreateInstance(targetTabBtn);
                     tab.show();
                 }
-                
+
                 // Highlight inputs
                 targetGpaInput.classList.add('is-valid');
                 targetCreditsInput.classList.add('is-valid');
-                
+
                 // Focus on New Credits Input (or Total Credits if active)
                 // const newCreditsInput = document.getElementById('new-credits'); // Already defined above
                 const totalCreditsInput = document.getElementById('total-credits');
-                
+
                 if (newCreditsInput && newCreditsInput.offsetParent !== null) {
                     newCreditsInput.focus();
                     newCreditsInput.select();
@@ -151,7 +151,7 @@ export function initManualCalcTab() {
         const newSemId = Date.now();
         const { semesters } = getManualState();
         const nextNum = semesters.length + 1;
-        
+
         // Guess next semester name
         let nextName = `Học kỳ ${nextNum}`;
         if (semesters.length > 0) {
@@ -161,7 +161,7 @@ export function initManualCalcTab() {
                 let hk = parseInt(match[1]);
                 let y1 = parseInt(match[2]);
                 let y2 = parseInt(match[3]);
-                
+
                 hk++;
                 if (hk > 3) {
                     hk = 1;
@@ -180,7 +180,7 @@ export function initManualCalcTab() {
     });
 
     resetManualBtn.addEventListener('click', () => {
-        if(confirm('Bạn có chắc muốn xóa toàn bộ dữ liệu tính thủ công?')) {
+        if (confirm('Bạn có chắc muốn xóa toàn bộ dữ liệu tính thủ công?')) {
             setManualState({
                 semesters: [],
                 initialGpa: '',
@@ -201,10 +201,10 @@ export function initManualCalcTab() {
 
     // Event Delegation for dynamic elements
     let deleteTimeout = null;
-    
+
     manualSemesterList.addEventListener('click', (e) => {
         const target = e.target;
-        
+
         // Adjust Credit
         const adjustBtn = target.closest('.adjust-credit-btn');
         if (adjustBtn) {
@@ -212,7 +212,7 @@ export function initManualCalcTab() {
             const courseId = adjustBtn.dataset.courseId;
             const action = adjustBtn.dataset.action;
             const delta = action === 'increase' ? 1 : -1;
-            
+
             const { semesters } = getManualState();
             const semester = semesters.find(s => String(s.id) === String(semId));
             if (semester) {
@@ -231,11 +231,11 @@ export function initManualCalcTab() {
         const deleteBtn = target.closest('.delete-semester-btn');
         if (deleteBtn) {
             if (deleteTimeout) clearTimeout(deleteTimeout);
-            
+
             deleteBtn.classList.remove('delete-semester-btn', 'text-danger', 'btn-link');
             deleteBtn.classList.add('confirm-delete-semester-btn', 'btn-danger', 'text-white');
             deleteBtn.innerHTML = 'Xóa?';
-            
+
             deleteTimeout = setTimeout(() => {
                 if (deleteBtn && document.body.contains(deleteBtn) && deleteBtn.classList.contains('confirm-delete-semester-btn')) {
                     deleteBtn.classList.add('delete-semester-btn', 'text-danger', 'btn-link');
@@ -287,7 +287,7 @@ export function initManualCalcTab() {
             const courseId = target.dataset.courseId;
             const field = target.dataset.field;
             const value = target.type === 'checkbox' ? target.checked : target.value;
-            
+
             updateManualCourse(semId, courseId, field, value);
         }
     });
@@ -312,7 +312,7 @@ export function initManualCalcTab() {
             }
 
             const importedSemesters = parsePortalText(text);
-            
+
             if (importedSemesters.length === 0) {
                 alert('Không tìm thấy dữ liệu hợp lệ. Vui lòng kiểm tra lại định dạng copy.');
                 return;
@@ -402,6 +402,7 @@ export function initTargetGPATab() {
     const newCreditsGroup = document.getElementById('new-credits-group');
     const totalCreditsGroup = document.getElementById('total-credits-group');
     const shareTargetBtn = document.getElementById('share-target-btn');
+    const exportPdfBtn = document.getElementById('export-pdf-btn');
 
     // Subscribe to store changes
     subscribe(() => {
@@ -411,14 +412,14 @@ export function initTargetGPATab() {
 
     loadTargetStateFromStorage();
     const initialState = getTargetState();
-    
+
     // Restore UI from state
     if (currentGpaInput) currentGpaInput.value = initialState.currentGpa || '';
     if (currentCreditsInput) currentCreditsInput.value = initialState.currentCredits || '';
     if (targetGpaInput) targetGpaInput.value = initialState.targetGpa || '';
     if (newCreditsInput) newCreditsInput.value = initialState.newCredits || '';
     if (totalCreditsInput) totalCreditsInput.value = initialState.totalCredits || '';
-    
+
     if (initialState.creditMode === 'total') {
         newCreditsGroup.classList.add('d-none');
         totalCreditsGroup.classList.remove('d-none');
@@ -446,9 +447,9 @@ export function initTargetGPATab() {
                 const oldGradeSelect = item.querySelector('.retake-old-grade');
                 const creditsInput = item.querySelector('.retake-credits');
                 if (oldGradeSelect && creditsInput) {
-                    retakes.push({ 
-                        oldGrade: parseFloat(oldGradeSelect.value), 
-                        credits: parseFloat(creditsInput.value) 
+                    retakes.push({
+                        oldGrade: parseFloat(oldGradeSelect.value),
+                        credits: parseFloat(creditsInput.value)
                     });
                 }
             });
@@ -466,7 +467,7 @@ export function initTargetGPATab() {
     };
 
     [currentGpaInput, currentCreditsInput, targetGpaInput, newCreditsInput, totalCreditsInput].forEach(input => {
-        if(input) input.addEventListener('input', saveStateFromInputs);
+        if (input) input.addEventListener('input', saveStateFromInputs);
     });
 
     // Sync Logic
@@ -548,29 +549,31 @@ export function initTargetGPATab() {
         const currentCredits = parseFloat(state.currentCredits) || 0;
         const targetGPA = parseFloat(state.targetGpa) || 0;
         let newCredits = parseFloat(state.newCredits) || 0;
-        
+
         if (state.creditMode === 'total') {
             const total = parseFloat(state.totalCredits) || 0;
             newCredits = Math.max(0, total - currentCredits);
         }
 
         const result = calculateTargetResult(currentGPA, currentCredits, targetGPA, newCredits, state.retakes);
-        
-        // Show share button
+
+        // Show share and export buttons
         const shareBtn = document.getElementById('share-target-btn');
         if (shareBtn) shareBtn.classList.remove('d-none');
+        const exportBtn = document.getElementById('export-pdf-btn');
+        if (exportBtn) exportBtn.classList.remove('d-none');
 
         // Render Result
         const targetResultContainer = document.getElementById('target-result-container');
         if (targetResultContainer) {
             targetResultContainer.className = 'card-body d-flex flex-column p-3 p-md-4';
-            
+
             // 1. Determine Status
             let statusIcon = 'bi-check-circle-fill';
             let statusColor = 'success';
             let statusMessage = 'Khả thi! Bạn hoàn toàn có thể đạt được.';
             let statusBadgeClass = 'bg-success-subtle text-success-emphasis border-success-subtle';
-            
+
             // Determine credits used for calculation (New + Retake)
             const creditsToStudy = result.totalEffortCredits !== undefined ? result.totalEffortCredits : result.newCredits;
 
@@ -603,13 +606,13 @@ export function initTargetGPATab() {
             let scenarioHTML = '';
             let displayedCount = 0;
             let totalCount = 0;
-            
+
             if (result.requiredGPA > 0 && result.requiredGPA <= 4.0 && creditsToStudy > 0) {
                 const combinations = generateGradeCombinations(creditsToStudy, result.requiredPoints);
                 totalCount = combinations.length;
                 const topCombinations = combinations.slice(0, 10);
                 displayedCount = topCombinations.length;
-                
+
                 if (totalCount > 0) {
                     // Generate Scenario Text from the first (easiest/closest) combination
                     const scenarioText = generateScenarioText(topCombinations[0]);
@@ -636,24 +639,24 @@ export function initTargetGPATab() {
                                 </div>
                             </div>
                             <div class="row g-2 align-items-stretch">
-                                <div class="col-5">
+                                <div class="col-5 col-sm-5">
                                     <div class="p-2 rounded border bg-white position-relative overflow-hidden h-100">
                                         <div class="position-absolute top-0 start-0 bottom-0 bg-${c.g1.color}" style="width: 3px; opacity: 0.8;"></div>
                                         <div class="d-flex justify-content-between align-items-center ps-1">
                                             <span class="fw-bold fs-5 text-${c.g1.color}">${c.g1.grade}</span>
-                                            <span class="badge bg-light text-secondary border-0 p-1 small">${c.c1} TC</span>
+                                            <span class="badge bg-light text-secondary border-0 p-1 small" style="font-size: 0.6rem !important;">${c.c1} TC</span>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-2 d-flex align-items-center justify-content-center text-muted small">
+                                <div class="col-2 col-sm-2 d-flex align-items-center justify-content-center text-muted small">
                                     <i class="bi bi-plus-lg"></i>
                                 </div>
-                                <div class="col-5">
+                                <div class="col-5 col-sm-5">
                                     <div class="p-2 rounded border bg-white position-relative overflow-hidden h-100">
                                         <div class="position-absolute top-0 start-0 bottom-0 bg-${c.g2.color}" style="width: 3px; opacity: 0.8;"></div>
                                         <div class="d-flex justify-content-between align-items-center ps-1">
                                             <span class="fw-bold fs-5 text-${c.g2.color}">${c.g2.grade}</span>
-                                            <span class="badge bg-light text-secondary border-0 p-1 small">${c.c2} TC</span>
+                                            <span class="badge bg-light text-secondary border-0 p-1 small" style="font-size: 0.6rem !important;">${c.c2} TC</span>
                                         </div>
                                     </div>
                                 </div>
@@ -774,13 +777,13 @@ export function initTargetGPATab() {
                     </div>
                 </div>
             `;
-            
+
             // Suggestions for Retake (if impossible)
             if (result.requiredGPA > 4.0) {
                 const deficitPoints = result.requiredPoints - (4.0 * result.newCredits);
                 const { semesters } = getManualState();
                 const suggestions = generateRetakeSuggestions(deficitPoints, targetGPA, semesters);
-                
+
                 if (suggestions.length > 0) {
                     targetResultContainer.innerHTML += `
                         <div class="mt-4 border-top pt-3">
@@ -849,13 +852,13 @@ export function initTargetGPATab() {
         shareTargetBtn.addEventListener('click', () => {
             const state = getTargetState();
             const shareUrl = generateShareUrl(state);
-            
+
             // Copy to clipboard
             navigator.clipboard.writeText(shareUrl).then(() => {
                 const originalText = shareTargetBtn.innerHTML;
                 shareTargetBtn.innerHTML = '<i class="bi bi-check-lg me-1"></i>Đã chép!';
                 shareTargetBtn.classList.replace('btn-outline-primary', 'btn-success');
-                
+
                 setTimeout(() => {
                     shareTargetBtn.innerHTML = originalText;
                     shareTargetBtn.classList.replace('btn-success', 'btn-outline-primary');
@@ -866,13 +869,76 @@ export function initTargetGPATab() {
             });
         });
     }
+
+    if (exportPdfBtn) {
+        exportPdfBtn.addEventListener('click', exportTargetToPDF);
+    }
+}
+
+async function exportTargetToPDF() {
+    const targetElement = document.getElementById('target-result-container');
+    const btn = document.getElementById('export-pdf-btn');
+    if (!targetElement || !btn) return;
+
+    const originalBtnContent = btn.innerHTML;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Đang xử lý...';
+    btn.disabled = true;
+
+    try {
+        const { jsPDF } = window.jspdf;
+
+        // Optimize for capture: Remove scrollbars if any, ensure full visibility
+        const originalMaxHeight = targetElement.style.maxHeight;
+        const scrollableDiv = targetElement.querySelector('.custom-scrollbar');
+        let originalScrollHeight = '';
+        if (scrollableDiv) {
+            originalScrollHeight = scrollableDiv.style.maxHeight;
+            scrollableDiv.style.maxHeight = 'none';
+        }
+
+        const canvas = await html2canvas(targetElement, {
+            scale: 2, // Higher quality
+            useCORS: true,
+            backgroundColor: document.documentElement.getAttribute('data-bs-theme') === 'dark' ? '#212529' : '#ffffff',
+            logging: false
+        });
+
+        // Restore styles
+        if (scrollableDiv) scrollableDiv.style.maxHeight = originalScrollHeight;
+
+        const imgData = canvas.toDataURL('image/png');
+
+        // Dynamic height to fit everything in one page
+        const imgWidth = 210; // mm (A4 width)
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        const margin = 10;
+
+        // Create PDF with custom size [width, height]
+        const pdf = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: [imgWidth, imgHeight + (margin * 2)]
+        });
+
+        pdf.addImage(imgData, 'PNG', 0, margin, imgWidth, imgHeight);
+
+        const date = new Date().toLocaleDateString('vi-VN').replace(/\//g, '-');
+        pdf.save(`Lo-Trinh-GPA-${date}.pdf`);
+
+    } catch (error) {
+        console.error('PDF Export Error:', error);
+        alert('Có lỗi xảy ra khi xuất PDF. Vui lòng thử lại.');
+    } finally {
+        btn.innerHTML = originalBtnContent;
+        btn.disabled = false;
+    }
 }
 
 function addRetakeItemUI(savedData = null) {
     const retakeList = document.getElementById('retake-list');
     const item = document.createElement('div');
     item.className = 'd-flex gap-2 mb-2 align-items-center flex-nowrap';
-    
+
     const dGrade = GRADE_SCALE.find(g => g.grade === 'D');
     const defaultD_GPA = dGrade ? dGrade.gpa : 1.0;
     const defaultGrade = savedData ? savedData.oldGrade : defaultD_GPA;
@@ -883,8 +949,8 @@ function addRetakeItemUI(savedData = null) {
             <span class="input-group-text bg-light text-muted small px-2">Điểm cũ</span>
             <select class="form-select retake-old-grade" aria-label="Old Grade" style="text-overflow: ellipsis;">
                 ${GRADE_SCALE
-                    .filter(g => !['A+', 'A', 'B+', 'B'].includes(g.grade))
-                    .map(g => `<option value="${g.gpa}" ${Math.abs(g.gpa - defaultGrade) < 0.01 ? 'selected' : ''}>${g.grade} (${g.gpa})</option>`).join('')}
+            .filter(g => !['A+', 'A', 'B+', 'B'].includes(g.grade))
+            .map(g => `<option value="${g.gpa}" ${Math.abs(g.gpa - defaultGrade) < 0.01 ? 'selected' : ''}>${g.grade} (${g.gpa})</option>`).join('')}
             </select>
         </div>
         <div class="input-group flex-nowrap" style="width: 90px; flex-shrink: 0;">
@@ -899,14 +965,14 @@ function addRetakeItemUI(savedData = null) {
     const input = item.querySelector('.retake-credits');
     const btnDec = item.querySelector('.btn-decrement');
     const btnInc = item.querySelector('.btn-increment');
-    
+
     const triggerSave = () => {
         const currentGpaInput = document.getElementById('current-gpa');
         if (currentGpaInput) currentGpaInput.dispatchEvent(new Event('input'));
     };
 
     select.addEventListener('change', triggerSave);
-    
+
     btnDec.addEventListener('click', () => {
         let val = parseFloat(input.value) || 0;
         if (val > 1) {
@@ -943,7 +1009,7 @@ export function initCourseGradeTab() {
     const courseGradeResults = document.getElementById('course-grade-results');
 
     if (!processScoreInput) return;
-    
+
     function calculateAndRender() {
         const selectedRadio = document.querySelector('input[name="btnradio"]:checked');
         const processWeight = parseFloat(selectedRadio ? selectedRadio.value : 0.4);
@@ -958,7 +1024,7 @@ export function initCourseGradeTab() {
         const passGrade = GRADE_SCALE.find(g => g.grade === 'D');
         const passTarget = passGrade ? passGrade.min : 4.0;
         let requiredPass = (passTarget - accumulated) / finalWeight;
-        
+
         if (requiredPass <= 0) {
             scoreToPassDisplay.textContent = "Đã qua";
         } else if (requiredPass > 10) {
@@ -970,7 +1036,7 @@ export function initCourseGradeTab() {
         const resultsHTML = GRADE_SCALE.map(grade => {
             const targetScore = grade.min;
             let requiredFinal = (targetScore - accumulated) / finalWeight;
-            
+
             let statusClass = '';
             let progressColor = '';
             let message = '';
@@ -1003,12 +1069,12 @@ export function initCourseGradeTab() {
             } else {
                 message = `<div class="d-flex align-items-baseline"><span class="text-muted small me-2">Cần:</span><strong class="fs-5 text-dark">${requiredFinal.toFixed(2)}</strong></div>`;
                 statusClass = 'bg-white border-light-subtle shadow-sm';
-                
+
                 if (requiredFinal < 5) progressColor = 'bg-success';
                 else if (requiredFinal < 7) progressColor = 'bg-info';
                 else if (requiredFinal < 8.5) progressColor = 'bg-warning';
                 else progressColor = 'bg-danger';
-                
+
                 progressPercent = (requiredFinal / 10) * 100;
             }
 
@@ -1090,7 +1156,7 @@ export function initCourseGradeTab() {
         let val = parseFloat(e.target.value);
         if (val > 10) val = 10;
         if (val < 0) val = 0;
-        
+
         if (!isNaN(val)) {
             processScoreRange.value = val;
             calculateAndRender();
@@ -1127,9 +1193,9 @@ export function initContactButton() {
 export function fetchVisitCount() {
     const containers = document.querySelectorAll('.visit-count-container');
     const countSpans = document.querySelectorAll('.visit-count-value');
-    
+
     countSpans.forEach(span => span.textContent = '...');
-    
+
     const url = `https://tienxdun.goatcounter.com/counter/TOTAL.json?rnd=${Math.random()}`;
 
     fetch(url)
@@ -1152,7 +1218,7 @@ export function fetchVisitCount() {
 export function initThemeToggle() {
     const toggleBtns = document.querySelectorAll('#theme-toggle-mobile, #theme-toggle-desktop, #theme-toggle');
     const navbar = document.querySelector('.navbar');
-    
+
     const getPreferredTheme = () => {
         const storedTheme = localStorage.getItem('theme');
         if (storedTheme) return storedTheme;
@@ -1162,7 +1228,7 @@ export function initThemeToggle() {
     const setTheme = (theme) => {
         document.documentElement.setAttribute('data-bs-theme', theme);
         localStorage.setItem('theme', theme);
-        
+
         toggleBtns.forEach(btn => {
             const icon = btn.querySelector('i');
             if (theme === 'dark') {
@@ -1267,10 +1333,10 @@ export function initFeedbackForm() {
     const previewContainer = document.getElementById('feedback-image-preview');
     const previewImg = previewContainer ? previewContainer.querySelector('img') : null;
     const removeImgBtn = document.getElementById('remove-image-btn');
-    
+
     // GOOGLE APPS SCRIPT URL
     // TODO: Thay thế URL bên dưới bằng URL Web App của bạn sau khi deploy Google Apps Script
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz_KJF_96v5p0sML6y3wcKJqmGbTUJ2h4LSVZldnRDNn608mhvAumBy_3UGF6xZgURK/exec'; 
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz_KJF_96v5p0sML6y3wcKJqmGbTUJ2h4LSVZldnRDNn608mhvAumBy_3UGF6xZgURK/exec';
 
     // --- 0. Handle Image Preview ---
     if (fileInput && previewContainer) {
@@ -1302,7 +1368,7 @@ export function initFeedbackForm() {
     if (form && submitBtn) {
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             // Disable button and show loading state
             const originalBtnText = submitBtn.innerHTML;
             submitBtn.disabled = true;
@@ -1337,7 +1403,7 @@ export function initFeedbackForm() {
                             body: formData,
                             referrer: '' // Fix 403 error sometimes
                         });
-                        
+
                         const imgurData = await imgurResponse.json();
                         if (imgurData.success) {
                             imageUrl = imgurData.data.link;
@@ -1376,7 +1442,7 @@ export function initFeedbackForm() {
                     previewContainer.classList.add('d-none');
                     previewImg.src = '';
                 }
-                
+
                 // Switch to list tab to see the new feedback (if auto-approved)
                 if (listTabBtn) {
                     const tab = new bootstrap.Tab(listTabBtn);
@@ -1519,7 +1585,7 @@ export function initNewsTab() {
     filterBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             const filter = btn.dataset.filter;
-            
+
             // Update UI: Active Button
             filterBtns.forEach(b => {
                 b.classList.replace('btn-primary', 'btn-outline-secondary');
@@ -1556,12 +1622,12 @@ export function initNewsTab() {
             if (src) {
                 handbookIframe.src = src;
             }
-            
+
             // Hide placeholder with animation
             handbookPlaceholder.style.transition = 'opacity 0.3s ease';
             handbookPlaceholder.style.opacity = '0';
             handbookPlaceholder.style.pointerEvents = 'none'; // Disable interactions immediately
-            
+
             setTimeout(() => {
                 handbookPlaceholder.remove(); // Completely remove from DOM
             }, 300);
@@ -1573,7 +1639,7 @@ export function initNewsTab() {
         imageViewerModal.addEventListener('show.bs.modal', event => {
             const button = event.relatedTarget;
             if (!button) return;
-            
+
             const src = button.getAttribute('data-bs-src');
             const modalImage = imageViewerModal.querySelector('#imageViewerSrc');
             if (modalImage && src) {
@@ -1593,10 +1659,10 @@ export function initGradeScaleSort() {
     if (savedOrder.length > 0 && scaleContainer) {
         const currentItems = Array.from(scaleContainer.children);
         const itemMap = new Map(currentItems.map(item => [item.id, item]));
-        
+
         // Clear container
         scaleContainer.innerHTML = '';
-        
+
         // Append in saved order
         savedOrder.forEach(id => {
             const item = itemMap.get(id);
@@ -1615,7 +1681,7 @@ export function initGradeScaleSort() {
         toggleSortBtn.addEventListener('click', () => {
             scaleContainer.classList.toggle('scale-sort-mode');
             toggleSortBtn.classList.toggle('active');
-            
+
             // Toggle button appearance
             if (scaleContainer.classList.contains('scale-sort-mode')) {
                 toggleSortBtn.classList.remove('btn-outline-primary');
