@@ -3,6 +3,28 @@ import { calculateYearlyStats, getYearInfo, calculateManualGPA } from '../core/c
 import { getManualState, getTargetState } from '../state/store.js';
 
 let gpaChart = null;
+let chartJsLoaded = false;
+
+// Lazy load Chart.js only when needed
+async function ensureChartJsLoaded() {
+    if (chartJsLoaded || typeof Chart !== 'undefined') {
+        chartJsLoaded = true;
+        return true;
+    }
+    
+    // Chart.js is loaded with defer, wait for it
+    return new Promise((resolve) => {
+        const checkChart = () => {
+            if (typeof Chart !== 'undefined') {
+                chartJsLoaded = true;
+                resolve(true);
+            } else {
+                setTimeout(checkChart, 50);
+            }
+        };
+        checkChart();
+    });
+}
 
 export function initGradeScaleTab() {
     const tableBody = document.getElementById('grade-scale-table-body');
@@ -96,11 +118,50 @@ export function initGradeScaleTab() {
     }
 }
 
+// Track last rendered state to avoid unnecessary re-renders
+let lastRenderedHash = '';
+
+function generateStateHash(semesters, initialGpa, initialCredits) {
+    // Create a simple hash from the state to detect changes
+    const stateString = JSON.stringify({
+        sems: semesters.map(s => ({
+            id: s.id,
+            name: s.name,
+            courses: s.courses.map(c => ({
+                id: c.id,
+                name: c.name,
+                credits: c.credits,
+                grade: c.grade,
+                isRetake: c.isRetake,
+                oldGrade: c.oldGrade
+            }))
+        })),
+        gpa: initialGpa,
+        credits: initialCredits
+    });
+    
+    // Simple hash function
+    let hash = 0;
+    for (let i = 0; i < stateString.length; i++) {
+        const char = stateString.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash;
+    }
+    return hash.toString();
+}
+
 export function renderManualSemesters() {
     const manualSemesterList = document.getElementById('manual-semester-list');
     if (!manualSemesterList) return;
 
     const { semesters: manualSemesters, initialGpa, initialCredits } = getManualState();
+
+    // Skip render if state hasn't changed (optimization for mobile)
+    const currentHash = generateStateHash(manualSemesters, initialGpa, initialCredits);
+    if (currentHash === lastRenderedHash) {
+        return;
+    }
+    lastRenderedHash = currentHash;
 
     // Pre-calculate cumulative GPA for each semester
     let runningTotalPoints = (parseFloat(initialGpa) || 0) * (parseFloat(initialCredits) || 0);
@@ -276,11 +337,11 @@ export function renderManualSemesters() {
     `;
     }).join('');
 
-    // Update Chart
+    // Update Chart (async to handle lazy loading)
     renderGPAChart(manualSemesters, initialGpa, initialCredits);
 }
 
-export function renderGPAChart(semesters, initialGpa, initialCredits) {
+export async function renderGPAChart(semesters, initialGpa, initialCredits) {
     const ctx = document.getElementById('gpa-chart');
     if (!ctx) return;
 
@@ -291,6 +352,9 @@ export function renderGPAChart(semesters, initialGpa, initialCredits) {
         }
         return;
     }
+
+    // Ensure Chart.js is loaded before proceeding
+    await ensureChartJsLoaded();
 
     // Calculate cumulative GPA for each semester (consistent with renderManualSemesters)
     let runningTotalPoints = (parseFloat(initialGpa) || 0) * (parseFloat(initialCredits) || 0);

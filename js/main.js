@@ -3,6 +3,16 @@ import { initGradeScaleTab } from './ui/renderers.js';
 import { decodeState } from './core/share.js';
 import { setTargetState, subscribe } from './state/store.js';
 
+// Polyfill for requestIdleCallback (Safari doesn't support it)
+const requestIdleCallback = window.requestIdleCallback || function(cb) {
+    const start = Date.now();
+    return setTimeout(() => {
+        cb({
+            didTimeout: false,
+            timeRemaining: () => Math.max(0, 50 - (Date.now() - start))
+        });
+    }, 1);
+};
 
 console.log("HUFLIT GPA Strategist loaded (Modular).");
 
@@ -20,13 +30,20 @@ document.addEventListener('DOMContentLoaded', () => {
     // Lazy initialization tracking
     const initializedTabs = new Set(['#pills-target']); // Target tab is active by default
 
-    // Essential initializations
+    // CRITICAL: Essential initializations (must run immediately)
     initTargetGPATab();
     initThemeToggle();
-    initUserGuide();
-    initFeedbackForm();
-    fetchVisitCount();
-    initContactButton();
+    
+    // NON-CRITICAL: Defer to idle time for better performance
+    requestIdleCallback(() => {
+        initUserGuide();
+        initContactButton();
+    }, { timeout: 2000 });
+
+    requestIdleCallback(() => {
+        fetchVisitCount();
+        initFeedbackForm();
+    }, { timeout: 3000 });
 
     // Re-render scale tab when state changes (only if already initialized to save performance)
     subscribe(() => {
@@ -54,7 +71,6 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Lazy load tab-specific logic
             if (!initializedTabs.has(targetId)) {
-                console.log(`Lazy loading tab: ${targetId}`);
                 if (targetId === '#pills-manual') initManualCalcTab();
                 if (targetId === '#pills-course') initCourseGradeTab();
                 if (targetId === '#pills-scale') {

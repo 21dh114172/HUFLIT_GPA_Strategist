@@ -1,4 +1,4 @@
-﻿@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+﻿/* Font is loaded in HTML with font-display: swap for better performance */
 
 :root {
     --primary-color: #d32f2f;
@@ -2056,4 +2056,70 @@ body {
 [data-bs-theme="dark"] #theme-toggle-desktop:hover {
     background: rgba(255, 255, 255, 0.2);
     color: #ffffff;
+}
+
+/* ==========================================
+   MOBILE PERFORMANCE OPTIMIZATIONS
+   Disable heavy animations on mobile/tablet for better performance
+   ========================================== */
+@media (max-width: 768px), (prefers-reduced-motion: reduce) {
+    /* Disable infinite pulse animations */
+    .animate-pulse,
+    .pulse-animation,
+    .floating-contact-btn {
+        animation: none !important;
+    }
+
+    /* Disable hover transform effects */
+    .hover-translate-y:hover,
+    .bento-item:hover {
+        transform: none !important;
+    }
+
+    /* Simplify card hover effects */
+    .card:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+        transform: none !important;
+    }
+
+    /* Disable fade-in animations - show immediately */
+    .ani-fade-in-up {
+        animation: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+    }
+
+    /* Reduce transition durations */
+    .transition-all,
+    .nav-pills .nav-link,
+    .btn,
+    .form-control,
+    .form-select {
+        transition-duration: 0.1s !important;
+    }
+
+    /* Disable backdrop blur on low-end devices (expensive) */
+    .bento-badge,
+    .nav-pills .nav-link,
+    .nav-pills .nav-link.active,
+    #theme-toggle-desktop {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+
+    /* Disable image zoom on hover */
+    .bento-item:hover .bento-img-container img {
+        transform: none !important;
+    }
+
+    /* Simplify news card animations */
+    .news-card {
+        animation: none !important;
+    }
+
+    /* Disable will-change to reduce memory usage */
+    .hover-translate-y,
+    .ani-fade-in-up {
+        will-change: auto !important;
+    }
 }

@@ -7,8 +7,42 @@ import { parsePortalText } from '../core/utils.js';
 import { generateShareUrl } from '../core/share.js';
 
 // ==========================================
-// GLOBAL HELPERS
+// GLOBAL HELPERS - Performance Utilities
 // ==========================================
+
+// Detect mobile device for performance optimizations
+const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
+    || window.innerWidth < 768;
+
+// Debounce function with configurable delay
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// Throttle function to limit execution frequency
+function throttle(func, limit) {
+    let inThrottle;
+    return function(...args) {
+        if (!inThrottle) {
+            func.apply(this, args);
+            inThrottle = true;
+            setTimeout(() => inThrottle = false, limit);
+        }
+    };
+}
+
+// Throttled haptic feedback for mobile (prevents lag from excessive vibrations)
+const throttledHaptic = throttle((duration) => {
+    triggerHapticFeedback(duration);
+}, 300);
 
 // ==========================================
 // TAB: TÍNH GPA THỦ CÔNG (MANUAL CALC)
@@ -24,16 +58,18 @@ export function initManualCalcTab() {
 
     if (!addSemesterBtn) return;
 
-    // Optimization: Debounce UI updates to prevent lag during typing
+    // Optimization: Use longer debounce on mobile for smoother experience
+    const RENDER_DEBOUNCE_MS = isMobile ? 200 : 50;
+    
     let renderTimeout = null;
-    const debouncedRender = () => {
+    const debouncedRender = debounce(() => {
+        // Use requestAnimationFrame for smooth rendering
         if (renderTimeout) cancelAnimationFrame(renderTimeout);
         renderTimeout = requestAnimationFrame(() => {
             renderManualSemesters();
             updateManualCalculationDisplay();
-            console.log("UI Rendered (RAF debounced)");
         });
-    };
+    }, RENDER_DEBOUNCE_MS);
 
     // Subscribe to store changes
     subscribe(debouncedRender);
@@ -185,7 +221,7 @@ export function initManualCalcTab() {
             name: nextName,
             courses: []
         });
-        triggerHapticFeedback(20);
+        throttledHaptic(20);
     });
 
     resetManualBtn.addEventListener('click', () => {
@@ -231,7 +267,7 @@ export function initManualCalcTab() {
                     val += delta;
                     if (val < 0) val = 0;
                     updateManualCourse(semId, courseId, 'credits', val);
-                    triggerHapticFeedback();
+                    throttledHaptic();
                 }
             }
             return;
@@ -266,7 +302,7 @@ export function initManualCalcTab() {
             }
             const semId = confirmBtn.dataset.id;
             removeManualSemester(semId);
-            triggerHapticFeedback(25);
+            throttledHaptic(25);
             return;
         }
 
@@ -281,7 +317,7 @@ export function initManualCalcTab() {
                 isRetake: false,
                 oldGrade: 'D'
             });
-            triggerHapticFeedback();
+            throttledHaptic();
         }
 
         // Delete Course
@@ -289,7 +325,7 @@ export function initManualCalcTab() {
             const semId = target.closest('.delete-course-btn').dataset.semId;
             const courseId = target.closest('.delete-course-btn').dataset.courseId;
             removeManualCourse(semId, courseId);
-            triggerHapticFeedback(15);
+            throttledHaptic(15);
         }
     });
 
@@ -302,7 +338,7 @@ export function initManualCalcTab() {
             const value = target.type === 'checkbox' ? target.checked : target.value;
 
             updateManualCourse(semId, courseId, field, value);
-            triggerHapticFeedback();
+            throttledHaptic();
         }
     });
 
