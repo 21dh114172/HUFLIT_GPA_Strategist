@@ -1869,6 +1869,43 @@ body {
     box-shadow: var(--glass-card-shadow) !important;
 }
 
+/* Fix for Colored Glass Cards - Ensure contrast */
+.card.bg-primary {
+    background: linear-gradient(135deg, #0d6efd, rgba(13, 110, 253, 0.85)) !important;
+    color: white !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+
+.card.bg-success {
+    background: linear-gradient(135deg, #198754, rgba(25, 135, 84, 0.85)) !important;
+    color: white !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+
+.card.bg-danger {
+    background: linear-gradient(135deg, #dc3545, rgba(220, 53, 69, 0.85)) !important;
+    color: white !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+
+.card.bg-warning {
+    background: linear-gradient(135deg, #ffc107, rgba(255, 193, 7, 0.85)) !important;
+    color: #212529 !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+
+.card.bg-info {
+    background: linear-gradient(135deg, #0dcaf0, rgba(13, 202, 240, 0.85)) !important;
+    color: #212529 !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+
+.card.bg-dark {
+    background: linear-gradient(135deg, #212529, rgba(33, 37, 41, 0.95)) !important;
+    color: white !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
 .card-header {
     background-color: transparent !important;
     border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
@@ -2062,7 +2099,9 @@ body {
    MOBILE PERFORMANCE OPTIMIZATIONS
    Disable heavy animations on mobile/tablet for better performance
    ========================================== */
-@media (max-width: 768px), (prefers-reduced-motion: reduce) {
+@media (max-width: 768px),
+(prefers-reduced-motion: reduce) {
+
     /* Disable infinite pulse animations */
     .animate-pulse,
     .pulse-animation,

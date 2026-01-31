@@ -11,7 +11,7 @@ import { generateShareUrl } from '../core/share.js';
 // ==========================================
 
 // Detect mobile device for performance optimizations
-const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
+const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
     || window.innerWidth < 768;
 
 // Debounce function with configurable delay
@@ -30,7 +30,7 @@ function debounce(func, wait) {
 // Throttle function to limit execution frequency
 function throttle(func, limit) {
     let inThrottle;
-    return function(...args) {
+    return function (...args) {
         if (!inThrottle) {
             func.apply(this, args);
             inThrottle = true;
@@ -60,7 +60,7 @@ export function initManualCalcTab() {
 
     // Optimization: Use longer debounce on mobile for smoother experience
     const RENDER_DEBOUNCE_MS = isMobile ? 200 : 50;
-    
+
     let renderTimeout = null;
     const debouncedRender = debounce(() => {
         // Use requestAnimationFrame for smooth rendering
@@ -809,16 +809,16 @@ export function initTargetGPATab() {
                                     <div class="card-body p-3">
                                         <div class="d-flex justify-content-between align-items-start mb-3">
                                             <div>
-                                                <div class="small text-white-50 text-uppercase fw-bold opacity-75">Điểm cần tích lũy thêm</div>
+                                                <div class="small text-white text-uppercase fw-bold opacity-75">Điểm cần tích lũy thêm</div>
                                                 <div class="h4 font-monospace fw-bold mb-0">${result.requiredPoints.toFixed(2)}</div>
                                             </div>
                                             <div class="text-end">
-                                                <div class="small text-white-50">Tổng tín chỉ học</div>
+                                                <div class="small text-white opacity-75">Tổng tín chỉ học</div>
                                                 <div class="fw-bold">${result.newCredits} TC</div>
                                             </div>
                                         </div>
                                         <div class="border-top border-white-50 pt-3 d-flex justify-content-between align-items-center">
-                                            <span class="small fw-medium text-white-50">GPA Trung bình cần đạt</span>
+                                            <span class="small fw-medium text-white opacity-75">GPA Trung bình cần đạt</span>
                                             <span class="badge bg-white bg-opacity-25 px-2 py-1 rounded font-monospace">${result.requiredPoints.toFixed(2)} / ${result.newCredits} = ${result.requiredGPA.toFixed(2)}</span>
                                         </div>
                                     </div>
