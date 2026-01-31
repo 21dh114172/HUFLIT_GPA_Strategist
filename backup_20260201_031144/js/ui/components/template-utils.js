@@ -3,10 +3,19 @@
  * Safe HTML templating with XSS protection
  */
 
-import { escapeHtml as escapeHtmlHelper } from '../../core/helpers.js';
-
-// Re-export from helpers for backward compatibility
-export { escapeHtmlHelper as escapeHtml };
+/**
+ * Escape HTML special characters to prevent XSS
+ * @param {*} text - Text to escape
+ * @returns {string} Escaped HTML string
+ */
+export function escapeHtml(text) {
+  if (text == null) return '';
+  
+  const str = String(text);
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
 
 /**
  * Create a DOM element from HTML string
@@ -59,12 +68,12 @@ export function html(strings, ...values) {
     // Handle arrays
     if (Array.isArray(value)) {
       return acc + str + value.map(v => 
-        (v && typeof v === 'object' && v._isRawHtml === true) ? v.content : escapeHtmlHelper(v)
+        (v && typeof v === 'object' && v._isRawHtml === true) ? v.content : escapeHtml(v)
       ).join('');
     }
     
     // Default: escape
-    return acc + str + escapeHtmlHelper(value);
+    return acc + str + escapeHtml(value);
   }, '');
   
   return String(result);
@@ -198,7 +207,7 @@ export function dataAttrs(attrs) {
   
   return Object.entries(attrs)
     .filter(([_, v]) => v !== undefined && v !== null)
-    .map(([k, v]) => `data-${kebabCase(k)}="${escapeHtmlHelper(v)}"`)
+    .map(([k, v]) => `data-${kebabCase(k)}="${escapeHtml(v)}"`)
     .join(' ');
 }
 
@@ -262,7 +271,7 @@ export function safeUrl(url) {
 
 // Default export with all utilities
 export default {
-  escapeHtml: escapeHtmlHelper,
+  escapeHtml,
   createElement,
   createFragment,
   html,

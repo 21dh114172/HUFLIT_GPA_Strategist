@@ -147,8 +147,6 @@ HUFLIT_GPA_Strategist/
 
 - **Tác giả**: Tiến Dũng 
 - **Facebook**: [tienxdun](https://www.facebook.com/tienxdun/)
-- **GitHub**: [TienxDun](https://github.com/TienxDun)
-- **Email**: tienxdun@gmail.com
 
 ---
 

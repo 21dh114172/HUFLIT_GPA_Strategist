@@ -1,1760 +1,1581 @@
-import { GRADE_SCALE, IMGUR_CLIENT_ID } from '../core/constants.js';
-import { getManualState, setManualState, addManualSemester, removeManualSemester, updateManualCourse, addManualCourse, removeManualCourse, loadManualStateFromStorage, getTargetState, setTargetState, loadTargetStateFromStorage, subscribe } from '../state/store.js';
-import { calculateManualGPA, calculateTargetResult, generateRetakeSuggestions, generateGradeCombinations, generateScenarioText } from '../core/calculator.js';
+/**
+ * UI Event Handlers
+ * Handles user interactions and coordinates between UI, state, and calculations
+ */
+
+import { GRADE_SCALE } from '../core/constants.js';
+import { API_CONFIG, UI_CONFIG } from '../core/config.js';
+import { debounce, throttle, isMobileDevice } from '../core/helpers.js';
+import {
+  getManualState,
+  setManualState,
+  addManualSemester,
+  removeManualSemester,
+  updateManualCourse,
+  addManualCourse,
+  removeManualCourse,
+  loadManualStateFromStorage,
+  getTargetState,
+  setTargetState,
+  loadTargetStateFromStorage,
+  subscribe
+} from '../state/store.js';
+import {
+  calculateManualGPA,
+  calculateTargetResult,
+  generateRetakeSuggestions,
+  generateGradeCombinations,
+  generateScenarioText
+} from '../core/calculator.js';
 import { ManualActions } from '../state/actions.js';
 import { renderManualSemesters } from './renderers.js';
 import { animateValue, triggerHapticFeedback } from './effects.js';
 import { parsePortalText } from '../core/utils.js';
 import { generateShareUrl } from '../core/share.js';
+import {
+  getStatusInfo,
+  renderMainResult,
+  renderAlgorithmDetails,
+  renderRetakeSuggestions
+} from './templates/target-result.js';
 
 // ==========================================
-// GLOBAL HELPERS - Performance Utilities
+// Performance Utilities
 // ==========================================
 
-// Detect mobile device for performance optimizations
-const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-    || window.innerWidth < 768;
-
-// Debounce function with configurable delay
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
-
-// Throttle function to limit execution frequency
-function throttle(func, limit) {
-    let inThrottle;
-    return function (...args) {
-        if (!inThrottle) {
-            func.apply(this, args);
-            inThrottle = true;
-            setTimeout(() => inThrottle = false, limit);
-        }
-    };
-}
-
-// Throttled haptic feedback for mobile (prevents lag from excessive vibrations)
-const throttledHaptic = throttle((duration) => {
-    triggerHapticFeedback(duration);
-}, 300);
+const isMobile = isMobileDevice();
+const RENDER_DEBOUNCE_MS = isMobile ? 200 : 50;
+const throttledHaptic = throttle((duration) => triggerHapticFeedback(duration), 300);
 
 // ==========================================
-// TAB: TÍNH GPA THỦ CÔNG (MANUAL CALC)
+// Tab: Manual GPA Calculation
 // ==========================================
 
 export function initManualCalcTab() {
-    const addSemesterBtn = document.getElementById('add-semester-btn');
-    const manualSemesterList = document.getElementById('manual-semester-list');
-    const resetManualBtn = document.getElementById('reset-manual-btn');
+  const elements = {
+    addSemesterBtn: document.getElementById('add-semester-btn'),
+    manualSemesterList: document.getElementById('manual-semester-list'),
+    resetManualBtn: document.getElementById('reset-manual-btn'),
+    manualInitialGpaInput: document.getElementById('manual-initial-gpa'),
+    manualInitialCreditsInput: document.getElementById('manual-initial-credits'),
+    processImportBtn: document.getElementById('process-import-btn'),
+    applyBtn: document.getElementById('apply-manual-to-target-btn')
+  };
+
+  if (!elements.addSemesterBtn) return;
+
+  setupManualCalcEventListeners(elements);
+  setupImportHandler(elements.processImportBtn);
+  setupApplyToTargetHandler(elements.applyBtn);
+  
+  // Subscribe to state changes
+  subscribe(debounce(() => {
+    renderManualSemesters();
+    updateManualCalculationDisplay();
+  }, RENDER_DEBOUNCE_MS));
+
+  // Initial load
+  loadManualStateFromStorage();
+}
+
+function setupManualCalcEventListeners(elements) {
+  // Add semester
+  elements.addSemesterBtn.addEventListener('click', handleAddSemester);
+  
+  // Reset
+  elements.resetManualBtn.addEventListener('click', handleResetManual);
+  
+  // Initial data inputs
+  elements.manualInitialGpaInput.addEventListener('input', (e) => {
+    setManualState({ initialGpa: e.target.value });
+  });
+  
+  elements.manualInitialCreditsInput.addEventListener('input', (e) => {
+    setManualState({ initialCredits: e.target.value });
+  });
+
+  // Event delegation for dynamic elements
+  setupSemesterListDelegation(elements.manualSemesterList);
+}
+
+function handleAddSemester() {
+  const { semesters } = getManualState();
+  const nextNum = semesters.length + 1;
+  const nextName = generateNextSemesterName(semesters, nextNum);
+
+  addManualSemester({
+    id: Date.now(),
+    name: nextName,
+    courses: []
+  });
+  throttledHaptic(20);
+}
+
+function generateNextSemesterName(semesters, nextNum) {
+  if (semesters.length === 0) return `Học kỳ ${nextNum}`;
+  
+  const lastSem = semesters[semesters.length - 1];
+  const match = lastSem.name.match(/HK(\d+)\s*\((\d{4})-(\d{4})\)/);
+  
+  if (!match) return `Học kỳ ${nextNum}`;
+  
+  let hk = parseInt(match[1]);
+  let y1 = parseInt(match[2]);
+  let y2 = parseInt(match[3]);
+
+  hk++;
+  if (hk > 3) {
+    hk = 1;
+    y1++;
+    y2++;
+  }
+  return `HK0${hk} (${y1}-${y2})`;
+}
+
+function handleResetManual() {
+  if (!confirm('Bạn có chắc muốn xóa toàn bộ dữ liệu tính thủ công?')) return;
+  
+  setManualState({
+    semesters: [],
+    initialGpa: '',
+    initialCredits: ''
+  });
+  
+  const gpaInput = document.getElementById('manual-initial-gpa');
+  const creditsInput = document.getElementById('manual-initial-credits');
+  if (gpaInput) gpaInput.value = '';
+  if (creditsInput) creditsInput.value = '';
+}
+
+function setupSemesterListDelegation(list) {
+  let deleteTimeout = null;
+
+  list.addEventListener('click', (e) => {
+    const target = e.target;
+
+    // Adjust credit
+    const adjustBtn = target.closest('.adjust-credit-btn');
+    if (adjustBtn) {
+      handleAdjustCredit(adjustBtn);
+      return;
+    }
+
+    // Delete semester (request confirmation)
+    const deleteBtn = target.closest('.delete-semester-btn');
+    if (deleteBtn) {
+      handleDeleteRequest(deleteBtn, deleteTimeout);
+      return;
+    }
+
+    // Confirm delete semester
+    const confirmBtn = target.closest('.confirm-delete-semester-btn');
+    if (confirmBtn) {
+      handleConfirmDelete(confirmBtn, deleteTimeout);
+      return;
+    }
+
+    // Add course
+    if (target.closest('.add-course-btn')) {
+      const semId = target.closest('.add-course-btn').dataset.id;
+      addManualCourse(semId, {
+        id: Date.now(),
+        name: '',
+        credits: 3,
+        grade: '',
+        isRetake: false,
+        oldGrade: 'D'
+      });
+      throttledHaptic();
+      return;
+    }
+
+    // Delete course
+    if (target.closest('.delete-course-btn')) {
+      const btn = target.closest('.delete-course-btn');
+      removeManualCourse(btn.dataset.semId, btn.dataset.courseId);
+      throttledHaptic(15);
+    }
+  });
+
+  list.addEventListener('change', (e) => {
+    const target = e.target;
+    if (target.classList.contains('manual-input')) {
+      const { semId, courseId, field } = target.dataset;
+      const value = target.type === 'checkbox' ? target.checked : target.value;
+      updateManualCourse(semId, courseId, field, value);
+      throttledHaptic();
+    }
+  });
+
+  list.addEventListener('input', (e) => {
+    const target = e.target;
+    if (target.classList.contains('manual-input') && target.dataset.field === 'credits') {
+      const { semId, courseId } = target.dataset;
+      updateManualCourse(semId, courseId, 'credits', target.value);
+    }
+  });
+}
+
+function handleAdjustCredit(btn) {
+  const { semId, courseId, action } = btn.dataset;
+  const delta = action === 'increase' ? 1 : -1;
+
+  const { semesters } = getManualState();
+  const semester = semesters.find(s => String(s.id) === String(semId));
+  if (!semester) return;
+
+  const course = semester.courses.find(c => String(c.id) === String(courseId));
+  if (!course) return;
+
+  let val = parseFloat(course.credits) || 0;
+  val += delta;
+  if (val < 0) val = 0;
+  
+  updateManualCourse(semId, courseId, 'credits', val);
+  throttledHaptic();
+}
+
+function handleDeleteRequest(deleteBtn, deleteTimeout) {
+  if (deleteTimeout) clearTimeout(deleteTimeout);
+
+  deleteBtn.classList.remove('delete-semester-btn', 'text-danger', 'btn-link');
+  deleteBtn.classList.add('confirm-delete-semester-btn', 'btn-danger', 'text-white');
+  deleteBtn.innerHTML = 'Xóa?';
+
+  setTimeout(() => {
+    if (deleteBtn && document.body.contains(deleteBtn) && deleteBtn.classList.contains('confirm-delete-semester-btn')) {
+      deleteBtn.classList.add('delete-semester-btn', 'text-danger', 'btn-link');
+      deleteBtn.classList.remove('confirm-delete-semester-btn', 'btn-danger', 'text-white');
+      deleteBtn.innerHTML = '<i class="bi bi-trash"></i>';
+    }
+  }, 2000);
+}
+
+function handleConfirmDelete(confirmBtn, deleteTimeout) {
+  if (deleteTimeout) clearTimeout(deleteTimeout);
+  removeManualSemester(confirmBtn.dataset.id);
+  throttledHaptic(25);
+}
+
+function setupApplyToTargetHandler(applyBtn) {
+  if (!applyBtn) return;
+
+  applyBtn.addEventListener('click', () => {
+    const manualGpaDisplay = document.getElementById('manual-gpa');
+    const manualCreditsDisplay = document.getElementById('manual-credits');
+
+    const gpa = manualGpaDisplay?.textContent || '0';
+    const credits = manualCreditsDisplay?.textContent || '0';
+
+    const targetGpaInput = document.getElementById('current-gpa');
+    const targetCreditsInput = document.getElementById('current-credits');
+    const goalGpaInput = document.getElementById('target-gpa');
+    const newCreditsInput = document.getElementById('new-credits');
+
+    if (!targetGpaInput || !targetCreditsInput) return;
+
+    const remainingCredits = calculateRemainingCredits();
+
+    targetGpaInput.value = gpa;
+    targetCreditsInput.value = credits;
+    targetGpaInput.dispatchEvent(new Event('input'));
+    targetCreditsInput.dispatchEvent(new Event('input'));
+
+    if (newCreditsInput) {
+      newCreditsInput.value = remainingCredits > 0 ? remainingCredits : '';
+      newCreditsInput.dispatchEvent(new Event('input'));
+      
+      if (remainingCredits > 0) {
+        const newCreditsGroup = document.getElementById('new-credits-group');
+        const totalCreditsGroup = document.getElementById('total-credits-group');
+        if (newCreditsGroup && totalCreditsGroup) {
+          newCreditsGroup.classList.remove('d-none');
+          totalCreditsGroup.classList.add('d-none');
+        }
+        newCreditsInput.classList.add('is-valid');
+        setTimeout(() => newCreditsInput.classList.remove('is-valid'), 2000);
+      }
+    }
+
+    suggestTargetGPA(goalGpaInput, parseFloat(gpa));
+    switchToTargetTab();
+    highlightInputs([targetGpaInput, targetCreditsInput]);
+    focusCreditsInput(newCreditsInput);
+  });
+}
+
+function calculateRemainingCredits() {
+  const { semesters } = getManualState();
+  let remainingCredits = 0;
+
+  semesters.forEach(sem => {
+    sem.courses?.forEach(course => {
+      const hasValidGrade = course.grade && GRADE_SCALE.some(g => g.grade === course.grade);
+      if (!hasValidGrade) {
+        remainingCredits += parseFloat(course.credits) || 0;
+      }
+    });
+  });
+
+  return remainingCredits;
+}
+
+function suggestTargetGPA(goalGpaInput, currentGpaVal) {
+  if (!goalGpaInput) return;
+  
+  let suggestedTarget = '4.0';
+  if (currentGpaVal < 2.0) suggestedTarget = '2.0';
+  else if (currentGpaVal < 2.5) suggestedTarget = '2.5';
+  else if (currentGpaVal < 3.2) suggestedTarget = '3.2';
+  else if (currentGpaVal < 3.6) suggestedTarget = '3.6';
+
+  goalGpaInput.value = suggestedTarget;
+  goalGpaInput.dispatchEvent(new Event('input'));
+  goalGpaInput.classList.add('is-valid');
+  setTimeout(() => goalGpaInput.classList.remove('is-valid'), 2000);
+}
+
+function switchToTargetTab() {
+  const targetTabBtn = document.querySelector('button[data-bs-target="#pills-target"]');
+  if (targetTabBtn) {
+    const tab = bootstrap.Tab.getOrCreateInstance(targetTabBtn);
+    tab.show();
+  }
+}
+
+function highlightInputs(inputs) {
+  inputs.forEach(input => {
+    if (input) {
+      input.classList.add('is-valid');
+      setTimeout(() => input.classList.remove('is-valid'), 2000);
+    }
+  });
+}
+
+function focusCreditsInput(newCreditsInput) {
+  const totalCreditsInput = document.getElementById('total-credits');
+  
+  if (newCreditsInput && newCreditsInput.offsetParent !== null) {
+    newCreditsInput.focus();
+    newCreditsInput.select();
+  } else if (totalCreditsInput) {
+    totalCreditsInput.focus();
+    totalCreditsInput.select();
+  }
+}
+
+function setupImportHandler(processImportBtn) {
+  if (!processImportBtn) return;
+
+  processImportBtn.addEventListener('click', () => {
+    const text = document.getElementById('import-text-area')?.value || '';
+    
+    if (!text.trim()) {
+      alert('Vui lòng dán nội dung bảng điểm vào ô trống.');
+      return;
+    }
+
+    const importedSemesters = parsePortalText(text);
+
+    if (importedSemesters.length === 0) {
+      alert('Không tìm thấy dữ liệu hợp lệ. Vui lòng kiểm tra lại định dạng copy.');
+      return;
+    }
+
+    // Clear input fields
     const manualInitialGpaInput = document.getElementById('manual-initial-gpa');
     const manualInitialCreditsInput = document.getElementById('manual-initial-credits');
-    const processImportBtn = document.getElementById('process-import-btn');
+    if (manualInitialGpaInput) manualInitialGpaInput.value = '';
+    if (manualInitialCreditsInput) manualInitialCreditsInput.value = '';
 
-    if (!addSemesterBtn) return;
-
-    // Optimization: Use longer debounce on mobile for smoother experience
-    const RENDER_DEBOUNCE_MS = isMobile ? 200 : 50;
-
-    let renderTimeout = null;
-    const debouncedRender = debounce(() => {
-        // Use requestAnimationFrame for smooth rendering
-        if (renderTimeout) cancelAnimationFrame(renderTimeout);
-        renderTimeout = requestAnimationFrame(() => {
-            renderManualSemesters();
-            updateManualCalculationDisplay();
-        });
-    }, RENDER_DEBOUNCE_MS);
-
-    // Subscribe to store changes
-    subscribe(debouncedRender);
-
-    // Initial Load
-    loadManualStateFromStorage();
-
-    // Apply Manual Data to Target Tab
-    const applyBtn = document.getElementById('apply-manual-to-target-btn');
-    if (applyBtn) {
-        applyBtn.addEventListener('click', () => {
-            const manualGpaDisplay = document.getElementById('manual-gpa');
-            const manualCreditsDisplay = document.getElementById('manual-credits');
-
-            const gpa = manualGpaDisplay.textContent;
-            const credits = manualCreditsDisplay.textContent;
-
-            const targetGpaInput = document.getElementById('current-gpa');
-            const targetCreditsInput = document.getElementById('current-credits');
-            const goalGpaInput = document.getElementById('target-gpa');
-            const newCreditsInput = document.getElementById('new-credits');
-
-            // 1. Calculate Remaining Credits (courses without valid grades)
-            const { semesters } = getManualState();
-            let remainingCredits = 0;
-
-            if (semesters && semesters.length > 0) {
-                semesters.forEach(sem => {
-                    if (sem.courses && sem.courses.length > 0) {
-                        sem.courses.forEach(course => {
-                            // Check if grade is valid (in GRADE_SCALE) or has a value
-                            // Assuming empty grade or grade not in scale means "not yet studied" or "no score"
-                            const hasValidGrade = course.grade && GRADE_SCALE.some(g => g.grade === course.grade);
-
-                            if (!hasValidGrade) {
-                                remainingCredits += parseFloat(course.credits) || 0;
-                            }
-                        });
-                    }
-                });
-            }
-
-            if (targetGpaInput && targetCreditsInput) {
-                targetGpaInput.value = gpa;
-                targetCreditsInput.value = credits;
-
-                // Trigger input event to save state
-                targetGpaInput.dispatchEvent(new Event('input'));
-                targetCreditsInput.dispatchEvent(new Event('input'));
-
-                // Apply Remaining Credits
-                if (newCreditsInput) {
-                    newCreditsInput.value = remainingCredits > 0 ? remainingCredits : '';
-                    newCreditsInput.dispatchEvent(new Event('input'));
-
-                    // Ensure "New Credits" mode is visible if we have data
-                    const newCreditsGroup = document.getElementById('new-credits-group');
-                    const totalCreditsGroup = document.getElementById('total-credits-group');
-
-                    if (remainingCredits > 0 && newCreditsGroup && totalCreditsGroup) {
-                        newCreditsGroup.classList.remove('d-none');
-                        totalCreditsGroup.classList.add('d-none');
-                        // Update state to reflect 'new' mode if needed, usually handled by toggle listeners 
-                        // but dispatching input on newCreditsInput should update the state model.
-                    }
-
-                    if (remainingCredits > 0) {
-                        newCreditsInput.classList.add('is-valid');
-                        setTimeout(() => newCreditsInput.classList.remove('is-valid'), 2000);
-                    }
-                }
-
-                // Auto-suggest Target GPA
-                if (goalGpaInput) {
-                    const currentGpaVal = parseFloat(gpa);
-                    let suggestedTarget = '';
-
-                    if (currentGpaVal < 2.0) suggestedTarget = '2.0';
-                    else if (currentGpaVal < 2.5) suggestedTarget = '2.5';
-                    else if (currentGpaVal < 3.2) suggestedTarget = '3.2';
-                    else if (currentGpaVal < 3.6) suggestedTarget = '3.6';
-                    else suggestedTarget = '4.0';
-
-                    goalGpaInput.value = suggestedTarget;
-                    goalGpaInput.dispatchEvent(new Event('input'));
-
-                    goalGpaInput.classList.add('is-valid');
-                    setTimeout(() => goalGpaInput.classList.remove('is-valid'), 2000);
-                }
-
-                // Switch to Tab 1
-                const targetTabBtn = document.querySelector('button[data-bs-target="#pills-target"]');
-                if (targetTabBtn) {
-                    const tab = bootstrap.Tab.getOrCreateInstance(targetTabBtn);
-                    tab.show();
-                }
-
-                // Highlight inputs
-                targetGpaInput.classList.add('is-valid');
-                targetCreditsInput.classList.add('is-valid');
-
-                // Focus on New Credits Input (or Total Credits if active)
-                // const newCreditsInput = document.getElementById('new-credits'); // Already defined above
-                const totalCreditsInput = document.getElementById('total-credits');
-
-                if (newCreditsInput && newCreditsInput.offsetParent !== null) {
-                    newCreditsInput.focus();
-                    newCreditsInput.select();
-                } else if (totalCreditsInput) {
-                    totalCreditsInput.focus();
-                    totalCreditsInput.select();
-                }
-
-                setTimeout(() => {
-                    targetGpaInput.classList.remove('is-valid');
-                    targetCreditsInput.classList.remove('is-valid');
-                }, 2000);
-            }
-        });
+    const success = ManualActions.importFromPortal(importedSemesters);
+    
+    if (!success) {
+      alert('Có lỗi xảy ra khi nhập dữ liệu. Vui lòng thử lại.');
+      return;
     }
 
-    addSemesterBtn.addEventListener('click', () => {
-        const newSemId = Date.now();
-        const { semesters } = getManualState();
-        const nextNum = semesters.length + 1;
+    const addedCount = importedSemesters.reduce((sum, sem) => sum + (sem.courses?.length || 0), 0);
 
-        // Guess next semester name
-        let nextName = `Học kỳ ${nextNum}`;
-        if (semesters.length > 0) {
-            const lastSem = semesters[semesters.length - 1];
-            const match = lastSem.name.match(/HK(\d+)\s*\((\d{4})-(\d{4})\)/);
-            if (match) {
-                let hk = parseInt(match[1]);
-                let y1 = parseInt(match[2]);
-                let y2 = parseInt(match[3]);
+    processImportBtn.blur();
+    const modalEl = document.getElementById('importModal');
+    const modal = bootstrap.Modal.getInstance(modalEl);
+    modal?.hide();
+    
+    const textArea = document.getElementById('import-text-area');
+    if (textArea) textArea.value = '';
 
-                hk++;
-                if (hk > 3) {
-                    hk = 1;
-                    y1++;
-                    y2++;
-                }
-                nextName = `HK0${hk} (${y1}-${y2})`;
-            }
-        }
-
-        addManualSemester({
-            id: newSemId,
-            name: nextName,
-            courses: []
-        });
-        throttledHaptic(20);
-    });
-
-    resetManualBtn.addEventListener('click', () => {
-        if (confirm('Bạn có chắc muốn xóa toàn bộ dữ liệu tính thủ công?')) {
-            setManualState({
-                semesters: [],
-                initialGpa: '',
-                initialCredits: ''
-            });
-            manualInitialGpaInput.value = '';
-            manualInitialCreditsInput.value = '';
-        }
-    });
-
-    // Initial Data Inputs
-    manualInitialGpaInput.addEventListener('input', (e) => {
-        setManualState({ initialGpa: e.target.value });
-    });
-    manualInitialCreditsInput.addEventListener('input', (e) => {
-        setManualState({ initialCredits: e.target.value });
-    });
-
-    // Event Delegation for dynamic elements
-    let deleteTimeout = null;
-
-    manualSemesterList.addEventListener('click', (e) => {
-        const target = e.target;
-
-        // Adjust Credit
-        const adjustBtn = target.closest('.adjust-credit-btn');
-        if (adjustBtn) {
-            const semId = adjustBtn.dataset.semId;
-            const courseId = adjustBtn.dataset.courseId;
-            const action = adjustBtn.dataset.action;
-            const delta = action === 'increase' ? 1 : -1;
-
-            const { semesters } = getManualState();
-            const semester = semesters.find(s => String(s.id) === String(semId));
-            if (semester) {
-                const course = semester.courses.find(c => String(c.id) === String(courseId));
-                if (course) {
-                    let val = parseFloat(course.credits) || 0;
-                    val += delta;
-                    if (val < 0) val = 0;
-                    updateManualCourse(semId, courseId, 'credits', val);
-                    throttledHaptic();
-                }
-            }
-            return;
-        }
-
-        // Delete Semester (Request Confirmation)
-        const deleteBtn = target.closest('.delete-semester-btn');
-        if (deleteBtn) {
-            if (deleteTimeout) clearTimeout(deleteTimeout);
-
-            deleteBtn.classList.remove('delete-semester-btn', 'text-danger', 'btn-link');
-            deleteBtn.classList.add('confirm-delete-semester-btn', 'btn-danger', 'text-white');
-            deleteBtn.innerHTML = 'Xóa?';
-
-            deleteTimeout = setTimeout(() => {
-                if (deleteBtn && document.body.contains(deleteBtn) && deleteBtn.classList.contains('confirm-delete-semester-btn')) {
-                    deleteBtn.classList.add('delete-semester-btn', 'text-danger', 'btn-link');
-                    deleteBtn.classList.remove('confirm-delete-semester-btn', 'btn-danger', 'text-white');
-                    deleteBtn.innerHTML = '<i class="bi bi-trash"></i>';
-                }
-                deleteTimeout = null;
-            }, 2000);
-            return;
-        }
-
-        // Confirm Delete Semester
-        const confirmBtn = target.closest('.confirm-delete-semester-btn');
-        if (confirmBtn) {
-            if (deleteTimeout) {
-                clearTimeout(deleteTimeout);
-                deleteTimeout = null;
-            }
-            const semId = confirmBtn.dataset.id;
-            removeManualSemester(semId);
-            throttledHaptic(25);
-            return;
-        }
-
-        // Add Course
-        if (target.closest('.add-course-btn')) {
-            const semId = target.closest('.add-course-btn').dataset.id;
-            addManualCourse(semId, {
-                id: Date.now(),
-                name: '',
-                credits: 3,
-                grade: '',
-                isRetake: false,
-                oldGrade: 'D'
-            });
-            throttledHaptic();
-        }
-
-        // Delete Course
-        if (target.closest('.delete-course-btn')) {
-            const semId = target.closest('.delete-course-btn').dataset.semId;
-            const courseId = target.closest('.delete-course-btn').dataset.courseId;
-            removeManualCourse(semId, courseId);
-            throttledHaptic(15);
-        }
-    });
-
-    manualSemesterList.addEventListener('change', (e) => {
-        const target = e.target;
-        if (target.classList.contains('manual-input')) {
-            const semId = target.dataset.semId;
-            const courseId = target.dataset.courseId;
-            const field = target.dataset.field;
-            const value = target.type === 'checkbox' ? target.checked : target.value;
-
-            updateManualCourse(semId, courseId, field, value);
-            throttledHaptic();
-        }
-    });
-
-    manualSemesterList.addEventListener('input', (e) => {
-        const target = e.target;
-        if (target.classList.contains('manual-input') && target.dataset.field === 'credits') {
-            const semId = target.dataset.semId;
-            const courseId = target.dataset.courseId;
-            const value = target.value;
-            updateManualCourse(semId, courseId, 'credits', value);
-        }
-    });
-
-    // Import Logic
-    if (processImportBtn) {
-        processImportBtn.addEventListener('click', () => {
-            const text = document.getElementById('import-text-area').value;
-            if (!text.trim()) {
-                alert('Vui lòng dán nội dung bảng điểm vào ô trống.');
-                return;
-            }
-
-            const importedSemesters = parsePortalText(text);
-
-            if (importedSemesters.length === 0) {
-                alert('Không tìm thấy dữ liệu hợp lệ. Vui lòng kiểm tra lại định dạng copy.');
-                return;
-            }
-
-            // Clear input fields
-            manualInitialGpaInput.value = '';
-            manualInitialCreditsInput.value = '';
-
-            // Import using ManualActions
-            const success = ManualActions.importFromPortal(importedSemesters);
-            
-            if (!success) {
-                alert('Có lỗi xảy ra khi nhập dữ liệu. Vui lòng thử lại.');
-                return;
-            }
-
-            // Count total courses
-            const addedCount = importedSemesters.reduce((sum, sem) => sum + (sem.courses?.length || 0), 0);
-
-            processImportBtn.blur();
-            const modalEl = document.getElementById('importModal');
-            const modal = bootstrap.Modal.getInstance(modalEl);
-            modal.hide();
-            document.getElementById('import-text-area').value = '';
-
-            setTimeout(() => {
-                alert(`Đã nhập thành công ${importedSemesters.length} học kỳ với ${addedCount} môn học.`);
-            }, 150);
-        });
-    }
+    setTimeout(() => {
+      alert(`Đã nhập thành công ${importedSemesters.length} học kỳ với ${addedCount} môn học.`);
+    }, 150);
+  });
 }
 
 function updateManualCalculationDisplay() {
-    const { semesters, initialGpa, initialCredits } = getManualState();
-    const { gpa, totalCredits, rank } = calculateManualGPA(semesters, parseFloat(initialGpa) || 0, parseFloat(initialCredits) || 0);
+  const { semesters, initialGpa, initialCredits } = getManualState();
+  const { gpa, totalCredits, rank } = calculateManualGPA(
+    semesters, 
+    parseFloat(initialGpa) || 0, 
+    parseFloat(initialCredits) || 0
+  );
 
-    const manualGpaDisplay = document.getElementById('manual-gpa');
-    const manualCreditsDisplay = document.getElementById('manual-credits');
-    const manualRankDisplay = document.getElementById('manual-rank');
+  const manualGpaDisplay = document.getElementById('manual-gpa');
+  const manualCreditsDisplay = document.getElementById('manual-credits');
+  const manualRankDisplay = document.getElementById('manual-rank');
 
-    if (manualGpaDisplay) {
-        const currentVal = parseFloat(manualGpaDisplay.textContent) || 0;
-        animateValue(manualGpaDisplay, currentVal, gpa, 800, 2);
-        manualGpaDisplay.className = `display-1 fw-bold mb-2 ${gpa >= 3.2 ? 'text-success' : (gpa >= 2.5 ? 'text-primary' : 'text-danger')}`;
-    }
-    if (manualCreditsDisplay) manualCreditsDisplay.textContent = totalCredits;
-    if (manualRankDisplay) manualRankDisplay.textContent = rank;
+  if (manualGpaDisplay) {
+    const currentVal = parseFloat(manualGpaDisplay.textContent) || 0;
+    animateValue(manualGpaDisplay, currentVal, gpa, 800, 2);
+    manualGpaDisplay.className = `display-1 fw-bold mb-2 ${gpa >= 3.2 ? 'text-success' : (gpa >= 2.5 ? 'text-primary' : 'text-danger')}`;
+  }
+  if (manualCreditsDisplay) manualCreditsDisplay.textContent = totalCredits;
+  if (manualRankDisplay) manualRankDisplay.textContent = rank;
 }
 
 // ==========================================
-// TAB: LỘ TRÌNH GPA (TARGET GPA)
+// Tab: Target GPA
 // ==========================================
 
 export function initTargetGPATab() {
-    const calcTargetBtn = document.getElementById('calc-target-btn');
-    if (!calcTargetBtn) return;
+  const elements = getTargetElements();
+  if (!elements.calcTargetBtn) return;
 
-    const currentGpaInput = document.getElementById('current-gpa');
-    const currentCreditsInput = document.getElementById('current-credits');
-    const targetGpaInput = document.getElementById('target-gpa');
-    const newCreditsInput = document.getElementById('new-credits');
-    const totalCreditsInput = document.getElementById('total-credits');
-    const retakeToggle = document.getElementById('retake-toggle');
-    const retakeArea = document.getElementById('retake-area');
-    const retakeList = document.getElementById('retake-list');
-    const addRetakeBtn = document.getElementById('add-retake-btn');
-    const btnSwitchToTotal = document.getElementById('btn-switch-to-total');
-    const btnSwitchToNew = document.getElementById('btn-switch-to-new');
-    const newCreditsGroup = document.getElementById('new-credits-group');
-    const totalCreditsGroup = document.getElementById('total-credits-group');
-    const shareTargetBtn = document.getElementById('share-target-btn');
-    const exportPdfBtn = document.getElementById('export-pdf-btn');
+  loadTargetStateFromStorage();
+  restoreUIState(elements);
+  setupTargetEventListeners(elements);
+  
+  subscribe(() => {
+    // Update UI based on state if needed
+  });
+}
 
-    // Subscribe to store changes
-    subscribe(() => {
-        // Update UI based on state if needed (e.g. retake list)
-        // For inputs, we generally trust the input value unless we are reloading state
-    });
+function getTargetElements() {
+  return {
+    calcTargetBtn: document.getElementById('calc-target-btn'),
+    currentGpaInput: document.getElementById('current-gpa'),
+    currentCreditsInput: document.getElementById('current-credits'),
+    targetGpaInput: document.getElementById('target-gpa'),
+    newCreditsInput: document.getElementById('new-credits'),
+    totalCreditsInput: document.getElementById('total-credits'),
+    retakeToggle: document.getElementById('retake-toggle'),
+    retakeArea: document.getElementById('retake-area'),
+    retakeList: document.getElementById('retake-list'),
+    addRetakeBtn: document.getElementById('add-retake-btn'),
+    btnSwitchToTotal: document.getElementById('btn-switch-to-total'),
+    btnSwitchToNew: document.getElementById('btn-switch-to-new'),
+    newCreditsGroup: document.getElementById('new-credits-group'),
+    totalCreditsGroup: document.getElementById('total-credits-group'),
+    shareTargetBtn: document.getElementById('share-target-btn'),
+    exportPdfBtn: document.getElementById('export-pdf-btn')
+  };
+}
 
-    loadTargetStateFromStorage();
-    const initialState = getTargetState();
+function restoreUIState(elements) {
+  const initialState = getTargetState();
 
-    // Restore UI from state
-    if (currentGpaInput) currentGpaInput.value = initialState.currentGpa || '';
-    if (currentCreditsInput) currentCreditsInput.value = initialState.currentCredits || '';
-    if (targetGpaInput) targetGpaInput.value = initialState.targetGpa || '';
-    if (newCreditsInput) newCreditsInput.value = initialState.newCredits || '';
-    if (totalCreditsInput) totalCreditsInput.value = initialState.totalCredits || '';
+  if (elements.currentGpaInput) elements.currentGpaInput.value = initialState.currentGpa || '';
+  if (elements.currentCreditsInput) elements.currentCreditsInput.value = initialState.currentCredits || '';
+  if (elements.targetGpaInput) elements.targetGpaInput.value = initialState.targetGpa || '';
+  if (elements.newCreditsInput) elements.newCreditsInput.value = initialState.newCredits || '';
+  if (elements.totalCreditsInput) elements.totalCreditsInput.value = initialState.totalCredits || '';
 
-    if (initialState.creditMode === 'total') {
-        newCreditsGroup.classList.add('d-none');
-        totalCreditsGroup.classList.remove('d-none');
+  if (initialState.creditMode === 'total') {
+    elements.newCreditsGroup?.classList.add('d-none');
+    elements.totalCreditsGroup?.classList.remove('d-none');
+  } else {
+    elements.totalCreditsGroup?.classList.add('d-none');
+    elements.newCreditsGroup?.classList.remove('d-none');
+  }
+
+  if (elements.retakeToggle) {
+    elements.retakeToggle.checked = initialState.isRetake || false;
+    if (initialState.isRetake) {
+      elements.retakeArea?.classList.remove('d-none');
+      elements.retakeList.innerHTML = '';
+      initialState.retakes.forEach(r => addRetakeItemUI(r));
     } else {
-        totalCreditsGroup.classList.add('d-none');
-        newCreditsGroup.classList.remove('d-none');
+      elements.retakeArea?.classList.add('d-none');
     }
+  }
+}
 
-    if (retakeToggle) {
-        retakeToggle.checked = initialState.isRetake || false;
-        if (initialState.isRetake) {
-            retakeArea.classList.remove('d-none');
-            retakeList.innerHTML = '';
-            initialState.retakes.forEach(r => addRetakeItemUI(r));
-        } else {
-            retakeArea.classList.add('d-none');
-        }
+function setupTargetEventListeners(elements) {
+  // Input listeners
+  const inputs = [
+    elements.currentGpaInput,
+    elements.currentCreditsInput,
+    elements.targetGpaInput,
+    elements.newCreditsInput,
+    elements.totalCreditsInput
+  ].filter(Boolean);
+
+  inputs.forEach(input => {
+    input.addEventListener('input', () => saveStateFromInputs(elements));
+  });
+
+  // Credit mode switches
+  setupCreditModeSwitches(elements);
+
+  // Retake toggle
+  elements.retakeToggle?.addEventListener('change', (e) => {
+    if (e.target.checked) {
+      elements.retakeArea?.classList.remove('d-none');
+      if (elements.retakeList.children.length === 0) addRetakeItemUI();
+    } else {
+      elements.retakeArea?.classList.add('d-none');
+      elements.retakeList.innerHTML = '';
     }
+    saveStateFromInputs(elements);
+  });
 
-    // Input Listeners
-    const saveStateFromInputs = () => {
-        const retakes = [];
-        if (retakeToggle.checked) {
-            Array.from(retakeList.children).forEach(item => {
-                const oldGradeSelect = item.querySelector('.retake-old-grade');
-                const creditsInput = item.querySelector('.retake-credits');
-                if (oldGradeSelect && creditsInput) {
-                    retakes.push({
-                        oldGrade: parseFloat(oldGradeSelect.value),
-                        credits: parseFloat(creditsInput.value)
-                    });
-                }
-            });
-        }
+  // Add retake button
+  elements.addRetakeBtn?.addEventListener('click', () => {
+    addRetakeItemUI();
+    saveStateFromInputs(elements);
+  });
 
-        setTargetState({
-            currentGpa: currentGpaInput.value,
-            currentCredits: currentCreditsInput.value,
-            targetGpa: targetGpaInput.value,
-            newCredits: newCreditsInput.value,
-            totalCredits: totalCreditsInput.value,
-            isRetake: retakeToggle.checked,
-            retakes: retakes
+  // Calculate button
+  elements.calcTargetBtn?.addEventListener('click', () => handleCalculateTarget(elements));
+
+  // Share button
+  elements.shareTargetBtn?.addEventListener('click', handleShareTarget);
+
+  // Export PDF button
+  elements.exportPdfBtn?.addEventListener('click', exportTargetToPDF);
+}
+
+function setupCreditModeSwitches(elements) {
+  elements.btnSwitchToTotal?.addEventListener('click', () => {
+    setTargetState({ creditMode: 'total' });
+    elements.newCreditsGroup?.classList.add('d-none');
+    elements.totalCreditsGroup?.classList.remove('d-none');
+    
+    const current = parseFloat(elements.currentCreditsInput?.value) || 0;
+    const newCred = parseFloat(elements.newCreditsInput?.value) || 0;
+    if (!elements.totalCreditsInput?.value) elements.totalCreditsInput.value = current + newCred;
+    saveStateFromInputs(elements);
+  });
+
+  elements.btnSwitchToNew?.addEventListener('click', () => {
+    setTargetState({ creditMode: 'new' });
+    elements.totalCreditsGroup?.classList.add('d-none');
+    elements.newCreditsGroup?.classList.remove('d-none');
+    
+    const current = parseFloat(elements.currentCreditsInput?.value) || 0;
+    const total = parseFloat(elements.totalCreditsInput?.value) || 0;
+    if (!elements.newCreditsInput?.value) elements.newCreditsInput.value = Math.max(0, total - current);
+    saveStateFromInputs(elements);
+  });
+
+  // Sync logic
+  elements.totalCreditsInput?.addEventListener('input', () => {
+    const total = parseFloat(elements.totalCreditsInput.value) || 0;
+    const current = parseFloat(elements.currentCreditsInput?.value) || 0;
+    if (elements.newCreditsInput) elements.newCreditsInput.value = Math.max(0, total - current);
+    saveStateFromInputs(elements);
+  });
+
+  elements.newCreditsInput?.addEventListener('input', () => {
+    const newCred = parseFloat(elements.newCreditsInput?.value) || 0;
+    const current = parseFloat(elements.currentCreditsInput?.value) || 0;
+    if (elements.totalCreditsInput) elements.totalCreditsInput.value = current + newCred;
+    saveStateFromInputs(elements);
+  });
+
+  elements.currentCreditsInput?.addEventListener('input', () => {
+    const current = parseFloat(elements.currentCreditsInput.value) || 0;
+    const { creditMode } = getTargetState();
+    if (creditMode === 'total') {
+      const total = parseFloat(elements.totalCreditsInput?.value) || 0;
+      if (elements.newCreditsInput) elements.newCreditsInput.value = Math.max(0, total - current);
+    } else {
+      const newCred = parseFloat(elements.newCreditsInput?.value) || 0;
+      if (elements.totalCreditsInput) elements.totalCreditsInput.value = current + newCred;
+    }
+    saveStateFromInputs(elements);
+  });
+}
+
+function saveStateFromInputs(elements) {
+  const retakes = [];
+  if (elements.retakeToggle?.checked) {
+    Array.from(elements.retakeList?.children || []).forEach(item => {
+      const oldGradeSelect = item.querySelector('.retake-old-grade');
+      const creditsInput = item.querySelector('.retake-credits');
+      if (oldGradeSelect && creditsInput) {
+        retakes.push({
+          oldGrade: parseFloat(oldGradeSelect.value),
+          credits: parseFloat(creditsInput.value)
         });
-    };
-
-    [currentGpaInput, currentCreditsInput, targetGpaInput, newCreditsInput, totalCreditsInput].forEach(input => {
-        if (input) input.addEventListener('input', saveStateFromInputs);
+      }
     });
+  }
 
-    // Sync Logic
-    if (totalCreditsInput && newCreditsInput && currentCreditsInput) {
-        totalCreditsInput.addEventListener('input', () => {
-            const total = parseFloat(totalCreditsInput.value) || 0;
-            const current = parseFloat(currentCreditsInput.value) || 0;
-            newCreditsInput.value = Math.max(0, total - current);
-            saveStateFromInputs();
-        });
+  setTargetState({
+    currentGpa: elements.currentGpaInput?.value || '',
+    currentCredits: elements.currentCreditsInput?.value || '',
+    targetGpa: elements.targetGpaInput?.value || '',
+    newCredits: elements.newCreditsInput?.value || '',
+    totalCredits: elements.totalCreditsInput?.value || '',
+    isRetake: elements.retakeToggle?.checked || false,
+    retakes
+  });
+}
 
-        newCreditsInput.addEventListener('input', () => {
-            const newCred = parseFloat(newCreditsInput.value) || 0;
-            const current = parseFloat(currentCreditsInput.value) || 0;
-            totalCreditsInput.value = current + newCred;
-            saveStateFromInputs();
-        });
+function handleCalculateTarget(elements) {
+  triggerHapticFeedback(30);
+  
+  const state = getTargetState();
+  const currentGPA = parseFloat(state.currentGpa) || 0;
+  const currentCredits = parseFloat(state.currentCredits) || 0;
+  const targetGPA = parseFloat(state.targetGpa) || 0;
+  let newCredits = parseFloat(state.newCredits) || 0;
 
-        currentCreditsInput.addEventListener('input', () => {
-            const current = parseFloat(currentCreditsInput.value) || 0;
-            const { creditMode } = getTargetState();
-            if (creditMode === 'total') {
-                const total = parseFloat(totalCreditsInput.value) || 0;
-                newCreditsInput.value = Math.max(0, total - current);
-            } else {
-                const newCred = parseFloat(newCreditsInput.value) || 0;
-                totalCreditsInput.value = current + newCred;
-            }
-            saveStateFromInputs();
-        });
+  if (state.creditMode === 'total') {
+    const total = parseFloat(state.totalCredits) || 0;
+    newCredits = Math.max(0, total - currentCredits);
+  }
+
+  const result = calculateTargetResult(currentGPA, currentCredits, targetGPA, newCredits, state.retakes);
+  const creditsToStudy = result.totalEffortCredits ?? result.newCredits;
+
+  // Show action buttons
+  elements.shareTargetBtn?.classList.remove('d-none');
+  elements.exportPdfBtn?.classList.remove('d-none');
+
+  renderTargetResult(result, creditsToStudy, currentCredits, targetGPA);
+}
+
+function renderTargetResult(result, creditsToStudy, currentCredits, targetGPA) {
+  const container = document.getElementById('target-result-container');
+  if (!container) return;
+
+  const status = getStatusInfo(result.requiredGPA, creditsToStudy, result.requiredPoints);
+  
+  // Generate combinations if applicable
+  let combinations = [];
+  let scenarioText = '';
+  const showCombinations = result.requiredGPA > 0 && result.requiredGPA <= 4.0 && creditsToStudy > 0;
+  
+  if (showCombinations) {
+    combinations = generateGradeCombinations(creditsToStudy, result.requiredPoints);
+    if (combinations.length > 0) {
+      scenarioText = generateScenarioText(combinations[0]);
     }
+  }
 
-    if (btnSwitchToTotal) {
-        btnSwitchToTotal.addEventListener('click', () => {
-            setTargetState({ creditMode: 'total' });
-            newCreditsGroup.classList.add('d-none');
-            totalCreditsGroup.classList.remove('d-none');
-            // Sync
-            const current = parseFloat(currentCreditsInput.value) || 0;
-            const newCred = parseFloat(newCreditsInput.value) || 0;
-            if (!totalCreditsInput.value) totalCreditsInput.value = current + newCred;
-            saveStateFromInputs();
-        });
+  // Build HTML
+  container.className = 'card-body d-flex flex-column p-3 p-md-4';
+  
+  let html = renderMainResult({
+    result,
+    status,
+    creditsToStudy,
+    scenarioText,
+    combinations,
+    showCombinations
+  });
+
+  html += renderAlgorithmDetails({ targetGPA, currentCredits, result });
+
+  // Add retake suggestions if impossible
+  if (result.requiredGPA > 4.0) {
+    const deficitPoints = result.requiredPoints - (4.0 * result.newCredits);
+    const { semesters } = getManualState();
+    const suggestions = generateRetakeSuggestions(deficitPoints, targetGPA, semesters);
+    html += renderRetakeSuggestions(deficitPoints, suggestions);
+  }
+
+  container.innerHTML = html;
+
+  // Animate GPA value
+  animateGPAResult(result.requiredGPA, result.requiredPoints);
+}
+
+function animateGPAResult(requiredGPA, requiredPoints) {
+  const gpaTargetEl = document.getElementById('animated-required-gpa');
+  if (!gpaTargetEl) return;
+
+  if (requiredGPA > 0) {
+    animateValue(gpaTargetEl, 0, requiredGPA, 1200, 2);
+  } else if (requiredGPA <= 0 && requiredPoints <= 0.01) {
+    gpaTargetEl.innerHTML = 'Đạt';
+  } else {
+    gpaTargetEl.innerHTML = '---';
+  }
+}
+
+function handleShareTarget() {
+  const state = getTargetState();
+  const shareUrl = generateShareUrl(state);
+
+  navigator.clipboard.writeText(shareUrl).then(() => {
+    const btn = document.getElementById('share-target-btn');
+    const originalText = btn?.innerHTML;
+    if (btn) {
+      btn.innerHTML = '<i class="bi bi-check-lg me-1"></i>Đã chép!';
+      btn.classList.replace('btn-outline-primary', 'btn-success');
+
+      setTimeout(() => {
+        btn.innerHTML = originalText;
+        btn.classList.replace('btn-success', 'btn-outline-primary');
+      }, 2000);
     }
-    if (btnSwitchToNew) {
-        btnSwitchToNew.addEventListener('click', () => {
-            setTargetState({ creditMode: 'new' });
-            totalCreditsGroup.classList.add('d-none');
-            newCreditsGroup.classList.remove('d-none');
-            // Sync
-            const current = parseFloat(currentCreditsInput.value) || 0;
-            const total = parseFloat(totalCreditsInput.value) || 0;
-            if (!newCreditsInput.value) newCreditsInput.value = Math.max(0, total - current);
-            saveStateFromInputs();
-        });
-    }
-
-    retakeToggle.addEventListener('change', (e) => {
-        if (e.target.checked) {
-            retakeArea.classList.remove('d-none');
-            if (retakeList.children.length === 0) {
-                addRetakeItemUI();
-            }
-        } else {
-            retakeArea.classList.add('d-none');
-            retakeList.innerHTML = '';
-        }
-        saveStateFromInputs();
-    });
-
-    addRetakeBtn.addEventListener('click', () => {
-        addRetakeItemUI();
-        saveStateFromInputs();
-    });
-
-    calcTargetBtn.addEventListener('click', () => {
-        triggerHapticFeedback(30);
-        const state = getTargetState();
-        const currentGPA = parseFloat(state.currentGpa) || 0;
-        const currentCredits = parseFloat(state.currentCredits) || 0;
-        const targetGPA = parseFloat(state.targetGpa) || 0;
-        let newCredits = parseFloat(state.newCredits) || 0;
-
-        if (state.creditMode === 'total') {
-            const total = parseFloat(state.totalCredits) || 0;
-            newCredits = Math.max(0, total - currentCredits);
-        }
-
-        const result = calculateTargetResult(currentGPA, currentCredits, targetGPA, newCredits, state.retakes);
-
-        // Show share and export buttons
-        const shareBtn = document.getElementById('share-target-btn');
-        if (shareBtn) shareBtn.classList.remove('d-none');
-        const exportBtn = document.getElementById('export-pdf-btn');
-        if (exportBtn) exportBtn.classList.remove('d-none');
-
-        // Render Result
-        const targetResultContainer = document.getElementById('target-result-container');
-        if (targetResultContainer) {
-            targetResultContainer.className = 'card-body d-flex flex-column p-3 p-md-4';
-
-            // 1. Determine Status
-            let statusIcon = 'bi-check-circle-fill';
-            let statusColor = 'success';
-            let statusMessage = 'Khả thi! Bạn hoàn toàn có thể đạt được.';
-            let statusBadgeClass = 'bg-success-subtle text-success-emphasis border-success-subtle';
-
-            // Determine credits used for calculation (New + Retake)
-            const creditsToStudy = result.totalEffortCredits !== undefined ? result.totalEffortCredits : result.newCredits;
-
-            if (result.requiredGPA > 4.0) {
-                statusIcon = 'bi-x-circle-fill';
-                statusColor = 'danger';
-                statusMessage = 'Không khả thi! GPA yêu cầu vượt quá 4.0.';
-                statusBadgeClass = 'bg-danger-subtle text-danger-emphasis border-danger-subtle';
-            } else if (result.requiredGPA <= 0) {
-                if (creditsToStudy === 0 && result.requiredPoints > 0.01) {
-                    statusIcon = 'bi-exclamation-triangle-fill';
-                    statusColor = 'danger';
-                    statusMessage = 'Không thể đạt được! Hết tín chỉ để cải thiện.';
-                    statusBadgeClass = 'bg-danger-subtle text-danger-emphasis border-danger-subtle';
-                } else {
-                    statusIcon = 'bi-trophy-fill';
-                    statusColor = 'primary';
-                    statusMessage = 'Đã đạt mục tiêu! Hãy duy trì phong độ.';
-                    statusBadgeClass = 'bg-primary-subtle text-primary-emphasis border-primary-subtle';
-                }
-            } else if (result.requiredGPA > 3.6) {
-                statusIcon = 'bi-exclamation-circle-fill';
-                statusColor = 'warning';
-                statusMessage = 'Khó! Cần nỗ lực rất lớn.';
-                statusBadgeClass = 'bg-warning-subtle text-warning-emphasis border-warning-subtle';
-            }
-
-            // 2. Generate Combinations & Scenario
-            let combinationsHTML = '';
-            let scenarioHTML = '';
-            let displayedCount = 0;
-            let totalCount = 0;
-
-            if (result.requiredGPA > 0 && result.requiredGPA <= 4.0 && creditsToStudy > 0) {
-                const combinations = generateGradeCombinations(creditsToStudy, result.requiredPoints);
-                totalCount = combinations.length;
-                const topCombinations = combinations.slice(0, 10);
-                displayedCount = topCombinations.length;
-
-                if (totalCount > 0) {
-                    // Generate Scenario Text from the first (easiest/closest) combination
-                    const scenarioText = generateScenarioText(topCombinations[0]);
-                    scenarioHTML = `
-                        <div class="alert alert-primary border-0 shadow-sm rounded-3 mb-4 py-3 ani-fade-in-up">
-                            <div class="d-flex align-items-center">
-                                <div class="bg-primary text-white rounded-circle me-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 40px; height: 40px;">
-                                    <i class="bi bi-lightbulb-fill"></i>
-                                </div>
-                                <div>
-                                    <h6 class="fw-bold mb-1">Kịch bản gợi ý</h6>
-                                    <p class="mb-0 small">${scenarioText}</p>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-
-                    combinationsHTML = topCombinations.map(c => `
-                        <div class="bg-light rounded-3 p-2 p-md-3 border transition-all">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="badge bg-white text-dark border-0 shadow-sm text-uppercase small px-2">Kết hợp ${c.g1.grade} &amp; ${c.g2.grade}</span>
-                                <div class="text-success fw-bold small">
-                                    <i class="bi bi-record-fill me-1"></i>${c.totalPoints.toFixed(2)}đ
-                                </div>
-                            </div>
-                            <div class="row g-2 align-items-stretch">
-                                <div class="col-5 col-sm-5">
-                                    <div class="p-2 rounded border bg-white position-relative overflow-hidden h-100">
-                                        <div class="position-absolute top-0 start-0 bottom-0 bg-${c.g1.color}" style="width: 3px; opacity: 0.8;"></div>
-                                        <div class="d-flex justify-content-between align-items-center ps-1">
-                                            <span class="fw-bold fs-5 text-${c.g1.color}">${c.g1.grade}</span>
-                                            <span class="badge bg-light text-secondary border-0 p-1 small" style="font-size: 0.6rem !important;">${c.c1} TC</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-2 col-sm-2 d-flex align-items-center justify-content-center text-muted small">
-                                    <i class="bi bi-plus-lg"></i>
-                                </div>
-                                <div class="col-5 col-sm-5">
-                                    <div class="p-2 rounded border bg-white position-relative overflow-hidden h-100">
-                                        <div class="position-absolute top-0 start-0 bottom-0 bg-${c.g2.color}" style="width: 3px; opacity: 0.8;"></div>
-                                        <div class="d-flex justify-content-between align-items-center ps-1">
-                                            <span class="fw-bold fs-5 text-${c.g2.color}">${c.g2.grade}</span>
-                                            <span class="badge bg-light text-secondary border-0 p-1 small" style="font-size: 0.6rem !important;">${c.c2} TC</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    `).join('');
-                } else {
-                    combinationsHTML = '<div class="text-center text-muted small py-3">Không tìm thấy tổ hợp phù hợp.</div>';
-                }
-            }
-
-            // 3. Render Main Content
-            targetResultContainer.innerHTML = `
-                <div class="text-center mb-4 w-100">
-                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-${statusColor} text-white shadow-sm mb-3" style="width: 60px; height: 60px;">
-                        <i class="bi ${statusIcon} fs-2"></i>
-                    </div>
-                    <h6 class="text-uppercase text-secondary fw-bold small letter-spacing-1 mb-2">GPA Trung bình cần đạt</h6>
-                    <div class="display-1 fw-bold text-${statusColor}-emphasis mb-2" id="animated-required-gpa" style="letter-spacing: -2px;">
-                        0.00
-                    </div>
-                    <p class="text-muted fw-medium mb-0">cho <span class="fw-bold text-dark">${creditsToStudy}</span> tín chỉ tiếp theo</p>
-                    <div class="mt-3">
-                        <span class="badge rounded-pill ${statusBadgeClass} px-3 py-2 border">
-                            ${statusMessage}
-                        </span>
-                    </div>
-                </div>
-
-                ${scenarioHTML}
-
-                ${result.requiredGPA > 0 && result.requiredGPA <= 4.0 ? `
-                <div class="px-2 px-md-3 pb-3 border-top mt-2">
-                    <div class="pt-3 mb-3 d-flex align-items-center justify-content-between">
-                        <p class="small fw-bold text-secondary text-uppercase mb-0 d-flex align-items-center">
-                            <i class="bi bi-layers me-2"></i>Các phương án khả thi
-                        </p>
-                        <span class="badge bg-light text-secondary rounded-pill border">${displayedCount} tổ hợp</span>
-                    </div>
-                    <div class="d-flex flex-column gap-2 gap-md-3 overflow-auto pe-1 custom-scrollbar" style="max-height: 500px;">
-                        ${combinationsHTML}
-                    </div>
-                    <div class="mt-2 small text-muted text-center fst-italic">Danh sách sắp xếp theo mức độ đạt được từ dễ - khó</div>
-                </div>
-                ` : ''}
-
-                <div class="mt-4 border-top pt-3">
-                    <button class="btn btn-light w-100 d-flex align-items-center justify-content-between text-secondary mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#algoDetails" aria-expanded="false" aria-controls="algoDetails">
-                        <span class="d-flex align-items-center gap-2">
-                            <div class="bg-light text-secondary p-1 rounded transition-colors">
-                                <i class="bi bi-calculator"></i>
-                            </div>
-                            Chi tiết thuật toán tính điểm
-                        </span>
-                        <i class="bi bi-chevron-down"></i>
-                    </button>
-                    <div class="collapse" id="algoDetails">
-                        <div class="position-relative">
-                            <div class="position-absolute start-0 top-0 bottom-0 border-start border-2 ms-3" style="z-index: 0;"></div>
-                            
-                            <!-- Step 1: Target Total Points -->
-                            <div class="d-flex gap-3 mb-3 position-relative" style="z-index: 1;">
-                                <div class="rounded-circle bg-white border d-flex align-items-center justify-content-center flex-shrink-0 shadow-sm" style="width: 32px; height: 32px;">
-                                    <span class="small fw-bold text-secondary">1</span>
-                                </div>
-                                <div class="card flex-grow-1 border shadow-sm">
-                                    <div class="card-body p-2">
-                                        <div class="small text-muted fw-medium mb-1">Tổng điểm hệ 4 cần đạt</div>
-                                        <div class="d-flex justify-content-between align-items-end">
-                                            <span class="small text-muted">(${targetGPA} GPA × ${result.totalFutureCredits} TC)</span>
-                                            <span class="fw-bold font-monospace text-dark">${result.targetTotalPoints.toFixed(2)}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Step 2: Current Accumulated Points -->
-                            <div class="d-flex gap-3 mb-3 position-relative" style="z-index: 1;">
-                                <div class="rounded-circle bg-white border d-flex align-items-center justify-content-center flex-shrink-0 shadow-sm" style="width: 32px; height: 32px;">
-                                    <span class="small fw-bold text-secondary">2</span>
-                                </div>
-                                <div class="card flex-grow-1 border shadow-sm">
-                                    <div class="card-body p-2">
-                                        <div class="small text-muted fw-medium mb-1">Điểm tích lũy hiện có</div>
-                                        <div class="d-flex justify-content-between align-items-end">
-                                            <span class="small text-muted">(${currentCredits} TC)</span>
-                                            <span class="fw-bold font-monospace text-dark">${result.effectiveCurrentPoints.toFixed(2)}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Step 3: Final Calculation -->
-                            <div class="d-flex gap-3 position-relative" style="z-index: 1;">
-                                <div class="rounded-circle bg-primary border-4 border-primary-subtle d-flex align-items-center justify-content-center flex-shrink-0 shadow-sm" style="width: 32px; height: 32px;">
-                                    <span class="small fw-bold text-white">3</span>
-                                </div>
-                                <div class="card flex-grow-1 bg-primary text-white border-0 shadow">
-                                    <div class="card-body p-3">
-                                        <div class="d-flex justify-content-between align-items-start mb-3">
-                                            <div>
-                                                <div class="small text-white text-uppercase fw-bold opacity-75">Điểm cần tích lũy thêm</div>
-                                                <div class="h4 font-monospace fw-bold mb-0">${result.requiredPoints.toFixed(2)}</div>
-                                            </div>
-                                            <div class="text-end">
-                                                <div class="small text-white opacity-75">Tổng tín chỉ học</div>
-                                                <div class="fw-bold">${result.newCredits} TC</div>
-                                            </div>
-                                        </div>
-                                        <div class="border-top border-white-50 pt-3 d-flex justify-content-between align-items-center">
-                                            <span class="small fw-medium text-white opacity-75">GPA Trung bình cần đạt</span>
-                                            <span class="badge bg-white bg-opacity-25 px-2 py-1 rounded font-monospace">${result.requiredPoints.toFixed(2)} / ${result.newCredits} = ${result.requiredGPA.toFixed(2)}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            // Suggestions for Retake (if impossible)
-            if (result.requiredGPA > 4.0) {
-                const deficitPoints = result.requiredPoints - (4.0 * result.newCredits);
-                const { semesters } = getManualState();
-                const suggestions = generateRetakeSuggestions(deficitPoints, targetGPA, semesters);
-
-                if (suggestions.length > 0) {
-                    targetResultContainer.innerHTML += `
-                        <div class="mt-4 border-top pt-3">
-                            <div class="alert alert-warning border-warning-subtle bg-warning-subtle text-dark mb-3">
-                                <div class="d-flex">
-                                    <i class="bi bi-exclamation-triangle-fill text-warning-emphasis me-2 fs-5"></i>
-                                    <div>
-                                        <strong>Mục tiêu hiện tại quá cao!</strong>
-                                        <div class="small mt-1">Ngay cả khi bạn đạt 4.0 cho tất cả các môn còn lại, bạn vẫn thiếu khoảng <strong>${deficitPoints.toFixed(2)}</strong> điểm tích lũy.</div>
-                                        <div class="small mt-1">Dưới đây là các phương án <strong>học cải thiện</strong> các môn điểm thấp trong quá khứ để bù đắp số điểm còn thiếu:</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <h6 class="text-danger fw-bold mb-3"><i class="bi bi-lightbulb-fill me-2"></i>Gợi ý môn học lại tối ưu:</h6>
-                            <div class="list-group">
-                                ${suggestions.map((s, index) => `
-                                    <div class="list-group-item list-group-item-action border-danger-subtle bg-white mb-2 rounded shadow-sm">
-                                        <div class="d-flex w-100 justify-content-between align-items-center mb-2">
-                                            <span class="badge bg-danger text-white rounded-pill">Phương án ${index + 1}</span>
-                                            <span class="text-success fw-bold small"><i class="bi bi-graph-up-arrow me-1"></i>Tăng thêm ${s.totalGain.toFixed(2)} điểm</span>
-                                        </div>
-                                        
-                                        ${s.courses.map(c => `
-                                            <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2 last-no-border">
-                                                <div>
-                                                    <div class="fw-bold text-dark">${c.name}</div>
-                                                    <div class="small text-muted">${c.semName} • ${c.credits} TC</div>
-                                                </div>
-                                                <div class="d-flex align-items-center bg-light rounded px-2 py-1">
-                                                    <span class="fw-bold text-secondary">${c.grade}</span>
-                                                    <i class="bi bi-arrow-right-short mx-1 text-muted"></i>
-                                                    <span class="fw-bold text-success">A (4.0)</span>
-                                                </div>
-                                            </div>
-                                        `).join('')}
-                                        
-                                        <div class="small text-muted fst-italic mt-1">
-                                            <i class="bi bi-info-circle me-1"></i>Tổng tín chỉ học lại: <strong>${s.totalCredits} TC</strong>
-                                        </div>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                    `;
-                }
-            }
-
-            // Hiệu ứng "Count-up" cho GPA trung bình cần đạt
-            const gpaTargetEl = document.getElementById('animated-required-gpa');
-            if (gpaTargetEl) {
-                const targetValue = result.requiredGPA > 0 ? result.requiredGPA : 0;
-                // Nếu giá trị > 0 mới chạy hiệu ứng, nếu là "Đạt" hoặc "---" thì đã set ở HTML
-                if (result.requiredGPA > 0) {
-                    animateValue(gpaTargetEl, 0, targetValue, 1200, 2);
-                } else if (result.requiredGPA <= 0 && result.requiredPoints <= 0.01) {
-                    gpaTargetEl.innerHTML = 'Đạt';
-                } else {
-                    gpaTargetEl.innerHTML = '---';
-                }
-            }
-        }
-    });
-
-    if (shareTargetBtn) {
-        shareTargetBtn.addEventListener('click', () => {
-            const state = getTargetState();
-            const shareUrl = generateShareUrl(state);
-
-            // Copy to clipboard
-            navigator.clipboard.writeText(shareUrl).then(() => {
-                const originalText = shareTargetBtn.innerHTML;
-                shareTargetBtn.innerHTML = '<i class="bi bi-check-lg me-1"></i>Đã chép!';
-                shareTargetBtn.classList.replace('btn-outline-primary', 'btn-success');
-
-                setTimeout(() => {
-                    shareTargetBtn.innerHTML = originalText;
-                    shareTargetBtn.classList.replace('btn-success', 'btn-outline-primary');
-                }, 2000);
-            }).catch(err => {
-                console.error('Không thể sao chép: ', err);
-                alert('Không thể sao chép liên kết. Bạn có thể chép thủ công từ thanh địa chỉ.');
-            });
-        });
-    }
-
-    if (exportPdfBtn) {
-        exportPdfBtn.addEventListener('click', exportTargetToPDF);
-    }
+  }).catch(err => {
+    console.error('Failed to copy:', err);
+    alert('Không thể sao chép liên kết. Bạn có thể chép thủ công từ thanh địa chỉ.');
+  });
 }
 
 async function exportTargetToPDF() {
-    const targetElement = document.getElementById('target-result-container');
-    const btn = document.getElementById('export-pdf-btn');
-    if (!targetElement || !btn) return;
+  const targetElement = document.getElementById('target-result-container');
+  const btn = document.getElementById('export-pdf-btn');
+  if (!targetElement || !btn) return;
 
-    const originalBtnContent = btn.innerHTML;
-    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Đang xử lý...';
-    btn.disabled = true;
+  const originalBtnContent = btn.innerHTML;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Đang xử lý...';
+  btn.disabled = true;
 
-    try {
-        const { jsPDF } = window.jspdf;
+  try {
+    const { jsPDF } = window.jspdf;
 
-        // Optimize for capture: Remove scrollbars if any, ensure full visibility
-        const originalMaxHeight = targetElement.style.maxHeight;
-        const scrollableDiv = targetElement.querySelector('.custom-scrollbar');
-        let originalScrollHeight = '';
-        if (scrollableDiv) {
-            originalScrollHeight = scrollableDiv.style.maxHeight;
-            scrollableDiv.style.maxHeight = 'none';
-        }
-
-        const canvas = await html2canvas(targetElement, {
-            scale: 2, // Higher quality
-            useCORS: true,
-            backgroundColor: document.documentElement.getAttribute('data-bs-theme') === 'dark' ? '#212529' : '#ffffff',
-            logging: false
-        });
-
-        // Restore styles
-        if (scrollableDiv) scrollableDiv.style.maxHeight = originalScrollHeight;
-
-        const imgData = canvas.toDataURL('image/png');
-
-        // Dynamic height to fit everything in one page
-        const imgWidth = 210; // mm (A4 width)
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-        const margin = 10;
-
-        // Create PDF with custom size [width, height]
-        const pdf = new jsPDF({
-            orientation: 'portrait',
-            unit: 'mm',
-            format: [imgWidth, imgHeight + (margin * 2)]
-        });
-
-        pdf.addImage(imgData, 'PNG', 0, margin, imgWidth, imgHeight);
-
-        const date = new Date().toLocaleDateString('vi-VN').replace(/\//g, '-');
-        pdf.save(`Lo-Trinh-GPA-${date}.pdf`);
-
-    } catch (error) {
-        console.error('PDF Export Error:', error);
-        alert('Có lỗi xảy ra khi xuất PDF. Vui lòng thử lại.');
-    } finally {
-        btn.innerHTML = originalBtnContent;
-        btn.disabled = false;
+    // Optimize for capture
+    const scrollableDiv = targetElement.querySelector('.custom-scrollbar');
+    let originalScrollHeight = '';
+    if (scrollableDiv) {
+      originalScrollHeight = scrollableDiv.style.maxHeight;
+      scrollableDiv.style.maxHeight = 'none';
     }
+
+    const canvas = await html2canvas(targetElement, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: document.documentElement.getAttribute('data-bs-theme') === 'dark' ? '#212529' : '#ffffff',
+      logging: false
+    });
+
+    if (scrollableDiv) scrollableDiv.style.maxHeight = originalScrollHeight;
+
+    const imgData = canvas.toDataURL('image/png');
+    const imgWidth = 210; // A4 width in mm
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    const margin = 10;
+
+    const pdf = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: [imgWidth, imgHeight + (margin * 2)]
+    });
+
+    pdf.addImage(imgData, 'PNG', 0, margin, imgWidth, imgHeight);
+
+    const date = new Date().toLocaleDateString('vi-VN').replace(/\//g, '-');
+    pdf.save(`Lo-Trinh-GPA-${date}.pdf`);
+
+  } catch (error) {
+    console.error('PDF Export Error:', error);
+    alert('Có lỗi xảy ra khi xuất PDF. Vui lòng thử lại.');
+  } finally {
+    btn.innerHTML = originalBtnContent;
+    btn.disabled = false;
+  }
 }
 
 function addRetakeItemUI(savedData = null) {
-    const retakeList = document.getElementById('retake-list');
-    const item = document.createElement('div');
-    item.className = 'd-flex gap-2 mb-2 align-items-center flex-nowrap';
+  const retakeList = document.getElementById('retake-list');
+  if (!retakeList) return;
 
-    const dGrade = GRADE_SCALE.find(g => g.grade === 'D');
-    const defaultD_GPA = dGrade ? dGrade.gpa : 1.0;
-    const defaultGrade = savedData ? savedData.oldGrade : defaultD_GPA;
-    const defaultCredits = savedData ? savedData.credits : 3;
+  const item = document.createElement('div');
+  item.className = 'd-flex gap-2 mb-2 align-items-center flex-nowrap';
 
-    item.innerHTML = `
-        <div class="input-group flex-grow-1" style="min-width: 0;">
-            <span class="input-group-text bg-light text-muted small px-2">Điểm cũ</span>
-            <select class="form-select retake-old-grade" aria-label="Old Grade" style="text-overflow: ellipsis;">
-                ${GRADE_SCALE
-            .filter(g => !['A+', 'A', 'B+', 'B'].includes(g.grade))
-            .map(g => `<option value="${g.gpa}" ${Math.abs(g.gpa - defaultGrade) < 0.01 ? 'selected' : ''}>${g.grade} (${g.gpa})</option>`).join('')}
-            </select>
-        </div>
-        <div class="input-group flex-nowrap" style="width: 90px; flex-shrink: 0;">
-            <button class="btn btn-light border text-muted small px-2 btn-decrement" type="button">-</button>
-            <input type="number" class="form-control retake-credits text-center px-0 border-start-0 border-end-0" placeholder="3" value="${defaultCredits}" min="1" max="10" readonly>
-            <button class="btn btn-light border text-muted small px-2 btn-increment" type="button">+</button>
-        </div>
-        <button class="btn btn-light text-danger border-0 delete-retake-btn p-2 flex-shrink-0" type="button"><i class="bi bi-trash"></i></button>
-    `;
+  const dGrade = GRADE_SCALE.find(g => g.grade === 'D');
+  const defaultD_GPA = dGrade ? dGrade.gpa : 1.0;
+  const defaultGrade = savedData ? savedData.oldGrade : defaultD_GPA;
+  const defaultCredits = savedData ? savedData.credits : 3;
 
-    const select = item.querySelector('.retake-old-grade');
-    const input = item.querySelector('.retake-credits');
-    const btnDec = item.querySelector('.btn-decrement');
-    const btnInc = item.querySelector('.btn-increment');
+  item.innerHTML = `
+    <div class="input-group flex-grow-1" style="min-width: 0;">
+      <span class="input-group-text bg-light text-muted small px-2">Điểm cũ</span>
+      <select class="form-select retake-old-grade" aria-label="Old Grade" style="text-overflow: ellipsis;">
+        ${GRADE_SCALE
+          .filter(g => !['A+', 'A', 'B+', 'B'].includes(g.grade))
+          .map(g => `<option value="${g.gpa}" ${Math.abs(g.gpa - defaultGrade) < 0.01 ? 'selected' : ''}>${g.grade} (${g.gpa})</option>`)
+          .join('')}
+      </select>
+    </div>
+    <div class="input-group flex-nowrap" style="width: 90px; flex-shrink: 0;">
+      <button class="btn btn-light border text-muted small px-2 btn-decrement" type="button">-</button>
+      <input type="number" class="form-control retake-credits text-center px-0 border-start-0 border-end-0" placeholder="3" value="${defaultCredits}" min="1" max="10" readonly>
+      <button class="btn btn-light border text-muted small px-2 btn-increment" type="button">+</button>
+    </div>
+    <button class="btn btn-light text-danger border-0 delete-retake-btn p-2 flex-shrink-0" type="button"><i class="bi bi-trash"></i></button>
+  `;
 
-    const triggerSave = () => {
-        const currentGpaInput = document.getElementById('current-gpa');
-        if (currentGpaInput) currentGpaInput.dispatchEvent(new Event('input'));
-    };
+  const select = item.querySelector('.retake-old-grade');
+  const input = item.querySelector('.retake-credits');
+  const btnDec = item.querySelector('.btn-decrement');
+  const btnInc = item.querySelector('.btn-increment');
 
-    select.addEventListener('change', triggerSave);
+  const triggerSave = () => {
+    const currentGpaInput = document.getElementById('current-gpa');
+    if (currentGpaInput) currentGpaInput.dispatchEvent(new Event('input'));
+  };
 
-    btnDec.addEventListener('click', () => {
-        let val = parseFloat(input.value) || 0;
-        if (val > 1) {
-            input.value = val - 1;
-            triggerSave();
-        }
-    });
+  select.addEventListener('change', triggerSave);
 
-    btnInc.addEventListener('click', () => {
-        let val = parseFloat(input.value) || 0;
-        if (val < 10) {
-            input.value = val + 1;
-            triggerSave();
-        }
-    });
+  btnDec.addEventListener('click', () => {
+    let val = parseFloat(input.value) || 0;
+    if (val > 1) {
+      input.value = val - 1;
+      triggerSave();
+    }
+  });
 
-    item.querySelector('.delete-retake-btn').addEventListener('click', () => {
-        item.remove();
-        triggerSave();
-    });
+  btnInc.addEventListener('click', () => {
+    let val = parseFloat(input.value) || 0;
+    if (val < 10) {
+      input.value = val + 1;
+      triggerSave();
+    }
+  });
 
-    retakeList.appendChild(item);
+  item.querySelector('.delete-retake-btn').addEventListener('click', () => {
+    item.remove();
+    triggerSave();
+  });
+
+  retakeList.appendChild(item);
 }
 
 // ==========================================
-// TAB: TÍNH ĐIỂM MÔN HỌC (COURSE GRADE)
+// Tab: Course Grade
 // ==========================================
 
 export function initCourseGradeTab() {
-    const processScoreInput = document.getElementById('process-score-input');
-    const processScoreRange = document.getElementById('process-score-range');
-    const accumulatedScoreDisplay = document.getElementById('accumulated-score');
-    const scoreToPassDisplay = document.getElementById('score-to-pass');
-    const courseGradeResults = document.getElementById('course-grade-results');
+  const elements = {
+    processScoreInput: document.getElementById('process-score-input'),
+    processScoreRange: document.getElementById('process-score-range'),
+    accumulatedScoreDisplay: document.getElementById('accumulated-score'),
+    scoreToPassDisplay: document.getElementById('score-to-pass'),
+    courseGradeResults: document.getElementById('course-grade-results')
+  };
 
-    if (!processScoreInput) return;
+  if (!elements.processScoreInput) return;
 
-    function calculateAndRender() {
-        const selectedRadio = document.querySelector('input[name="btnradio"]:checked');
-        const processWeight = parseFloat(selectedRadio ? selectedRadio.value : 0.4);
-        const finalWeight = 1 - processWeight;
+  loadCourseGradeState(elements);
+  calculateAndRenderCourseGrade(elements);
+  setupCourseGradeListeners(elements);
+}
 
-        let processScore = parseFloat(processScoreInput.value);
-        if (isNaN(processScore)) processScore = 0;
-
-        const accumulated = processScore * processWeight;
-        accumulatedScoreDisplay.textContent = accumulated.toFixed(2);
-
-        const passGrade = GRADE_SCALE.find(g => g.grade === 'D');
-        const passTarget = passGrade ? passGrade.min : 4.0;
-        let requiredPass = (passTarget - accumulated) / finalWeight;
-
-        if (requiredPass <= 0) {
-            scoreToPassDisplay.textContent = "Đã qua";
-        } else if (requiredPass > 10) {
-            scoreToPassDisplay.textContent = "Không thể";
-        } else {
-            scoreToPassDisplay.textContent = requiredPass.toFixed(2);
-        }
-
-        const resultsHTML = GRADE_SCALE.map(grade => {
-            const targetScore = grade.min;
-            let requiredFinal = (targetScore - accumulated) / finalWeight;
-
-            let statusClass = '';
-            let progressColor = '';
-            let message = '';
-            let progressPercent = 0;
-            let badgeColor = 'bg-secondary';
-
-            if (grade.grade.startsWith('A')) badgeColor = 'bg-success';
-            else if (grade.grade.startsWith('B')) badgeColor = 'bg-primary';
-            else if (grade.grade.startsWith('C')) badgeColor = 'bg-info text-dark';
-            else if (grade.grade.startsWith('D')) badgeColor = 'bg-warning text-dark';
-            else badgeColor = 'bg-danger';
-
-            if (requiredFinal <= 0) {
-                requiredFinal = 0;
-                if (grade.gpa === 0) {
-                    message = `<span class="text-danger fw-bold small"><i class="bi bi-x-circle-fill me-1"></i>Rớt</span>`;
-                    statusClass = 'bg-danger-subtle border-danger-subtle';
-                    progressColor = 'bg-danger';
-                } else {
-                    message = `<span class="text-success fw-bold small"><i class="bi bi-check-circle-fill me-1"></i>Đạt</span>`;
-                    statusClass = 'bg-success-subtle border-success-subtle';
-                    progressColor = 'bg-success';
-                }
-                progressPercent = 100;
-            } else if (requiredFinal > 10) {
-                message = `<span class="text-muted small">Không thể (>10)</span>`;
-                statusClass = 'bg-light opacity-75 border-light';
-                progressColor = 'bg-secondary';
-                progressPercent = 0;
-            } else {
-                message = `<div class="d-flex align-items-baseline"><span class="text-muted small me-2">Cần:</span><strong class="fs-5 text-dark">${requiredFinal.toFixed(2)}</strong></div>`;
-                statusClass = 'bg-white border-light-subtle shadow-sm';
-
-                if (requiredFinal < 5) progressColor = 'bg-success';
-                else if (requiredFinal < 7) progressColor = 'bg-info';
-                else if (requiredFinal < 8.5) progressColor = 'bg-warning';
-                else progressColor = 'bg-danger';
-
-                progressPercent = (requiredFinal / 10) * 100;
-            }
-
-            return `
-                <div class="p-3 rounded-3 border ${statusClass} mb-2">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="d-flex align-items-center">
-                            <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-sm ${badgeColor} me-3" 
-                                 style="width: 40px; height: 40px; font-size: 1rem;">
-                                ${grade.grade}
-                            </div>
-                            <div class="d-flex flex-column">
-                                <span class="fw-bold text-dark small">GPA ${grade.gpa}</span>
-                                <span class="text-muted" style="font-size: 0.7rem;">${grade.min} - ${grade.max}</span>
-                            </div>
-                        </div>
-                        <div class="text-end">
-                            ${message}
-                        </div>
-                    </div>
-                    ${requiredFinal <= 10 && requiredFinal > 0 ? `
-                    <div class="progress mt-2" style="height: 4px;">
-                        <div class="progress-bar ${progressColor}" role="progressbar" style="width: ${progressPercent}%" aria-valuenow="${progressPercent}" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                    ` : ''}
-                </div>
-            `;
-        }).join('');
-
-        courseGradeResults.innerHTML = resultsHTML;
+function loadCourseGradeState(elements) {
+  const saved = localStorage.getItem('courseGradeState');
+  if (saved) {
+    try {
+      const state = JSON.parse(saved);
+      if (state.ratio) {
+        const radio = document.querySelector(`input[name="btnradio"][value="${state.ratio}"]`);
+        if (radio) radio.checked = true;
+      }
+      if (state.processScore !== undefined) {
+        elements.processScoreInput.value = state.processScore;
+        elements.processScoreRange.value = state.processScore;
+      }
+    } catch (e) {
+      console.error('Failed to load course grade state:', e);
     }
+  } else {
+    elements.processScoreInput.value = 7.0;
+    elements.processScoreRange.value = 7.0;
+  }
+}
 
-    function saveState() {
-        const state = {
-            ratio: document.querySelector('input[name="btnradio"]:checked')?.value,
-            processScore: processScoreInput.value
-        };
-        localStorage.setItem('courseGradeState', JSON.stringify(state));
+function setupCourseGradeListeners(elements) {
+  const radioButtons = document.querySelectorAll('input[name="btnradio"]');
+  radioButtons.forEach(radio => {
+    radio.addEventListener('change', () => {
+      calculateAndRenderCourseGrade(elements);
+      saveCourseGradeState(elements);
+    });
+  });
+
+  elements.processScoreRange.addEventListener('input', (e) => {
+    elements.processScoreInput.value = e.target.value;
+    calculateAndRenderCourseGrade(elements);
+    saveCourseGradeState(elements);
+  });
+
+  elements.processScoreInput.addEventListener('input', (e) => {
+    let val = parseFloat(e.target.value);
+    if (val > 10) val = 10;
+    if (val < 0) val = 0;
+
+    if (!isNaN(val)) {
+      elements.processScoreRange.value = val;
+      calculateAndRenderCourseGrade(elements);
+      saveCourseGradeState(elements);
     }
+  });
+}
 
-    function loadState() {
-        const saved = localStorage.getItem('courseGradeState');
-        if (saved) {
-            try {
-                const state = JSON.parse(saved);
-                if (state.ratio) {
-                    const radio = document.querySelector(`input[name="btnradio"][value="${state.ratio}"]`);
-                    if (radio) radio.checked = true;
-                }
-                if (state.processScore !== undefined) {
-                    processScoreInput.value = state.processScore;
-                    processScoreRange.value = state.processScore;
-                }
-            } catch (e) { console.error(e); }
-        } else {
-            processScoreInput.value = 7.0;
-            processScoreRange.value = 7.0;
-        }
+function calculateAndRenderCourseGrade(elements) {
+  const selectedRadio = document.querySelector('input[name="btnradio"]:checked');
+  const processWeight = parseFloat(selectedRadio?.value) || 0.4;
+  const finalWeight = 1 - processWeight;
+
+  let processScore = parseFloat(elements.processScoreInput.value) || 0;
+
+  const accumulated = processScore * processWeight;
+  elements.accumulatedScoreDisplay.textContent = accumulated.toFixed(2);
+
+  const passGrade = GRADE_SCALE.find(g => g.grade === 'D');
+  const passTarget = passGrade ? passGrade.min : 4.0;
+  let requiredPass = (passTarget - accumulated) / finalWeight;
+
+  if (requiredPass <= 0) {
+    elements.scoreToPassDisplay.textContent = "Đã qua";
+  } else if (requiredPass > 10) {
+    elements.scoreToPassDisplay.textContent = "Không thể";
+  } else {
+    elements.scoreToPassDisplay.textContent = requiredPass.toFixed(2);
+  }
+
+  elements.courseGradeResults.innerHTML = GRADE_SCALE.map(grade => 
+    renderGradeCard(grade, accumulated, finalWeight)
+  ).join('');
+}
+
+function renderGradeCard(grade, accumulated, finalWeight) {
+  const targetScore = grade.min;
+  let requiredFinal = (targetScore - accumulated) / finalWeight;
+
+  const badgeColor = getBadgeColor(grade.grade);
+  const { statusClass, progressColor, message, progressPercent } = getGradeStatus(requiredFinal, grade.gpa);
+
+  return `
+    <div class="p-3 rounded-3 border ${statusClass} mb-2">
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center">
+          <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-sm ${badgeColor} me-3" 
+               style="width: 40px; height: 40px; font-size: 1rem;">
+            ${grade.grade}
+          </div>
+          <div class="d-flex flex-column">
+            <span class="fw-bold text-dark small">GPA ${grade.gpa}</span>
+            <span class="text-muted" style="font-size: 0.7rem;">${grade.min} - ${grade.max}</span>
+          </div>
+        </div>
+        <div class="text-end">
+          ${message}
+        </div>
+      </div>
+      ${requiredFinal <= 10 && requiredFinal > 0 ? `
+      <div class="progress mt-2" style="height: 4px;">
+        <div class="progress-bar ${progressColor}" role="progressbar" style="width: ${progressPercent}%" aria-valuenow="${progressPercent}" aria-valuemin="0" aria-valuemax="100"></div>
+      </div>
+      ` : ''}
+    </div>
+  `;
+}
+
+function getBadgeColor(grade) {
+  if (grade.startsWith('A')) return 'bg-success';
+  if (grade.startsWith('B')) return 'bg-primary';
+  if (grade.startsWith('C')) return 'bg-info text-dark';
+  if (grade.startsWith('D')) return 'bg-warning text-dark';
+  return 'bg-danger';
+}
+
+function getGradeStatus(requiredFinal, gpa) {
+  if (requiredFinal <= 0) {
+    if (gpa === 0) {
+      return {
+        message: `<span class="text-danger fw-bold small"><i class="bi bi-x-circle-fill me-1"></i>Rớt</span>`,
+        statusClass: 'bg-danger-subtle border-danger-subtle',
+        progressColor: 'bg-danger',
+        progressPercent: 100
+      };
     }
+    return {
+      message: `<span class="text-success fw-bold small"><i class="bi bi-check-circle-fill me-1"></i>Đạt</span>`,
+      statusClass: 'bg-success-subtle border-success-subtle',
+      progressColor: 'bg-success',
+      progressPercent: 100
+    };
+  }
 
-    loadState();
-    calculateAndRender();
+  if (requiredFinal > 10) {
+    return {
+      message: `<span class="text-muted small">Không thể (>10)</span>`,
+      statusClass: 'bg-light opacity-75 border-light',
+      progressColor: 'bg-secondary',
+      progressPercent: 0
+    };
+  }
 
-    const radioButtons = document.querySelectorAll('input[name="btnradio"]');
-    radioButtons.forEach(radio => {
-        radio.addEventListener('change', () => {
-            calculateAndRender();
-            saveState();
-        });
-    });
+  let progressColor = 'bg-success';
+  if (requiredFinal >= 5) progressColor = 'bg-info';
+  if (requiredFinal >= 7) progressColor = 'bg-warning';
+  if (requiredFinal >= 8.5) progressColor = 'bg-danger';
 
-    processScoreRange.addEventListener('input', (e) => {
-        processScoreInput.value = e.target.value;
-        calculateAndRender();
-        saveState();
-    });
+  return {
+    message: `<div class="d-flex align-items-baseline"><span class="text-muted small me-2">Cần:</span><strong class="fs-5 text-dark">${requiredFinal.toFixed(2)}</strong></div>`,
+    statusClass: 'bg-white border-light-subtle shadow-sm',
+    progressColor,
+    progressPercent: (requiredFinal / 10) * 100
+  };
+}
 
-    processScoreInput.addEventListener('input', (e) => {
-        let val = parseFloat(e.target.value);
-        if (val > 10) val = 10;
-        if (val < 0) val = 0;
-
-        if (!isNaN(val)) {
-            processScoreRange.value = val;
-            calculateAndRender();
-            saveState();
-        }
-    });
+function saveCourseGradeState(elements) {
+  const state = {
+    ratio: document.querySelector('input[name="btnradio"]:checked')?.value,
+    processScore: elements.processScoreInput.value
+  };
+  localStorage.setItem('courseGradeState', JSON.stringify(state));
 }
 
 // ==========================================
-// OTHER EVENTS
+// Other Event Handlers
 // ==========================================
 
 export function initContactButton() {
-    const wrapper = document.getElementById('contact-floating-wrapper');
-    const closeBtn = document.getElementById('close-contact-btn');
+  const wrapper = document.getElementById('contact-floating-wrapper');
+  const closeBtn = document.getElementById('close-contact-btn');
 
-    if (!wrapper || !closeBtn) return;
+  if (!wrapper || !closeBtn) return;
 
-    closeBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        wrapper.classList.add('d-none');
-        wrapper.style.setProperty('display', 'none', 'important');
+  closeBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    wrapper.classList.add('d-none');
+    wrapper.style.setProperty('display', 'none', 'important');
+  });
+
+  const contactModal = document.getElementById('contactModal');
+  if (contactModal) {
+    contactModal.addEventListener('shown.bs.modal', () => {
+      fetchVisitCount();
     });
-
-    const contactModal = document.getElementById('contactModal');
-    if (contactModal) {
-        contactModal.addEventListener('shown.bs.modal', () => {
-            fetchVisitCount();
-        });
-    }
+  }
 }
 
 export function fetchVisitCount() {
-    const containers = document.querySelectorAll('.visit-count-container');
-    const countSpans = document.querySelectorAll('.visit-count-value');
+  const containers = document.querySelectorAll('.visit-count-container');
+  const countSpans = document.querySelectorAll('.visit-count-value');
 
-    countSpans.forEach(span => span.textContent = '...');
+  countSpans.forEach(span => span.textContent = '...');
 
-    const url = `https://tienxdun.goatcounter.com/counter/TOTAL.json?rnd=${Math.random()}`;
+  const url = `${API_CONFIG.GOAT_COUNTER_URL}?rnd=${Math.random()}`;
 
-    fetch(url)
-        .then(response => {
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-            return response.json();
-        })
-        .then(data => {
-            if (data && data.count) {
-                countSpans.forEach(span => span.textContent = data.count);
-                containers.forEach(container => container.style.removeProperty('display'));
-            }
-        })
-        .catch(error => {
-            console.warn('Không thể lấy lượt truy cập:', error);
-            containers.forEach(container => container.style.display = 'none');
-        });
+  fetch(url)
+    .then(response => {
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      return response.json();
+    })
+    .then(data => {
+      if (data?.count) {
+        countSpans.forEach(span => span.textContent = data.count);
+        containers.forEach(container => container.style.removeProperty('display'));
+      }
+    })
+    .catch(error => {
+      console.warn('Failed to fetch visit count:', error);
+      containers.forEach(container => container.style.display = 'none');
+    });
 }
 
 export function initThemeToggle() {
-    const toggleBtns = document.querySelectorAll('#theme-toggle-mobile, #theme-toggle-desktop, #theme-toggle');
-    const navbar = document.querySelector('.navbar');
+  const toggleBtns = document.querySelectorAll('#theme-toggle-mobile, #theme-toggle-desktop, #theme-toggle');
+  const navbar = document.querySelector('.navbar');
 
-    const getPreferredTheme = () => {
-        const storedTheme = localStorage.getItem('theme');
-        if (storedTheme) return storedTheme;
-        return 'light';
-    };
+  const getPreferredTheme = () => localStorage.getItem('theme') || 'light';
 
-    const setTheme = (theme) => {
-        document.documentElement.setAttribute('data-bs-theme', theme);
-        localStorage.setItem('theme', theme);
-
-        toggleBtns.forEach(btn => {
-            const icon = btn.querySelector('i');
-            if (theme === 'dark') {
-                icon.classList.remove('bi-moon-stars-fill');
-                icon.classList.add('bi-sun-fill');
-                btn.classList.replace('btn-light', 'btn-dark');
-                btn.classList.replace('border', 'border-secondary');
-            } else {
-                icon.classList.remove('bi-sun-fill');
-                icon.classList.add('bi-moon-stars-fill');
-                btn.classList.replace('btn-dark', 'btn-light');
-                btn.classList.replace('border-secondary', 'border');
-            }
-        });
-
-        if (navbar) {
-            if (theme === 'dark') {
-                navbar.classList.remove('navbar-light', 'bg-white');
-                navbar.classList.add('navbar-dark', 'bg-dark');
-            } else {
-                navbar.classList.remove('navbar-dark', 'bg-dark');
-                navbar.classList.add('navbar-light', 'bg-white');
-            }
-        }
-    };
-
-    setTheme(getPreferredTheme());
+  const setTheme = (theme) => {
+    document.documentElement.setAttribute('data-bs-theme', theme);
+    localStorage.setItem('theme', theme);
 
     toggleBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const currentTheme = document.documentElement.getAttribute('data-bs-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            setTheme(newTheme);
-        });
+      const icon = btn.querySelector('i');
+      if (theme === 'dark') {
+        icon?.classList.remove('bi-moon-stars-fill');
+        icon?.classList.add('bi-sun-fill');
+        btn.classList.replace('btn-light', 'btn-dark');
+        btn.classList.replace('border', 'border-secondary');
+      } else {
+        icon?.classList.remove('bi-sun-fill');
+        icon?.classList.add('bi-moon-stars-fill');
+        btn.classList.replace('btn-dark', 'btn-light');
+        btn.classList.replace('border-secondary', 'border');
+      }
     });
+
+    if (navbar) {
+      if (theme === 'dark') {
+        navbar.classList.remove('navbar-light', 'bg-white');
+        navbar.classList.add('navbar-dark', 'bg-dark');
+      } else {
+        navbar.classList.remove('navbar-dark', 'bg-dark');
+        navbar.classList.add('navbar-light', 'bg-white');
+      }
+    }
+  };
+
+  setTheme(getPreferredTheme());
+
+  toggleBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const currentTheme = document.documentElement.getAttribute('data-bs-theme');
+      setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+    });
+  });
 }
 
 export function initUserGuide() {
-    const modalEl = document.getElementById('userGuideModal');
-    if (!modalEl) return;
+  const modalEl = document.getElementById('userGuideModal');
+  if (!modalEl) return;
 
-    const headerCloseBtn = document.getElementById('guideHeaderCloseBtn');
-    const checkContainer = document.getElementById('guideCheckContainer');
-    const checkbox = document.getElementById('guideUnderstandCheck');
-    const confirmBtn = document.getElementById('guideConfirmBtn');
+  const headerCloseBtn = document.getElementById('guideHeaderCloseBtn');
+  const checkContainer = document.getElementById('guideCheckContainer');
+  const checkbox = document.getElementById('guideUnderstandCheck');
+  const confirmBtn = document.getElementById('guideConfirmBtn');
 
-    if (checkbox && confirmBtn) {
-        checkbox.addEventListener('change', () => {
-            confirmBtn.disabled = !checkbox.checked;
-        });
+  if (checkbox && confirmBtn) {
+    checkbox.addEventListener('change', () => {
+      confirmBtn.disabled = !checkbox.checked;
+    });
+  }
+
+  modalEl.addEventListener('show.bs.modal', (event) => {
+    const isManual = !!event.relatedTarget;
+
+    if (isManual) {
+      if (headerCloseBtn) headerCloseBtn.style.display = 'block';
+      if (checkContainer) checkContainer.style.display = 'none';
+      if (confirmBtn) {
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = 'Đóng';
+        confirmBtn.classList.remove('btn-primary');
+        confirmBtn.classList.add('btn-secondary');
+      }
+    } else {
+      if (headerCloseBtn) headerCloseBtn.style.display = 'none';
+      if (checkContainer) checkContainer.style.display = 'block';
+      if (checkbox) checkbox.checked = false;
+      if (confirmBtn) {
+        confirmBtn.disabled = true;
+        confirmBtn.textContent = 'Bắt đầu sử dụng';
+        confirmBtn.classList.remove('btn-secondary');
+        confirmBtn.classList.add('btn-primary');
+      }
     }
+  });
 
-    modalEl.addEventListener('show.bs.modal', (event) => {
-        const isManual = !!event.relatedTarget;
-
-        if (isManual) {
-            if (headerCloseBtn) headerCloseBtn.style.display = 'block';
-            if (checkContainer) checkContainer.style.display = 'none';
-            if (confirmBtn) {
-                confirmBtn.disabled = false;
-                confirmBtn.textContent = 'Đóng';
-                confirmBtn.classList.remove('btn-primary');
-                confirmBtn.classList.add('btn-secondary');
-            }
-        } else {
-            if (headerCloseBtn) headerCloseBtn.style.display = 'none';
-            if (checkContainer) checkContainer.style.display = 'block';
-            if (checkbox) checkbox.checked = false;
-            if (confirmBtn) {
-                confirmBtn.disabled = true;
-                confirmBtn.textContent = 'Bắt đầu sử dụng';
-                confirmBtn.classList.remove('btn-secondary');
-                confirmBtn.classList.add('btn-primary');
-            }
-        }
-    });
-
-    modalEl.addEventListener('hidden.bs.modal', () => {
-        if (!localStorage.getItem('hasSeenGuide')) {
-            localStorage.setItem('hasSeenGuide', 'true');
-        }
-    });
-
+  modalEl.addEventListener('hidden.bs.modal', () => {
     if (!localStorage.getItem('hasSeenGuide')) {
-        setTimeout(() => {
-            const guideModal = new bootstrap.Modal(modalEl);
-            guideModal.show();
-        }, 1000);
+      localStorage.setItem('hasSeenGuide', 'true');
     }
+  });
+
+  if (!localStorage.getItem('hasSeenGuide')) {
+    setTimeout(() => {
+      const guideModal = new bootstrap.Modal(modalEl);
+      guideModal.show();
+    }, 1000);
+  }
 }
 
 // ==========================================
-// FEEDBACK FORM
+// Feedback Form
 // ==========================================
 
 export function initFeedbackForm() {
-    const form = document.getElementById('feedback-form');
-    const submitBtn = document.getElementById('submit-feedback-btn');
-    const listTabBtn = document.getElementById('feedback-list-tab');
-    const refreshBtn = document.getElementById('refresh-feedback-btn');
-    const fileInput = document.getElementById('feedback-image');
-    const previewContainer = document.getElementById('feedback-image-preview');
-    const previewImg = previewContainer ? previewContainer.querySelector('img') : null;
-    const removeImgBtn = document.getElementById('remove-image-btn');
+  const form = document.getElementById('feedback-form');
+  const submitBtn = document.getElementById('submit-feedback-btn');
+  const listTabBtn = document.getElementById('feedback-list-tab');
+  const refreshBtn = document.getElementById('refresh-feedback-btn');
+  const fileInput = document.getElementById('feedback-image');
+  const previewContainer = document.getElementById('feedback-image-preview');
+  const previewImg = previewContainer?.querySelector('img');
+  const removeImgBtn = document.getElementById('remove-image-btn');
 
-    // GOOGLE APPS SCRIPT URL
-    // TODO: Thay thế URL bên dưới bằng URL Web App của bạn sau khi deploy Google Apps Script
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz_KJF_96v5p0sML6y3wcKJqmGbTUJ2h4LSVZldnRDNn608mhvAumBy_3UGF6xZgURK/exec';
-
-    // --- 0. Handle Image Preview ---
-    if (fileInput && previewContainer) {
-        fileInput.addEventListener('change', () => {
-            const file = fileInput.files[0];
-            if (file) {
-                if (file.size > 5 * 1024 * 1024) { // 5MB limit
-                    alert('Ảnh quá lớn! Vui lòng chọn ảnh dưới 5MB.');
-                    fileInput.value = '';
-                    return;
-                }
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    previewImg.src = e.target.result;
-                    previewContainer.classList.remove('d-none');
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
-        removeImgBtn.addEventListener('click', () => {
-            fileInput.value = '';
-            previewContainer.classList.add('d-none');
-            previewImg.src = '';
-        });
-    }
-
-    // --- 1. Handle Form Submission ---
-    if (form && submitBtn) {
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            // Disable button and show loading state
-            const originalBtnText = submitBtn.innerHTML;
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Đang xử lý...';
-
-            const name = document.getElementById('feedback-name').value;
-            const type = document.getElementById('feedback-type').value;
-            const content = document.getElementById('feedback-content').value;
-            const file = fileInput.files[0];
-            let imageUrl = '';
-
-            if (SCRIPT_URL.includes('PLACEHOLDER')) {
-                alert('Tính năng đang được bảo trì (Chưa cấu hình Server). Vui lòng liên hệ qua Facebook.');
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalBtnText;
-                return;
-            }
-
-            try {
-                // Step A: Upload Image to Imgur (if any)
-                if (file) {
-                    submitBtn.textContent = 'Đang upload ảnh...';
-                    const formData = new FormData();
-                    formData.append('image', file);
-
-                    try {
-                        const imgurResponse = await fetch('https://api.imgur.com/3/image', {
-                            method: 'POST',
-                            headers: {
-                                Authorization: `Client-ID ${IMGUR_CLIENT_ID}`,
-                            },
-                            body: formData,
-                            referrer: '' // Fix 403 error sometimes
-                        });
-
-                        const imgurData = await imgurResponse.json();
-                        if (imgurData.success) {
-                            imageUrl = imgurData.data.link;
-                        } else {
-                            throw new Error('Imgur upload failed: ' + (imgurData.data.error || 'Unknown error'));
-                        }
-                    } catch (uploadError) {
-                        console.error('Upload Error:', uploadError);
-                        if (!confirm('Upload ảnh thất bại. Bạn có muốn tiếp tục gửi góp ý mà không có ảnh?')) {
-                            throw new Error('User cancelled due to upload failure');
-                        }
-                    }
-                }
-
-                // Step B: Submit to Google Sheet
-                submitBtn.textContent = 'Đang gửi góp ý...';
-                await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: {
-                        'Content-Type': 'text/plain',
-                    },
-                    body: JSON.stringify({
-                        name: name || 'Ẩn danh',
-                        type: type,
-                        content: content,
-                        image: imageUrl, // New field
-                        timestamp: new Date().toLocaleString('vi-VN')
-                    })
-                });
-
-                // Giả lập thành công vì no-cors không trả về status
-                alert('Cảm ơn bạn đã đóng góp ý kiến! Chúng tôi sẽ xem xét sớm nhất.');
-                form.reset();
-                if (previewContainer) {
-                    previewContainer.classList.add('d-none');
-                    previewImg.src = '';
-                }
-
-                // Switch to list tab to see the new feedback (if auto-approved)
-                if (listTabBtn) {
-                    const tab = new bootstrap.Tab(listTabBtn);
-                    tab.show();
-                }
-
-            } catch (error) {
-                console.error('Error submitting feedback:', error);
-                if (error.message !== 'User cancelled due to upload failure') {
-                    alert('Có lỗi xảy ra khi gửi góp ý. Vui lòng thử lại sau.');
-                }
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalBtnText;
-            }
-        });
-    }
-
-    // --- 2. Handle List Loading ---
-    const loadFeedbacks = async () => {
-        const container = document.getElementById('feedback-list-container');
-        if (!container) return;
-
-        container.innerHTML = `
-            <div class="text-center py-5 text-muted">
-                <div class="spinner-border text-primary mb-2" role="status"></div>
-                <p class="small mb-0">Đang tải dữ liệu...</p>
-            </div>
-        `;
-
-        try {
-            const response = await fetch(SCRIPT_URL);
-            const data = await response.json();
-
-            container.innerHTML = '';
-
-            if (!data || data.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-5 text-muted">
-                        <i class="bi bi-chat-square-dots fs-1 mb-2"></i>
-                        <p class="small mb-0">Chưa có góp ý nào được hiển thị.</p>
-                    </div>
-                `;
-                return;
-            }
-
-            data.forEach(item => {
-                const typeBadge = getTypeBadge(item.type);
-                const card = document.createElement('div');
-                card.className = 'card border-0 bg-light shadow-sm';
-
-                let imageHtml = '';
-                if (item.image) {
-                    imageHtml = `
-                        <div class="mt-2">
-                            <a href="${item.image}" target="_blank">
-                                <img src="${item.image}" alt="Minh họa" class="img-fluid rounded border" style="max-height: 200px;">
-                            </a>
-                        </div>
-                    `;
-                }
-
-                card.innerHTML = `
-                    <div class="card-body p-3">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <div class="d-flex align-items-center">
-                                <div class="bg-white rounded-circle border d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
-                                    <i class="bi bi-person-fill text-secondary"></i>
-                                </div>
-                                <div>
-                                    <h6 class="fw-bold mb-0 text-dark" style="font-size: 0.9rem;">${escapeHtml(item.name)}</h6>
-                                    <small class="text-muted" style="font-size: 0.75rem;">${item.timestamp}</small>
-                                </div>
-                            </div>
-                            ${typeBadge}
-                        </div>
-                        <p class="card-text text-secondary small mb-0" style="white-space: pre-line;">${escapeHtml(item.content)}</p>
-                        ${imageHtml}
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-
-        } catch (error) {
-            console.error('Error loading feedbacks:', error);
-            container.innerHTML = `
-                <div class="text-center py-5 text-danger">
-                    <i class="bi bi-exclamation-circle fs-1 mb-2"></i>
-                    <p class="small mb-0">Không thể tải dữ liệu. Vui lòng thử lại sau.</p>
-                </div>
-            `;
-        }
-    };
-
-    if (listTabBtn) {
-        listTabBtn.addEventListener('shown.bs.tab', () => {
-            loadFeedbacks();
-        });
-    }
-
-    if (refreshBtn) {
-        refreshBtn.addEventListener('click', () => {
-            loadFeedbacks();
-        });
-    }
+  setupImagePreview(fileInput, previewContainer, previewImg, removeImgBtn);
+  setupFormSubmission(form, submitBtn, listTabBtn, fileInput, previewContainer, previewImg);
+  setupFeedbackList(listTabBtn, refreshBtn);
 }
 
-function getTypeBadge(type) {
-    switch (type) {
-        case 'feature_request':
-            return '<span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill">Tính năng mới</span>';
-        case 'bug_report':
-            return '<span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill">Báo lỗi</span>';
-        case 'improvement':
-            return '<span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill">Cải tiến</span>';
-        default:
-            return '<span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill">Khác</span>';
+function setupImagePreview(fileInput, previewContainer, previewImg, removeImgBtn) {
+  if (!fileInput || !previewContainer) return;
+
+  fileInput.addEventListener('change', () => {
+    const file = fileInput.files[0];
+    if (!file) return;
+
+    if (file.size > UI_CONFIG.MAX_IMAGE_SIZE) {
+      alert('Ảnh quá lớn! Vui lòng chọn ảnh dưới 5MB.');
+      fileInput.value = '';
+      return;
     }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      if (previewImg) previewImg.src = e.target.result;
+      previewContainer.classList.remove('d-none');
+    };
+    reader.readAsDataURL(file);
+  });
+
+  removeImgBtn?.addEventListener('click', () => {
+    fileInput.value = '';
+    previewContainer.classList.add('d-none');
+    if (previewImg) previewImg.src = '';
+  });
+}
+
+function setupFormSubmission(form, submitBtn, listTabBtn, fileInput, previewContainer, previewImg) {
+  if (!form || !submitBtn) return;
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const originalBtnText = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Đang xử lý...';
+
+    const name = document.getElementById('feedback-name')?.value || '';
+    const type = document.getElementById('feedback-type')?.value || '';
+    const content = document.getElementById('feedback-content')?.value || '';
+    const file = fileInput?.files[0];
+    let imageUrl = '';
+
+    if (API_CONFIG.GOOGLE_SCRIPT_URL.includes('PLACEHOLDER')) {
+      alert('Tính năng đang được bảo trì (Chưa cấu hình Server). Vui lòng liên hệ qua Facebook.');
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = originalBtnText;
+      return;
+    }
+
+    try {
+      if (file) {
+        submitBtn.textContent = 'Đang upload ảnh...';
+        imageUrl = await uploadImageToImgur(file);
+      }
+
+      submitBtn.textContent = 'Đang gửi góp ý...';
+      await submitFeedback({ name, type, content, imageUrl });
+
+      alert('Cảm ơn bạn đã đóng góp ý kiến! Chúng tôi sẽ xem xét sớm nhất.');
+      form.reset();
+      if (previewContainer) {
+        previewContainer.classList.add('d-none');
+        if (previewImg) previewImg.src = '';
+      }
+
+      if (listTabBtn) {
+        const tab = new bootstrap.Tab(listTabBtn);
+        tab.show();
+      }
+
+    } catch (error) {
+      console.error('Error submitting feedback:', error);
+      if (error.message !== 'User cancelled due to upload failure') {
+        alert('Có lỗi xảy ra khi gửi góp ý. Vui lòng thử lại sau.');
+      }
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = originalBtnText;
+    }
+  });
+}
+
+async function uploadImageToImgur(file) {
+  const formData = new FormData();
+  formData.append('image', file);
+
+  const response = await fetch(API_CONFIG.IMGUR_UPLOAD_URL, {
+    method: 'POST',
+    headers: { Authorization: `Client-ID ${API_CONFIG.IMGUR_CLIENT_ID}` },
+    body: formData,
+    referrer: ''
+  });
+
+  const data = await response.json();
+  if (!data.success) {
+    throw new Error('Imgur upload failed: ' + (data.data.error || 'Unknown error'));
+  }
+  return data.data.link;
+}
+
+async function submitFeedback({ name, type, content, imageUrl }) {
+  await fetch(API_CONFIG.GOOGLE_SCRIPT_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify({
+      name: name || 'Ẩn danh',
+      type,
+      content,
+      image: imageUrl,
+      timestamp: new Date().toLocaleString('vi-VN')
+    })
+  });
+}
+
+function setupFeedbackList(listTabBtn, refreshBtn) {
+  const loadFeedbacks = async () => {
+    const container = document.getElementById('feedback-list-container');
+    if (!container) return;
+
+    container.innerHTML = `
+      <div class="text-center py-5 text-muted">
+        <div class="spinner-border text-primary mb-2" role="status"></div>
+        <p class="small mb-0">Đang tải dữ liệu...</p>
+      </div>
+    `;
+
+    try {
+      const response = await fetch(API_CONFIG.GOOGLE_SCRIPT_URL);
+      const data = await response.json();
+
+      renderFeedbackList(container, data);
+    } catch (error) {
+      console.error('Error loading feedbacks:', error);
+      container.innerHTML = `
+        <div class="text-center py-5 text-danger">
+          <i class="bi bi-exclamation-circle fs-1 mb-2"></i>
+          <p class="small mb-0">Không thể tải dữ liệu. Vui lòng thử lại sau.</p>
+        </div>
+      `;
+    }
+  };
+
+  listTabBtn?.addEventListener('shown.bs.tab', loadFeedbacks);
+  refreshBtn?.addEventListener('click', loadFeedbacks);
+}
+
+function renderFeedbackList(container, data) {
+  container.innerHTML = '';
+
+  if (!data || data.length === 0) {
+    container.innerHTML = `
+      <div class="text-center py-5 text-muted">
+        <i class="bi bi-chat-square-dots fs-1 mb-2"></i>
+        <p class="small mb-0">Chưa có góp ý nào được hiển thị.</p>
+      </div>
+    `;
+    return;
+  }
+
+  data.forEach(item => {
+    const card = createFeedbackCard(item);
+    container.appendChild(card);
+  });
+}
+
+function createFeedbackCard(item) {
+  const typeBadge = getFeedbackTypeBadge(item.type);
+  const card = document.createElement('div');
+  card.className = 'card border-0 bg-light shadow-sm';
+
+  const imageHtml = item.image ? `
+    <div class="mt-2">
+      <a href="${item.image}" target="_blank">
+        <img src="${item.image}" alt="Minh họa" class="img-fluid rounded border" style="max-height: 200px;">
+      </a>
+    </div>
+  ` : '';
+
+  card.innerHTML = `
+    <div class="card-body p-3">
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <div class="d-flex align-items-center">
+          <div class="bg-white rounded-circle border d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+            <i class="bi bi-person-fill text-secondary"></i>
+          </div>
+          <div>
+            <h6 class="fw-bold mb-0 text-dark" style="font-size: 0.9rem;">${escapeHtml(item.name)}</h6>
+            <small class="text-muted" style="font-size: 0.75rem;">${item.timestamp}</small>
+          </div>
+        </div>
+        ${typeBadge}
+      </div>
+      <p class="card-text text-secondary small mb-0" style="white-space: pre-line;">${escapeHtml(item.content)}</p>
+      ${imageHtml}
+    </div>
+  `;
+
+  return card;
+}
+
+function getFeedbackTypeBadge(type) {
+  const badges = {
+    feature_request: '<span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill">Tính năng mới</span>',
+    bug_report: '<span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill">Báo lỗi</span>',
+    improvement: '<span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill">Cải tiến</span>'
+  };
+  return badges[type] || '<span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill">Khác</span>';
 }
 
 function escapeHtml(text) {
-    if (!text) return '';
-    return text
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+  if (!text) return '';
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
 // ==========================================
-// TAB: TIN TỨC (NEWS)
+// Tab: News
 // ==========================================
 
 export function initNewsTab() {
-    // News Filter Logic
-    const filterBtns = document.querySelectorAll('.news-filters .filter-btn');
-    const newsCards = document.querySelectorAll('.news-card');
-
-    filterBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const filter = btn.dataset.filter;
-
-            // Update UI: Active Button
-            filterBtns.forEach(b => {
-                b.classList.replace('btn-primary', 'btn-outline-secondary');
-                b.classList.remove('active');
-            });
-            btn.classList.replace('btn-outline-secondary', 'btn-primary');
-            btn.classList.add('active');
-
-            // Apply Filter
-            newsCards.forEach(card => {
-                const category = card.dataset.category;
-                if (filter === 'all' || category === filter) {
-                    card.style.display = 'flex';
-                    // Re-trigger animation
-                    card.style.animation = 'none';
-                    card.offsetHeight; // force reflow
-                    card.style.animation = null;
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        });
-    });
-
-    // Handbook Lazy Load
-    const loadHandbookBtn = document.getElementById('load-handbook-btn');
-    const handbookPlaceholder = document.getElementById('handbook-placeholder');
-    const handbookIframe = document.getElementById('handbook-iframe');
-
-    if (loadHandbookBtn && handbookPlaceholder && handbookIframe) {
-        loadHandbookBtn.addEventListener('click', () => {
-            // Load iframe src
-            const src = handbookIframe.getAttribute('data-src');
-            if (src) {
-                handbookIframe.src = src;
-            }
-
-            // Hide placeholder with animation
-            handbookPlaceholder.style.transition = 'opacity 0.3s ease';
-            handbookPlaceholder.style.opacity = '0';
-            handbookPlaceholder.style.pointerEvents = 'none'; // Disable interactions immediately
-
-            setTimeout(() => {
-                handbookPlaceholder.remove(); // Completely remove from DOM
-            }, 300);
-        });
-    }
-
-    const imageViewerModal = document.getElementById('imageViewerModal');
-    if (imageViewerModal) {
-        imageViewerModal.addEventListener('show.bs.modal', event => {
-            const button = event.relatedTarget;
-            if (!button) return;
-
-            const src = button.getAttribute('data-bs-src');
-            const modalImage = imageViewerModal.querySelector('#imageViewerSrc');
-            if (modalImage && src) {
-                modalImage.src = src;
-            }
-        });
-    }
+  setupNewsFilters();
+  setupHandbookLazyLoad();
+  setupImageViewer();
 }
+
+function setupNewsFilters() {
+  const filterBtns = document.querySelectorAll('.news-filters .filter-btn');
+  const newsCards = document.querySelectorAll('.news-card');
+
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const filter = btn.dataset.filter;
+
+      filterBtns.forEach(b => {
+        b.classList.replace('btn-primary', 'btn-outline-secondary');
+        b.classList.remove('active');
+      });
+      btn.classList.replace('btn-outline-secondary', 'btn-primary');
+      btn.classList.add('active');
+
+      newsCards.forEach(card => {
+        const category = card.dataset.category;
+        if (filter === 'all' || category === filter) {
+          card.style.display = 'flex';
+          card.style.animation = 'none';
+          card.offsetHeight;
+          card.style.animation = null;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    });
+  });
+}
+
+function setupHandbookLazyLoad() {
+  const loadHandbookBtn = document.getElementById('load-handbook-btn');
+  const handbookPlaceholder = document.getElementById('handbook-placeholder');
+  const handbookIframe = document.getElementById('handbook-iframe');
+
+  if (!loadHandbookBtn || !handbookPlaceholder || !handbookIframe) return;
+
+  loadHandbookBtn.addEventListener('click', () => {
+    const src = handbookIframe.getAttribute('data-src');
+    if (src) handbookIframe.src = src;
+
+    handbookPlaceholder.style.transition = 'opacity 0.3s ease';
+    handbookPlaceholder.style.opacity = '0';
+    handbookPlaceholder.style.pointerEvents = 'none';
+
+    setTimeout(() => handbookPlaceholder.remove(), 300);
+  });
+}
+
+function setupImageViewer() {
+  const imageViewerModal = document.getElementById('imageViewerModal');
+  if (!imageViewerModal) return;
+
+  imageViewerModal.addEventListener('show.bs.modal', event => {
+    const button = event.relatedTarget;
+    if (!button) return;
+
+    const src = button.getAttribute('data-bs-src');
+    const modalImage = imageViewerModal.querySelector('#imageViewerSrc');
+    if (modalImage && src) modalImage.src = src;
+  });
+}
+
+// ==========================================
+// Grade Scale Sort
+// ==========================================
 
 export function initGradeScaleSort() {
-    const toggleSortBtn = document.getElementById('toggle-sort-scale-btn');
-    const scaleContainer = document.getElementById('scale-list-container');
-    const ORDER_KEY = 'HUFLIT_SCALE_ORDER';
+  const toggleSortBtn = document.getElementById('toggle-sort-scale-btn');
+  const scaleContainer = document.getElementById('scale-list-container');
+  const ORDER_KEY = 'HUFLIT_SCALE_ORDER';
 
-    // 1. Load saved order
-    const savedOrder = JSON.parse(localStorage.getItem(ORDER_KEY) || '[]');
-    if (savedOrder.length > 0 && scaleContainer) {
-        const currentItems = Array.from(scaleContainer.children);
-        const itemMap = new Map(currentItems.map(item => [item.id, item]));
-
-        // Clear container
-        scaleContainer.innerHTML = '';
-
-        // Append in saved order
-        savedOrder.forEach(id => {
-            const item = itemMap.get(id);
-            if (item) {
-                scaleContainer.appendChild(item);
-                itemMap.delete(id);
-            }
-        });
-
-        // Append remaining items (new ones)
-        itemMap.forEach(item => scaleContainer.appendChild(item));
-    }
-
-    // 2. Toggle sort mode
-    if (toggleSortBtn && scaleContainer) {
-        toggleSortBtn.addEventListener('click', () => {
-            scaleContainer.classList.toggle('scale-sort-mode');
-            toggleSortBtn.classList.toggle('active');
-
-            // Toggle button appearance
-            if (scaleContainer.classList.contains('scale-sort-mode')) {
-                toggleSortBtn.classList.remove('btn-outline-primary');
-                toggleSortBtn.classList.add('btn-primary');
-            } else {
-                toggleSortBtn.classList.add('btn-outline-primary');
-                toggleSortBtn.classList.remove('btn-primary');
-            }
-        });
-
-        // 3. Handle move
-        scaleContainer.addEventListener('click', (e) => {
-            const btn = e.target.closest('button');
-            if (!btn) return;
-
-            const card = btn.closest('.scale-card');
-            if (!card) return;
-
-            if (btn.classList.contains('btn-move-up')) {
-                const prev = card.previousElementSibling;
-                if (prev) {
-                    scaleContainer.insertBefore(card, prev);
-                    saveOrder();
-                }
-            } else if (btn.classList.contains('btn-move-down')) {
-                const next = card.nextElementSibling;
-                if (next) {
-                    scaleContainer.insertBefore(next, card);
-                    saveOrder();
-                }
-            }
-        });
-    }
-
-    function saveOrder() {
-        if (!scaleContainer) return;
-        const newOrder = Array.from(scaleContainer.children).map(item => item.id);
-        localStorage.setItem(ORDER_KEY, JSON.stringify(newOrder));
-    }
+  loadSavedOrder(scaleContainer, ORDER_KEY);
+  setupSortModeToggle(toggleSortBtn, scaleContainer, ORDER_KEY);
+  setupMoveHandlers(scaleContainer, ORDER_KEY);
 }
 
+function loadSavedOrder(scaleContainer, ORDER_KEY) {
+  const savedOrder = JSON.parse(localStorage.getItem(ORDER_KEY) || '[]');
+  if (savedOrder.length === 0 || !scaleContainer) return;
+
+  const currentItems = Array.from(scaleContainer.children);
+  const itemMap = new Map(currentItems.map(item => [item.id, item]));
+
+  scaleContainer.innerHTML = '';
+
+  savedOrder.forEach(id => {
+    const item = itemMap.get(id);
+    if (item) {
+      scaleContainer.appendChild(item);
+      itemMap.delete(id);
+    }
+  });
+
+  itemMap.forEach(item => scaleContainer.appendChild(item));
+}
+
+function setupSortModeToggle(toggleSortBtn, scaleContainer, ORDER_KEY) {
+  if (!toggleSortBtn || !scaleContainer) return;
+
+  toggleSortBtn.addEventListener('click', () => {
+    scaleContainer.classList.toggle('scale-sort-mode');
+    toggleSortBtn.classList.toggle('active');
+
+    if (scaleContainer.classList.contains('scale-sort-mode')) {
+      toggleSortBtn.classList.remove('btn-outline-primary');
+      toggleSortBtn.classList.add('btn-primary');
+    } else {
+      toggleSortBtn.classList.add('btn-outline-primary');
+      toggleSortBtn.classList.remove('btn-primary');
+    }
+  });
+}
+
+function setupMoveHandlers(scaleContainer, ORDER_KEY) {
+  if (!scaleContainer) return;
+
+  scaleContainer.addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+
+    const card = btn.closest('.scale-card');
+    if (!card) return;
+
+    if (btn.classList.contains('btn-move-up')) {
+      const prev = card.previousElementSibling;
+      if (prev) {
+        scaleContainer.insertBefore(card, prev);
+        saveOrder(scaleContainer, ORDER_KEY);
+      }
+    } else if (btn.classList.contains('btn-move-down')) {
+      const next = card.nextElementSibling;
+      if (next) {
+        scaleContainer.insertBefore(next, card);
+        saveOrder(scaleContainer, ORDER_KEY);
+      }
+    }
+  });
+}
+
+function saveOrder(scaleContainer, ORDER_KEY) {
+  if (!scaleContainer) return;
+  const newOrder = Array.from(scaleContainer.children).map(item => item.id);
+  localStorage.setItem(ORDER_KEY, JSON.stringify(newOrder));
+}

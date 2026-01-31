@@ -8,8 +8,7 @@ import {
   calculateYearlyStats, 
   getYearInfo, 
   calculateManualGPA,
-  getGradeColor,
-  classifyGPA
+  getGradeColor 
 } from '../core/calculator.js';
 import { getManualState, getTargetState } from '../state/store.js';
 import { GPA_RANKS, CSS_CLASSES } from '../core/app-constants.js';
@@ -142,25 +141,30 @@ function renderGradeScaleTable() {
 
   const currentGPA = getCurrentGPAForDisplay();
   const hasData = currentGPA !== null;
-  
-  // Get current rank to determine which grade to highlight
-  const currentRank = hasData ? classifyGPA(currentGPA) : null;
 
   const scaleData = [
-    { grade: 'A+', h10: '9.0 - 10', gpa: 4.0, color: 'success', rank: 'Xuất sắc' },
-    { grade: 'A', h10: '8.5 - 8.9', gpa: 4.0, color: 'success', rank: 'Xuất sắc' },
-    { grade: 'B+', h10: '8.0 - 8.4', gpa: 3.5, color: 'primary', rank: 'Giỏi' },
-    { grade: 'B', h10: '7.0 - 7.9', gpa: 3.0, color: 'primary', rank: 'Khá' },
-    { grade: 'C+', h10: '6.0 - 6.9', gpa: 2.5, color: 'info', rank: 'Trung bình' },
-    { grade: 'C', h10: '5.5 - 5.9', gpa: 2.0, color: 'info', rank: 'Trung bình' },
-    { grade: 'D+', h10: '5.0 - 5.4', gpa: 1.5, color: 'warning', rank: 'Yếu' },
-    { grade: 'D', h10: '4.0 - 4.9', gpa: 1.0, color: 'warning', rank: 'Yếu' },
-    { grade: 'F', h10: '< 4.0', gpa: 0, color: 'danger', rank: 'Kém' }
+    { grade: 'A+', h10: '9.0 - 10', gpa: 4.0, color: 'success' },
+    { grade: 'A', h10: '8.5 - 8.9', gpa: 4.0, color: 'success' },
+    { grade: 'B+', h10: '8.0 - 8.4', gpa: 3.5, color: 'primary' },
+    { grade: 'B', h10: '7.0 - 7.9', gpa: 3.0, color: 'primary' },
+    { grade: 'C+', h10: '6.0 - 6.9', gpa: 2.5, color: 'info' },
+    { grade: 'C', h10: '5.5 - 5.9', gpa: 2.0, color: 'info' },
+    { grade: 'D+', h10: '5.0 - 5.4', gpa: 1.5, color: 'warning' },
+    { grade: 'D', h10: '4.0 - 4.9', gpa: 1.0, color: 'warning' },
+    { grade: 'F', h10: '< 4.0', gpa: 0, color: 'danger' }
   ];
 
-  const rows = scaleData.map((item) => {
-    // Highlight based on academic rank matching
-    const isActive = hasData && item.rank === currentRank;
+  const rows = scaleData.map((item, index) => {
+    let isActive = false;
+    if (hasData) {
+      if (index === 0) {
+        isActive = currentGPA === 4.0;
+      } else {
+        const prevGpa = scaleData[index - 1].gpa;
+        isActive = currentGPA >= item.gpa && currentGPA < prevGpa;
+      }
+    }
+
     const activeClass = isActive ? 'table-active' : '';
 
     return html`

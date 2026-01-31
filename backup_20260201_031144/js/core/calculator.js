@@ -322,7 +322,7 @@ function calculateRetakeImpact(retakes) {
  * @returns {RetakeSuggestion[]} Array of suggestions
  */
 export function generateRetakeSuggestions(deficitPoints, targetGPA, manualSemesters) {
-  const candidates = gatherRetakeCandidates(manualSemesters, targetGPA);
+  const candidates = gatherRetakeCandidates(manualSemesters);
   const suggestions = findRetakeCombinations(candidates, deficitPoints);
   
   return suggestions.slice(0, 5);
@@ -331,10 +331,9 @@ export function generateRetakeSuggestions(deficitPoints, targetGPA, manualSemest
 /**
  * Gather all valid retake candidates from user's history
  * @param {Semester[]} semesters - User's semesters
- * @param {number} targetGPA - Target GPA
  * @returns {Array} Candidate courses
  */
-function gatherRetakeCandidates(semesters, targetGPA) {
+function gatherRetakeCandidates(semesters) {
   const candidates = [];
   
   for (const sem of semesters) {
@@ -641,6 +640,3 @@ export const _testHelpers = {
   classifyGPA,
   getGradeColor
 };
-
-// Export classifyGPA for use in UI
-export { classifyGPA };

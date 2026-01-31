@@ -16,7 +16,55 @@ import {
   validateFile,
   combineValidations
 } from '../../js/core/validators.js';
-import { describe, it, expect, passCount, failCount } from '../utils/test-helpers.js';
+
+// ==========================================
+// Test Runner
+// ==========================================
+
+let passCount = 0;
+let failCount = 0;
+
+function describe(name, fn) {
+  console.log(`\n📦 ${name}`);
+  fn();
+}
+
+function it(name, fn) {
+  try {
+    fn();
+    console.log(`  ✅ ${name}`);
+    passCount++;
+  } catch (error) {
+    console.log(`  ❌ ${name}`);
+    console.log(`     ${error.message}`);
+    failCount++;
+  }
+}
+
+function expect(actual) {
+  return {
+    toBe(expected) {
+      if (actual !== expected) {
+        throw new Error(`Expected ${expected} but got ${actual}`);
+      }
+    },
+    toEqual(expected) {
+      if (JSON.stringify(actual) !== JSON.stringify(expected)) {
+        throw new Error(`Expected ${JSON.stringify(expected)} but got ${JSON.stringify(actual)}`);
+      }
+    },
+    toBeTruthy() {
+      if (!actual) {
+        throw new Error(`Expected truthy value but got ${actual}`);
+      }
+    },
+    toBeFalsy() {
+      if (actual) {
+        throw new Error(`Expected falsy value but got ${actual}`);
+      }
+    }
+  };
+}
 
 // ==========================================
 // Test Suites

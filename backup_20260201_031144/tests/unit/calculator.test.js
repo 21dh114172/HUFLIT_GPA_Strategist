@@ -13,9 +13,75 @@ import {
   calculateYearlyStats,
   _testHelpers
 } from '../../js/core/calculator.js';
-import { describe, it, expect, passCount, failCount } from '../utils/test-helpers.js';
 
 const { findGradeInfo, getGPAPoints, roundGPA, classifyGPA, getGradeColor } = _testHelpers;
+
+// ==========================================
+// Test Runner
+// ==========================================
+
+let passCount = 0;
+let failCount = 0;
+
+function describe(name, fn) {
+  console.log(`\n📦 ${name}`);
+  fn();
+}
+
+function it(name, fn) {
+  try {
+    fn();
+    console.log(`  ✅ ${name}`);
+    passCount++;
+  } catch (error) {
+    console.log(`  ❌ ${name}`);
+    console.log(`     ${error.message}`);
+    failCount++;
+  }
+}
+
+function expect(actual) {
+  return {
+    toBe(expected) {
+      if (actual !== expected) {
+        throw new Error(`Expected ${expected} but got ${actual}`);
+      }
+    },
+    toEqual(expected) {
+      if (JSON.stringify(actual) !== JSON.stringify(expected)) {
+        throw new Error(`Expected ${JSON.stringify(expected)} but got ${JSON.stringify(actual)}`);
+      }
+    },
+    toBeCloseTo(expected, precision = 2) {
+      const multiplier = Math.pow(10, precision);
+      const actualRounded = Math.round(actual * multiplier) / multiplier;
+      const expectedRounded = Math.round(expected * multiplier) / multiplier;
+      if (actualRounded !== expectedRounded) {
+        throw new Error(`Expected ${expected} but got ${actual}`);
+      }
+    },
+    toBeGreaterThan(expected) {
+      if (!(actual > expected)) {
+        throw new Error(`Expected ${actual} to be greater than ${expected}`);
+      }
+    },
+    toBeLessThan(expected) {
+      if (!(actual < expected)) {
+        throw new Error(`Expected ${actual} to be less than ${expected}`);
+      }
+    },
+    toBeTruthy() {
+      if (!actual) {
+        throw new Error(`Expected truthy value but got ${actual}`);
+      }
+    },
+    toBeFalsy() {
+      if (actual) {
+        throw new Error(`Expected falsy value but got ${actual}`);
+      }
+    }
+  };
+}
 
 // ==========================================
 // Test Suites
