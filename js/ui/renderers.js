@@ -677,15 +677,17 @@ function createChart(ctx, labels, dataPoints) {
  * @param {number} requiredGPA - Required GPA
  * @param {number} creditsToStudy - Credits to study
  * @param {number} requiredPoints - Points needed
+ * @param {number} maxAchievableGPA - Maximum achievable GPA (when required > 4.0)
  * @returns {Object} Status info
  */
-export function getTargetStatusInfo(requiredGPA, creditsToStudy, requiredPoints) {
+export function getTargetStatusInfo(requiredGPA, creditsToStudy, requiredPoints, maxAchievableGPA = null) {
   // Impossible
   if (requiredGPA > 4.0) {
+    const maxGpaText = maxAchievableGPA !== null ? maxAchievableGPA.toFixed(2) : '4.00';
     return {
       icon: 'bi-x-circle-fill',
       color: 'danger',
-      message: 'Không khả thi! GPA yêu cầu vượt quá 4.0.',
+      message: `Không khả thi! GPA tối đa có thể đạt: ${maxGpaText}`,
       badgeClass: 'bg-danger-subtle text-danger-emphasis border-danger-subtle'
     };
   }

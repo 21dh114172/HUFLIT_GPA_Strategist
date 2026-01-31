@@ -10,14 +10,15 @@ import { raw } from '../components/template-utils.js';
  * @param {number} requiredGPA - Required GPA
  * @param {number} creditsToStudy - Credits to study
  * @param {number} requiredPoints - Points needed
+ * @param {number} maxAchievableGPA - Maximum achievable GPA (when required > 4.0)
  * @returns {Object} Status info
  */
-export function getStatusInfo(requiredGPA, creditsToStudy, requiredPoints) {
+export function getStatusInfo(requiredGPA, creditsToStudy, requiredPoints, maxAchievableGPA = null) {
   if (requiredGPA > 4.0) {
     return {
       icon: 'bi-x-circle-fill',
       color: 'danger',
-      message: 'Không khả thi! GPA yêu cầu vượt quá 4.0.',
+      message: 'Không khả thi! Vượt quá giới hạn 4.0',
       badgeClass: 'bg-danger-subtle text-danger-emphasis border-danger-subtle'
     };
   }
@@ -287,11 +288,36 @@ export function renderRetakeSuggestions(deficitPoints, suggestions) {
 }
 
 /**
+ * Render max achievable GPA info box
+ * @param {number} maxAchievableGPA - Maximum achievable GPA
+ * @returns {string} HTML string
+ */
+function renderMaxGpaInfo(maxAchievableGPA) {
+  return `
+    <div class="mt-3">
+      <div class="bg-light rounded-3 p-3 border">
+        <div class="d-flex justify-content-between align-items-center">
+          <span class="text-secondary small fw-medium">
+            <i class="bi bi-arrow-up-circle-fill text-success me-2"></i>GPA tối đa có thể đạt
+          </span>
+          <span class="fw-bold text-success fs-5">${maxAchievableGPA.toFixed(2)}</span>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/**
  * Render main result container
  * @param {Object} params - All parameters needed for rendering
  * @returns {string} Complete HTML string
  */
-export function renderMainResult({ result, status, creditsToStudy, scenarioText, combinations, showCombinations }) {
+export function renderMainResult({ result, status, creditsToStudy, scenarioText, combinations, showCombinations, maxAchievableGPA }) {
+  const isImpossible = result.requiredGPA > 4.0;
+  const maxGpaDisplay = isImpossible && maxAchievableGPA !== null 
+    ? renderMaxGpaInfo(maxAchievableGPA)
+    : '';
+  
   return `
     <div class="text-center mb-4 w-100">
       <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-${status.color} text-white shadow-sm mb-3" style="width: 60px; height: 60px;">
@@ -302,6 +328,7 @@ export function renderMainResult({ result, status, creditsToStudy, scenarioText,
         0.00
       </div>
       <p class="text-muted fw-medium mb-0">cho <span class="fw-bold text-dark">${creditsToStudy}</span> tín chỉ tiếp theo</p>
+      ${maxGpaDisplay}
       <div class="mt-3">
         <span class="badge rounded-pill ${status.badgeClass} px-3 py-2 border">
           ${status.message}

@@ -650,7 +650,14 @@ function renderTargetResult(result, creditsToStudy, currentCredits, targetGPA) {
   const container = document.getElementById('target-result-container');
   if (!container) return;
 
-  const status = getStatusInfo(result.requiredGPA, creditsToStudy, result.requiredPoints);
+  // Calculate maximum achievable GPA when required > 4.0
+  let maxAchievableGPA = null;
+  if (result.requiredGPA > 4.0) {
+    const maxPossiblePoints = result.effectiveCurrentPoints + (4.0 * creditsToStudy);
+    maxAchievableGPA = maxPossiblePoints / result.totalFutureCredits;
+  }
+
+  const status = getStatusInfo(result.requiredGPA, creditsToStudy, result.requiredPoints, maxAchievableGPA);
   
   // Generate combinations if applicable
   let combinations = [];
@@ -673,7 +680,8 @@ function renderTargetResult(result, creditsToStudy, currentCredits, targetGPA) {
     creditsToStudy,
     scenarioText,
     combinations,
-    showCombinations
+    showCombinations,
+    maxAchievableGPA
   });
 
   html += renderAlgorithmDetails({ targetGPA, currentCredits, result });
@@ -688,17 +696,18 @@ function renderTargetResult(result, creditsToStudy, currentCredits, targetGPA) {
 
   container.innerHTML = html;
 
-  // Animate GPA value
-  animateGPAResult(result.requiredGPA, result.requiredPoints);
+  // Animate GPA value - always show required GPA (even if > 4.0)
+  animateGPAResult(result.requiredGPA, result.requiredPoints, result.requiredGPA > 4.0);
 }
 
-function animateGPAResult(requiredGPA, requiredPoints) {
+function animateGPAResult(displayGPA, requiredPoints, isImpossible = false) {
   const gpaTargetEl = document.getElementById('animated-required-gpa');
   if (!gpaTargetEl) return;
 
-  if (requiredGPA > 0) {
-    animateValue(gpaTargetEl, 0, requiredGPA, 1200, 2);
-  } else if (requiredGPA <= 0 && requiredPoints <= 0.01) {
+  if (displayGPA > 0) {
+    // Show required GPA (even if > 4.0 for impossible case)
+    animateValue(gpaTargetEl, 0, displayGPA, 1200, 2);
+  } else if (displayGPA <= 0 && requiredPoints <= 0.01) {
     gpaTargetEl.innerHTML = 'Đạt';
   } else {
     gpaTargetEl.innerHTML = '---';
