@@ -38,6 +38,7 @@ import {
   renderAlgorithmDetails,
   renderRetakeSuggestions
 } from './templates/target-result.js';
+import { PDFExportService } from '../services/pdf-export.js';
 
 // ==========================================
 // Performance Utilities
@@ -540,8 +541,10 @@ function setupTargetEventListeners(elements) {
   // Share button
   elements.shareTargetBtn?.addEventListener('click', handleShareTarget);
 
-  // Export PDF button
-  elements.exportPdfBtn?.addEventListener('click', exportTargetToPDF);
+  // Export PDF button - open options modal
+  elements.exportPdfBtn?.addEventListener('click', () => {
+    showPDFExportModal();
+  });
 }
 
 function setupCreditModeSwitches(elements) {
@@ -736,57 +739,208 @@ function handleShareTarget() {
   });
 }
 
-async function exportTargetToPDF() {
+/**
+ * Show PDF export options modal
+ */
+function showPDFExportModal() {
+  // Get or create modal
+  let modalEl = document.getElementById('pdfExportOptionsModal');
+  if (!modalEl) {
+    modalEl = createPDFExportModal();
+  }
+  
+  const modal = new bootstrap.Modal(modalEl);
+  modal.show();
+}
+
+/**
+ * Create PDF export options modal
+ */
+function createPDFExportModal() {
+  const modalHtml = `
+    <div class="modal fade" id="pdfExportOptionsModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title fw-bold">
+              <i class="bi bi-file-earmark-pdf text-danger me-2"></i>Tùy chọn xuất PDF
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-4">
+              <label class="form-label fw-medium">Định dạng xuất</label>
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="radio" name="pdfMode" id="pdfModeText" value="text" checked>
+                <label class="form-check-label" for="pdfModeText">
+                  <strong><i class="bi bi-file-text me-1"></i>PDF dạng text</strong>
+                  <div class="text-muted small">Nhẹ, có thể chọn và copy nội dung</div>
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="pdfMode" id="pdfModeImage" value="image">
+                <label class="form-check-label" for="pdfModeImage">
+                  <strong><i class="bi bi-image me-1"></i>PDF dạng ảnh</strong>
+                  <div class="text-muted small">Giống giao diện web, khó chỉnh sửa</div>
+                </label>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label class="form-label fw-medium">Nội dung bao gồm</label>
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="pdfIncludeDetails" checked>
+                <label class="form-check-label" for="pdfIncludeDetails">
+                  Chi tiết thuật toán tính điểm
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="pdfIncludeCombinations" checked>
+                <label class="form-check-label" for="pdfIncludeCombinations">
+                  Các phương án GPA khả thi
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Hủy</button>
+            <button type="button" class="btn btn-danger" id="confirmExportPdf">
+              <i class="bi bi-file-earmark-pdf me-1"></i>Xuất PDF
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  // Append to body
+  const div = document.createElement('div');
+  div.innerHTML = modalHtml;
+  document.body.appendChild(div.firstElementChild);
+  
+  // Add event listener
+  const confirmBtn = document.getElementById('confirmExportPdf');
+  if (confirmBtn) {
+    confirmBtn.addEventListener('click', () => {
+      const mode = document.querySelector('input[name="pdfMode"]:checked')?.value || 'text';
+      const includeDetails = document.getElementById('pdfIncludeDetails')?.checked ?? true;
+      const includeCombinations = document.getElementById('pdfIncludeCombinations')?.checked ?? true;
+      
+      // Close modal
+      const modalEl = document.getElementById('pdfExportOptionsModal');
+      const modal = bootstrap.Modal.getInstance(modalEl);
+      modal?.hide();
+      
+      // Export with options
+      exportTargetToPDF({ mode, includeDetails, includeCombinations });
+    });
+  }
+  
+  return document.getElementById('pdfExportOptionsModal');
+}
+
+/**
+ * Export target calculation to PDF with options
+ */
+async function exportTargetToPDF(options = {}) {
   const targetElement = document.getElementById('target-result-container');
   const btn = document.getElementById('export-pdf-btn');
   if (!targetElement || !btn) return;
 
   const originalBtnContent = btn.innerHTML;
-  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Đang xử lý...';
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Đang tạo...';
   btn.disabled = true;
 
   try {
-    const { jsPDF } = window.jspdf;
-
-    // Optimize for capture
-    const scrollableDiv = targetElement.querySelector('.custom-scrollbar');
-    let originalScrollHeight = '';
-    if (scrollableDiv) {
-      originalScrollHeight = scrollableDiv.style.maxHeight;
-      scrollableDiv.style.maxHeight = 'none';
+    const state = getTargetState();
+    const currentGPA = parseFloat(state.currentGpa) || 0;
+    const currentCredits = parseFloat(state.currentCredits) || 0;
+    const targetGPA = parseFloat(state.targetGpa) || 0;
+    let newCredits = parseFloat(state.newCredits) || 0;
+    
+    if (state.creditMode === 'total') {
+      const total = parseFloat(state.totalCredits) || 0;
+      newCredits = Math.max(0, total - currentCredits);
     }
-
-    const canvas = await html2canvas(targetElement, {
-      scale: 2,
-      useCORS: true,
-      backgroundColor: document.documentElement.getAttribute('data-bs-theme') === 'dark' ? '#212529' : '#ffffff',
-      logging: false
+    
+    const result = calculateTargetResult(currentGPA, currentCredits, targetGPA, newCredits, state.retakes);
+    
+    // Create PDF service
+    const pdfService = new PDFExportService();
+    pdfService.setOptions({
+      mode: options.mode || 'text',
+      includeDetails: options.includeDetails ?? true,
+      includeCombinations: options.includeCombinations ?? true
     });
-
-    if (scrollableDiv) scrollableDiv.style.maxHeight = originalScrollHeight;
-
-    const imgData = canvas.toDataURL('image/png');
-    const imgWidth = 210; // A4 width in mm
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-    const margin = 10;
-
-    const pdf = new jsPDF({
-      orientation: 'portrait',
-      unit: 'mm',
-      format: [imgWidth, imgHeight + (margin * 2)]
-    });
-
-    pdf.addImage(imgData, 'PNG', 0, margin, imgWidth, imgHeight);
-
-    const date = new Date().toLocaleDateString('vi-VN').replace(/\//g, '-');
-    pdf.save(`Lo-Trinh-GPA-${date}.pdf`);
-
+    
+    // Get status info
+    let maxAchievableGPA = null;
+    if (result.requiredGPA > 4.0) {
+      const maxPossiblePoints = result.effectiveCurrentPoints + (4.0 * result.newCredits);
+      maxAchievableGPA = maxPossiblePoints / result.totalFutureCredits;
+    }
+    const status = getStatusInfo(result.requiredGPA, result.newCredits, result.requiredPoints, maxAchievableGPA);
+    
+    // Generate combinations if needed
+    let combinations = [];
+    let deficitPoints = 0;
+    let suggestions = [];
+    
+    if (result.requiredGPA > 0 && result.requiredGPA <= 4.0 && newCredits > 0 && options.includeCombinations !== false) {
+      combinations = generateGradeCombinations(newCredits, result.requiredPoints);
+    }
+    
+    if (result.requiredGPA > 4.0) {
+      deficitPoints = result.requiredPoints - (4.0 * result.newCredits);
+      const { semesters } = getManualState();
+      suggestions = generateRetakeSuggestions(deficitPoints, targetGPA, semesters);
+    }
+    
+    // Export based on mode
+    if (options.mode === 'image') {
+      await pdfService.export({
+        elementId: 'target-result-container',
+        mode: 'image'
+      });
+    } else {
+      await pdfService.export({
+        result,
+        status,
+        combinations,
+        deficitPoints,
+        suggestions,
+        currentCredits,
+        mode: 'text'
+      });
+    }
+    
+    // Success feedback
+    btn.innerHTML = '<i class="bi bi-check-lg me-1"></i>Đã tải xuống!';
+    btn.classList.replace('btn-outline-success', 'btn-success');
+    setTimeout(() => {
+      btn.innerHTML = originalBtnContent;
+      btn.classList.replace('btn-success', 'btn-outline-success');
+    }, 2000);
+    
   } catch (error) {
     console.error('PDF Export Error:', error);
-    alert('Có lỗi xảy ra khi xuất PDF. Vui lòng thử lại.');
+    
+    // Detailed error messages
+    let errorMessage = 'Có lỗi xảy ra khi xuất PDF.';
+    if (error.message?.includes('font')) {
+      errorMessage = 'Lỗi font chữ. Vui lòng thử lại với định dạng ảnh.';
+    } else if (error.message?.includes('memory') || error.message?.includes('canvas')) {
+      errorMessage = 'Nội dung quá lớn. Vui lòng thử lại với ít dữ liệu hơn.';
+    } else if (error.message?.includes('network') || error.message?.includes('fetch')) {
+      errorMessage = 'Lỗi kết nối mạng. Vui lòng kiểm tra kết nối và thử lại.';
+    }
+    
+    alert(errorMessage);
   } finally {
-    btn.innerHTML = originalBtnContent;
     btn.disabled = false;
+    if (btn.innerHTML.includes('spinner')) {
+      btn.innerHTML = originalBtnContent;
+    }
   }
 }
 
