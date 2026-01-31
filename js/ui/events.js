@@ -1,6 +1,7 @@
 import { GRADE_SCALE, IMGUR_CLIENT_ID } from '../core/constants.js';
 import { getManualState, setManualState, addManualSemester, removeManualSemester, updateManualCourse, addManualCourse, removeManualCourse, loadManualStateFromStorage, getTargetState, setTargetState, loadTargetStateFromStorage, subscribe } from '../state/store.js';
 import { calculateManualGPA, calculateTargetResult, generateRetakeSuggestions, generateGradeCombinations, generateScenarioText } from '../core/calculator.js';
+import { ManualActions } from '../state/actions.js';
 import { renderManualSemesters } from './renderers.js';
 import { animateValue, triggerHapticFeedback } from './effects.js';
 import { parsePortalText } from '../core/utils.js';
@@ -368,37 +369,20 @@ export function initManualCalcTab() {
                 return;
             }
 
-            // Clear existing data
-            setManualState({
-                semesters: [],
-                initialGpa: '',
-                initialCredits: ''
-            });
+            // Clear input fields
             manualInitialGpaInput.value = '';
             manualInitialCreditsInput.value = '';
 
-            // Add imported semesters
-            let addedCount = 0;
-            importedSemesters.forEach(sem => {
-                if (sem.courses.length > 0) {
-                    const newSemId = Date.now().toString() + Math.random().toString(36).substr(2, 5);
-                    const courses = sem.courses.map(c => ({
-                        id: Date.now().toString() + Math.random().toString(36).substr(2, 5),
-                        name: c.name,
-                        credits: parseFloat(c.credits) || 0,
-                        grade: c.grade,
-                        isRetake: c.isRetake || false,
-                        oldGrade: c.oldGrade || 'D'
-                    }));
+            // Import using ManualActions
+            const success = ManualActions.importFromPortal(importedSemesters);
+            
+            if (!success) {
+                alert('Có lỗi xảy ra khi nhập dữ liệu. Vui lòng thử lại.');
+                return;
+            }
 
-                    addManualSemester({
-                        id: newSemId,
-                        name: sem.name,
-                        courses: courses
-                    });
-                    addedCount += courses.length;
-                }
-            });
+            // Count total courses
+            const addedCount = importedSemesters.reduce((sum, sem) => sum + (sem.courses?.length || 0), 0);
 
             processImportBtn.blur();
             const modalEl = document.getElementById('importModal');

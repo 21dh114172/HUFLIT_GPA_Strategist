@@ -22,7 +22,8 @@ Công cụ tính toán GPA và lập kế hoạch điểm số dành riêng cho 
 
 ### 2. 📝 Tính GPA Thủ công & Import dữ liệu
 - **Import thông minh**: Copy bảng điểm trực tiếp từ Portal đào tạo và dán vào công cụ. Tự động nhận diện tên môn, số tín chỉ và điểm số.
-- **Quản lý chi tiết**: Quản lý điểm số theo từng học kỳ, tính GPA tích lũy và GPA từng kỳ theo thời gian thực.
+- **Quản lý chi tiết**: Quản lý điểm số theo từng học kỳ, tính GPA tích lũy và GPA từng kỳ theo thờigian thực.
+- **Biểu đồ tiến trình**: Theo dõi sự thay đổi GPA qua các học kỳ với biểu đồ trực quan (Chart.js).
 - Chuyển dữ liệu sang tab "Lộ trình GPA" để lập kế hoạch.
 
 ![Tính GPA thủ công](assets/images/Tab2.2.png)
@@ -43,7 +44,7 @@ Tính toán điểm thi cuối kỳ cần đạt dựa trên điểm quá trình
 ### 4. 📋 Thang điểm chuẩn HUFLIT
 - Tích hợp sẵn thang điểm quy đổi (A, B+, B, C+...) theo quy chế mới nhất.
 - Phân loại học lực dựa trên GPA tích lũy.
-- Thời gian biểu học tập chi tiết theo tiết.
+- Thờigian biểu học tập chi tiết theo tiết.
 
 ### 5. 📰 Tin tức & Tài liệu
 - **Tin tức cập nhật**: Thông báo hoạt động, kế hoạch nghỉ lễ, thông báo rèn luyện.
@@ -73,6 +74,9 @@ Tính toán điểm thi cuối kỳ cần đạt dựa trên điểm quá trình
 - **Frontend**: HTML5, CSS3 (Bootstrap 5.3)
 - **JavaScript**: Vanilla JS (ES6 Modules, Modular Architecture)
 - **Storage**: LocalStorage cho dữ liệu cá nhân
+- **Charts**: Chart.js cho biểu đồ GPA
+- **PDF Export**: jsPDF + html2canvas
+- **Markdown**: Marked.js cho hiển thị tài liệu
 - **Icons**: Bootstrap Icons
 - **Fonts**: Google Fonts (Inter)
 - **Analytics**: GoatCounter (Privacy-focused)
@@ -91,28 +95,53 @@ Tính toán điểm thi cuối kỳ cần đạt dựa trên điểm quá trình
 
 ```
 HUFLIT_GPA_Strategist/
-├── index.html              # Giao diện chính (Single Page Application)
+├── index.html                  # Giao diện chính (Single Page Application)
+├── manifest.json               # PWA manifest
+├── LICENSE                     # Giấy phép MIT
+├── README.md                   # Tài liệu này
 ├── css/
-│   └── main.css            # CSS chính với tối ưu animation
-├── js/                     # Mã nguồn JavaScript (ES6 Modules)
-│   ├── main.js             # Entry point: Khởi tạo ứng dụng
-│   ├── core/               # Business Logic & Constants
-│   │   ├── constants.js    # Hằng số (Thang điểm, Config)
-│   │   ├── calculator.js   # Các hàm tính toán thuần túy
-│   │   └── utils.js        # Hàm tiện ích (Parser, Format)
-│   ├── state/              # State Management
-│   │   └── store.js        # Central Store & Observer pattern
-│   └── ui/                 # User Interface Logic
-│       ├── events.js       # Event Listeners & Controller Logic
-│       ├── renderers.js    # DOM Manipulation & HTML Generation
-│       └── effects.js      # Visual Effects (Disabled)
-├── assets/                 # Tài nguyên tĩnh
-│   └── images/             # Hình ảnh & screenshots
-├── manifest.json           # PWA manifest
-├── ARCHITECTURE.md         # Tài liệu kiến trúc kỹ thuật
-├── LICENSE                 # Giấy phép MIT
-└── README.md               # Tài liệu này
+│   └── main.css                # CSS chính với tối ưu animation
+├── js/                         # Mã nguồn JavaScript (ES6 Modules)
+│   ├── main.js                 # Entry point: Khởi tạo ứng dụng
+│   ├── core/                   # Business Logic & Constants
+│   │   ├── app-constants.js    # Hằng số ứng dụng (Grade scales, Config)
+│   │   ├── constants.js        # Hằng số cũ (deprecated)
+│   │   ├── calculator.js       # Các hàm tính toán thuần túy
+│   │   ├── utils.js            # Hàm tiện ích (Parser, Format)
+│   │   ├── validators.js       # Hàm validate dữ liệu
+│   │   └── share.js            # Chia sẻ dữ liệu (Export/Import)
+│   ├── state/                  # State Management
+│   │   ├── store.js            # Central Store & Observer pattern
+│   │   └── actions.js          # Các action cập nhật state
+│   ├── services/               # Services
+│   │   └── storage.js          # Quản lý LocalStorage
+│   └── ui/                     # User Interface Logic
+│       ├── events.js           # Event Listeners & Controller Logic
+│       ├── renderers.js        # DOM Manipulation & HTML Generation
+│       ├── effects.js          # Visual Effects
+│       └── components/         # UI Components
+│           └── template-utils.js
+├── templates/                  # HTML Templates
+│   ├── components/modals/      # Modal components
+│   ├── shared/                 # Shared templates
+│   └── tabs/                   # Tab content templates
+├── assets/                     # Tài nguyên tĩnh
+│   └── images/                 # Hình ảnh & screenshots
+├── tests/                      # Unit Tests
+│   ├── fixtures/               # Test data
+│   ├── test-logic.js           # Test runner
+│   └── unit/                   # Unit test files
+│       ├── calculator.test.js
+│       ├── utils.test.js
+│       └── validators.test.js
+└── .github/
+    ├── workflows/
+    │   └── deploy.yml          # GitHub Actions - Auto deploy to Pages
+    ├── ARCHITECTURE.md         # Tài liệu kiến trúc kỹ thuật
+    ├── PROJECT_GUIDELINES.md   # Quy tắc dự án
+    └── copilot-instructions.md # Hướng dẫn cho Copilot
 ```
+
 
 ## 📞 Liên hệ
 
@@ -127,4 +156,4 @@ HUFLIT_GPA_Strategist/
 
 ## Giấy phép
 
-MIT License - Xem file LICENSE để biết thêm chi tiết.
+MIT License - Xem file [LICENSE](LICENSE) để biết thêm chi tiết.
