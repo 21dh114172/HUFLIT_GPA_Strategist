@@ -761,49 +761,33 @@ function createPDFExportModal() {
     <div class="modal fade" id="pdfExportOptionsModal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title fw-bold">
-              <i class="bi bi-file-earmark-pdf text-danger me-2"></i>Tùy chọn xuất PDF
+          <div class="modal-header bg-light">
+            <h5 class="modal-title fw-bold text-danger">
+              <i class="bi bi-file-earmark-pdf me-2"></i>Xuất báo cáo PDF
             </h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <div class="mb-4">
-              <label class="form-label fw-medium">Định dạng xuất</label>
-              <div class="form-check mb-2">
-                <input class="form-check-input" type="radio" name="pdfMode" id="pdfModeText" value="text" checked>
-                <label class="form-check-label" for="pdfModeText">
-                  <strong><i class="bi bi-file-text me-1"></i>PDF dạng text</strong>
-                  <div class="text-muted small">Nhẹ, có thể chọn và copy nội dung</div>
-                </label>
-              </div>
-              <div class="form-check">
-                <input class="form-check-input" type="radio" name="pdfMode" id="pdfModeImage" value="image">
-                <label class="form-check-label" for="pdfModeImage">
-                  <strong><i class="bi bi-image me-1"></i>PDF dạng ảnh</strong>
-                  <div class="text-muted small">Giống giao diện web, khó chỉnh sửa</div>
-                </label>
-              </div>
+            <div class="alert alert-info border-0 bg-info-subtle">
+              <i class="bi bi-info-circle-fill me-2"></i>
+              <strong>PDF Text chuyên nghiệp</strong> với đầy đủ font tiếng Việt, có thể chọn và copy nội dung.
             </div>
             
             <div class="mb-3">
-              <label class="form-label fw-medium">Nội dung bao gồm</label>
+              <label class="form-label fw-medium">Nội dung báo cáo</label>
               <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" id="pdfIncludeDetails" checked>
-                <label class="form-check-label" for="pdfIncludeDetails">
-                  Chi tiết thuật toán tính điểm
-                </label>
-              </div>
-              <div class="form-check">
                 <input class="form-check-input" type="checkbox" id="pdfIncludeCombinations" checked>
                 <label class="form-check-label" for="pdfIncludeCombinations">
-                  Các phương án GPA khả thi
+                  <i class="bi bi-layers me-1 text-success"></i>Các phương án GPA khả thi
                 </label>
               </div>
+
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Hủy</button>
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+              <i class="bi bi-x-lg me-1"></i>Hủy
+            </button>
             <button type="button" class="btn btn-danger" id="confirmExportPdf">
               <i class="bi bi-file-earmark-pdf me-1"></i>Xuất PDF
             </button>
@@ -822,8 +806,6 @@ function createPDFExportModal() {
   const confirmBtn = document.getElementById('confirmExportPdf');
   if (confirmBtn) {
     confirmBtn.addEventListener('click', () => {
-      const mode = document.querySelector('input[name="pdfMode"]:checked')?.value || 'text';
-      const includeDetails = document.getElementById('pdfIncludeDetails')?.checked ?? true;
       const includeCombinations = document.getElementById('pdfIncludeCombinations')?.checked ?? true;
       
       // Close modal
@@ -831,8 +813,8 @@ function createPDFExportModal() {
       const modal = bootstrap.Modal.getInstance(modalEl);
       modal?.hide();
       
-      // Export with options
-      exportTargetToPDF({ mode, includeDetails, includeCombinations });
+      // Export with options (text mode only)
+      exportTargetToPDF({ includeCombinations });
     });
   }
   
@@ -840,18 +822,18 @@ function createPDFExportModal() {
 }
 
 /**
- * Export target calculation to PDF with options
+ * Export target calculation to PDF - Professional Text Mode Only
  */
 async function exportTargetToPDF(options = {}) {
-  const targetElement = document.getElementById('target-result-container');
   const btn = document.getElementById('export-pdf-btn');
-  if (!targetElement || !btn) return;
+  if (!btn) return;
 
   const originalBtnContent = btn.innerHTML;
-  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Đang tạo...';
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Đang tạo PDF...';
   btn.disabled = true;
 
   try {
+    // Get all state data
     const state = getTargetState();
     const currentGPA = parseFloat(state.currentGpa) || 0;
     const currentCredits = parseFloat(state.currentCredits) || 0;
@@ -863,15 +845,8 @@ async function exportTargetToPDF(options = {}) {
       newCredits = Math.max(0, total - currentCredits);
     }
     
+    // Calculate result
     const result = calculateTargetResult(currentGPA, currentCredits, targetGPA, newCredits, state.retakes);
-    
-    // Create PDF service
-    const pdfService = new PDFExportService();
-    pdfService.setOptions({
-      mode: options.mode || 'text',
-      includeDetails: options.includeDetails ?? true,
-      includeCombinations: options.includeCombinations ?? true
-    });
     
     // Get status info
     let maxAchievableGPA = null;
@@ -896,23 +871,28 @@ async function exportTargetToPDF(options = {}) {
       suggestions = generateRetakeSuggestions(deficitPoints, targetGPA, semesters);
     }
     
-    // Export based on mode
-    if (options.mode === 'image') {
-      await pdfService.export({
-        elementId: 'target-result-container',
-        mode: 'image'
-      });
-    } else {
-      await pdfService.export({
-        result,
-        status,
-        combinations,
-        deficitPoints,
-        suggestions,
-        currentCredits,
-        mode: 'text'
-      });
-    }
+    // Create PDF service with options
+    const pdfService = new PDFExportService();
+    pdfService.setOptions({
+      includeCombinations: options.includeCombinations ?? true
+    });
+    
+    // Export professional PDF
+    await pdfService.export({
+      result,
+      status,
+      combinations,
+      deficitPoints,
+      suggestions,
+      state: {
+        currentGpa: state.currentGpa,
+        currentCredits: state.currentCredits,
+        targetGpa: state.targetGpa,
+        newCredits: state.newCredits,
+        totalCredits: state.totalCredits,
+        creditMode: state.creditMode
+      }
+    });
     
     // Success feedback
     btn.innerHTML = '<i class="bi bi-check-lg me-1"></i>Đã tải xuống!';
@@ -920,19 +900,20 @@ async function exportTargetToPDF(options = {}) {
     setTimeout(() => {
       btn.innerHTML = originalBtnContent;
       btn.classList.replace('btn-success', 'btn-outline-success');
-    }, 2000);
+    }, 2500);
     
   } catch (error) {
     console.error('PDF Export Error:', error);
     
     // Detailed error messages
-    let errorMessage = 'Có lỗi xảy ra khi xuất PDF.';
-    if (error.message?.includes('font')) {
-      errorMessage = 'Lỗi font chữ. Vui lòng thử lại với định dạng ảnh.';
-    } else if (error.message?.includes('memory') || error.message?.includes('canvas')) {
-      errorMessage = 'Nội dung quá lớn. Vui lòng thử lại với ít dữ liệu hơn.';
-    } else if (error.message?.includes('network') || error.message?.includes('fetch')) {
-      errorMessage = 'Lỗi kết nối mạng. Vui lòng kiểm tra kết nối và thử lại.';
+    let errorMessage = 'Có lỗi xảy ra khi xuất PDF. Vui lòng thử lại.';
+    
+    if (error.message?.includes('font') || error.message?.includes('Font')) {
+      errorMessage = 'Không thể tải font tiếng Việt. Vui lòng kiểm tra kết nối mạng và thử lại.';
+    } else if (error.message?.includes('network') || error.message?.includes('fetch') || error.message?.includes('load')) {
+      errorMessage = 'Lỗi kết nối mạng khi tải font. Vui lòng kiểm tra kết nối và thử lại.';
+    } else if (error.message?.includes('memory')) {
+      errorMessage = 'Bộ nhớ không đủ. Vui lòng đóng các tab khác và thử lại.';
     }
     
     alert(errorMessage);
