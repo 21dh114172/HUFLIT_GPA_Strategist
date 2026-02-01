@@ -122,7 +122,7 @@ import { renderManualSemesters } from './renderers.js';
 
 
 
-import { animateValue, triggerHapticFeedback } from './effects.js';
+import { animateValue, triggerHapticFeedback, showToast } from './effects.js';
 
 
 
@@ -454,7 +454,7 @@ function generateNextSemesterName(semesters, nextNum) {
 
 
 
-  if (semesters.length === 0) return `Hoc ky ${nextNum}`;
+  if (semesters.length === 0) return `Học kỳ ${nextNum}`;
 
 
 
@@ -474,7 +474,7 @@ function generateNextSemesterName(semesters, nextNum) {
 
 
 
-  if (!match) return `Hoc ky ${nextNum}`;
+  if (!match) return `Học kỳ ${nextNum}`;
 
 
 
@@ -538,7 +538,7 @@ function handleResetManual() {
 
 
 
-  if (!confirm('Ban co chac muon xoa toan bo du lieu tinh thu cong?')) return;
+  if (!confirm('Bạn có chắc muốn xóa toàn bộ dữ liệu tính thủ công?')) return;
 
 
 
@@ -1490,7 +1490,7 @@ function setupImportHandler(processImportBtn) {
 
 
 
-      alert('Vui long dan noi dung bang diem vao o trong.');
+      showToast('Vui lòng dán nội dung bảng điểm vào ô trống.', 'warning');
 
 
 
@@ -1518,7 +1518,7 @@ function setupImportHandler(processImportBtn) {
 
 
 
-      alert('Khong tim thay du lieu hop le. Vui long kiem tra lai dinh dang copy.');
+      showToast('Không tìm thấy dữ liệu hợp lệ. Vui lòng kiểm tra lại định dạng copy.', 'error');
 
 
 
@@ -1570,7 +1570,7 @@ function setupImportHandler(processImportBtn) {
 
 
 
-      alert('Co loi xay ra khi nhap du lieu. Vui long thu lai.');
+      showToast('Có lỗi xảy ra khi nhập dữ liệu. Vui lòng thử lại.', 'error');
 
 
 
@@ -1630,7 +1630,7 @@ function setupImportHandler(processImportBtn) {
 
 
 
-      alert(`Da nhap thanh cong ${importedSemesters.length} hoc ky voi ${addedCount} mon hoc.`);
+      showToast(`Đã nhập thành công ${importedSemesters.length} học kỳ với ${addedCount} môn học.`, 'success');
 
 
 
@@ -2822,7 +2822,7 @@ function animateGPAResult(displayGPA, requiredPoints, isImpossible = false) {
 
 
 
-    gpaTargetEl.innerHTML = 'Dat';
+    gpaTargetEl.innerHTML = 'Đạt';
 
 
 
@@ -2878,7 +2878,7 @@ function handleShareTarget() {
 
 
 
-      btn.innerHTML = '<i class="bi bi-check-lg me-1"></i>Da chep!';
+      btn.innerHTML = '<i class="bi bi-check-lg me-1"></i>Đã chép!';
 
 
 
@@ -2918,7 +2918,7 @@ function handleShareTarget() {
 
 
 
-    alert('Khong the sao chep lien ket. Ban co the chep thu cong tu thanh dia chi.');
+    showToast('Không thể sao chép liên kết. Bạn có thể chép thủ công từ thanh địa chỉ.', 'error');
 
 
 
@@ -2994,7 +2994,7 @@ function addRetakeItemUI(savedData = null) {
 
 
 
-      <span class="input-group-text bg-light text-muted small px-2">Diem cu</span>
+      <span class="input-group-text bg-light text-muted small px-2">Điểm cũ</span>
 
 
 
@@ -3542,7 +3542,7 @@ function calculateAndRenderCourseGrade(elements) {
 
 
 
-    elements.scoreToPassDisplay.textContent = "Da qua";
+    elements.scoreToPassDisplay.textContent = "Đã qua";
 
 
 
@@ -3550,7 +3550,7 @@ function calculateAndRenderCourseGrade(elements) {
 
 
 
-    elements.scoreToPassDisplay.textContent = "Khong the";
+    elements.scoreToPassDisplay.textContent = "Không thể";
 
 
 
@@ -3798,7 +3798,7 @@ function getGradeStatus(requiredFinal, gpa) {
 
 
 
-      message: `<span class="text-success fw-bold small"><i class="bi bi-check-circle-fill me-1"></i>Dat</span>`,
+      message: `<span class="text-success fw-bold small"><i class="bi bi-check-circle-fill me-1"></i>Đạt</span>`,
 
 
 
@@ -3834,7 +3834,7 @@ function getGradeStatus(requiredFinal, gpa) {
 
 
 
-      message: `<span class="text-muted small">Khong the (>10)</span>`,
+      message: `<span class="text-muted small">Không thể (>10)</span>`,
 
 
 
@@ -4654,7 +4654,7 @@ function setupImagePreview(fileInput, previewContainer, previewImg, removeImgBtn
 
 
 
-      alert('Anh qua lon! Vui long chon anh duoi 5MB.');
+      showToast('Ảnh quá lớn! Vui lòng chọn ảnh dưới 5MB.', 'warning');
 
 
 
@@ -4766,7 +4766,7 @@ function setupFormSubmission(form, submitBtn, listTabBtn, fileInput, previewCont
 
 
 
-    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Dang xu ly...';
+    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Đang xử lý...';
 
 
 
@@ -4802,11 +4802,7 @@ function setupFormSubmission(form, submitBtn, listTabBtn, fileInput, previewCont
 
 
 
-      alert('Tinh nang dang duoc bao tri (Chua cau hinh Server). Vui long lien he qua Facebook.');
-
-
-
-      alert('Tinh nang dang duoc bao tri (Chua cau hinh Server). Vui long lien he qua Facebook.');
+      showToast('Tính năng đang được bảo trì (Chưa cấu hình Server). Vui lòng liên hệ qua Facebook.', 'warning');
 
 
 
@@ -4834,11 +4830,11 @@ function setupFormSubmission(form, submitBtn, listTabBtn, fileInput, previewCont
 
 
 
-        submitBtn.textContent = 'Dang upload anh...';
+        submitBtn.textContent = 'Đang upload ảnh...';
 
 
 
-        submitBtn.textContent = 'Dang upload anh...';
+        submitBtn.textContent = 'Đang upload ảnh...';
 
 
 
@@ -4850,11 +4846,11 @@ function setupFormSubmission(form, submitBtn, listTabBtn, fileInput, previewCont
 
 
 
-      submitBtn.textContent = 'Dang gui gop y...';
+      submitBtn.textContent = 'Đang gửi góp ý...';
 
 
 
-        submitBtn.textContent = 'Dang gui gop y...';
+        submitBtn.textContent = 'Đang gửi góp ý...';
 
 
 
@@ -4862,11 +4858,11 @@ function setupFormSubmission(form, submitBtn, listTabBtn, fileInput, previewCont
 
 
 
-      alert('Cam on ban da dong gop y kien! Chung toi se xem xet som nhat.');
+      showToast('Cảm ơn bạn đã đóng góp ý kiến! Chúng tôi sẽ xem xét sớm nhất.', 'success');
 
 
 
-      alert('Cam on ban da dong gop y kien! Chung toi se xem xet som nhat.');
+      showToast('Cam on ban da dong gop y kien! Chung toi se xem xet som nhat.', 'success');
 
 
 
@@ -4919,7 +4915,7 @@ function setupFormSubmission(form, submitBtn, listTabBtn, fileInput, previewCont
 
 
       if (error.message !== 'User cancelled due to upload failure') {
-        alert('Co loi xay ra khi gui gop y. Vui long thu lai sau.');
+        showToast('Có lỗi xảy ra khi gửi góp ý. Vui lòng thử lại sau.', 'error');
       }
     } finally {
 
@@ -5113,7 +5109,7 @@ function setupFeedbackList(listTabBtn, refreshBtn) {
 
 
 
-        <p class="small mb-0">Dang tai du lieu...</p>
+        <p class="small mb-0">Đang tải dữ liệu...</p>
 
 
 
@@ -5169,7 +5165,7 @@ function setupFeedbackList(listTabBtn, refreshBtn) {
 
 
 
-          <p class="small mb-0">Khong the tai du lieu. Vui long thu lai sau.</p>
+          <p class="small mb-0">Không thể tải dữ liệu. Vui lòng thử lại sau.</p>
 
 
 
@@ -5449,7 +5445,7 @@ function getFeedbackTypeBadge(type) {
 
 
 
-  return badges[type] || '<span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill">Khac</span>';
+  return badges[type] || '<span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill">Khác</span>';
 
 
 

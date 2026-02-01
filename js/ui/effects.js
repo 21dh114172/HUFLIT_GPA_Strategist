@@ -46,37 +46,76 @@ export function triggerHapticFeedback(duration = 10) {
 
 export function initChristmasTreeInteraction() {
     // Disabled
-    /*
-    const treeContainer = document.querySelector('.christmas-tree-container');
-    const tree = document.querySelector('.christmas-tree');
+}
 
-    if (treeContainer && tree) {
-        treeContainer.addEventListener('click', () => {
-            // 1. Shake Effect
-            // Remove class if it exists to restart animation
-            tree.classList.remove('shake');
-            
-            // Trigger reflow
-            void tree.offsetWidth;
-            
-            // Add class
-            tree.classList.add('shake');
-
-            // Remove class after animation ends to return to sway
-            setTimeout(() => {
-                tree.classList.remove('shake');
-            }, 500); // Match animation duration
-
-            // 2. Toggle Snow Effect
-            const snowContainer = document.getElementById('snow-container');
-            if (snowContainer) {
-                if (snowContainer.style.display === 'none') {
-                    snowContainer.style.display = 'block';
-                } else {
-                    snowContainer.style.display = 'none';
-                }
-            }
-        });
+/**
+ * Hiển thị toast notification thay thế alert()
+ * @param {string} message - Nội dung thông báo
+ * @param {string} type - Loại: 'info', 'success', 'warning', 'error'
+ * @param {number} duration - Thời gian hiển thị (ms)
+ */
+export function showToast(message, type = 'info', duration = 3000) {
+    // Tạo container nếu chưa có
+    let container = document.getElementById('toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'toast-container';
+        container.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        `;
+        document.body.appendChild(container);
     }
-    */
+
+    // Màu sắc theo type
+    const colors = {
+        info: { bg: '#0dcaf0', icon: 'bi-info-circle' },
+        success: { bg: '#198754', icon: 'bi-check-circle' },
+        warning: { bg: '#ffc107', icon: 'bi-exclamation-triangle' },
+        error: { bg: '#dc3545', icon: 'bi-x-circle' }
+    };
+    const color = colors[type] || colors.info;
+
+    // Tạo toast element
+    const toast = document.createElement('div');
+    toast.style.cssText = `
+        background: ${color.bg};
+        color: white;
+        padding: 12px 16px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 280px;
+        max-width: 400px;
+        font-size: 14px;
+        animation: slideInRight 0.3s ease;
+        cursor: pointer;
+    `;
+    toast.innerHTML = `
+        <i class="bi ${color.icon}"></i>
+        <span style="flex: 1;">${message}</span>
+        <i class="bi bi-x" style="opacity: 0.7;"></i>
+    `;
+
+    // Click để đóng
+    toast.addEventListener('click', () => removeToast(toast));
+
+    container.appendChild(toast);
+
+    // Tự động đóng sau duration
+    if (duration > 0) {
+        setTimeout(() => removeToast(toast), duration);
+    }
+}
+
+function removeToast(toast) {
+    toast.style.animation = 'slideOutRight 0.3s ease';
+    setTimeout(() => toast.remove(), 300);
 }
