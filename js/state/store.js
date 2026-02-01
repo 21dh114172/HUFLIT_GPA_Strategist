@@ -133,7 +133,8 @@ function saveTargetStateToStorage() {
     if (saveTargetTimeout) clearTimeout(saveTargetTimeout);
     saveTargetTimeout = setTimeout(() => {
         localStorage.setItem('targetState', JSON.stringify(targetState));
-        console.log("Target state saved (debounced)");
+        // console.log("Target state saved (debounced)");
+
     }, 500);
 }
 

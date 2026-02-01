@@ -2303,3 +2303,42 @@ body {
         transform: translateX(100%);
     }
 }
+
+/* Helper Classes for Clean Code Refactor */
+.form-switch-lg {
+    width: 3em !important;
+    height: 1.5em !important;
+}
+
+.icon-box-lg {
+    width: 100px;
+    height: 100px;
+}
+
+.icon-size-3rem {
+    font-size: 3rem;
+}
+
+.max-w-300 {
+    max-width: 300px;
+}
+
+.sticky-summary-top {
+    top: 90px;
+    z-index: 100;
+}
+
+.input-height-40 {
+    height: 40px;
+}
+
+.scale-icon-box {
+    width: 45px;
+    height: 45px;
+    min-width: 45px;
+}
+
+.scale-title-responsive {
+    font-size: clamp(1.1rem, 4vw, 1.5rem);
+}
+

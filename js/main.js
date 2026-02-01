@@ -4,7 +4,7 @@ import { decodeState } from './core/share.js';
 import { setTargetState, subscribe } from './state/store.js';
 
 // Polyfill for requestIdleCallback (Safari doesn't support it)
-const requestIdleCallback = window.requestIdleCallback || function(cb) {
+const requestIdleCallback = window.requestIdleCallback || function (cb) {
     const start = Date.now();
     return setTimeout(() => {
         cb({
@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // CRITICAL: Essential initializations (must run immediately)
     initTargetGPATab();
     initThemeToggle();
-    
+
     // NON-CRITICAL: Defer to idle time for better performance
     requestIdleCallback(() => {
         initUserGuide();
@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
             const calcBtn = document.getElementById('calc-target-btn');
             if (calcBtn) calcBtn.click();
-            
+
             // Xóa tham số share trên URL để tránh nạp lại khi refresh (tùy chọn)
             window.history.replaceState({}, document.title, window.location.pathname);
         }, 500);
@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
     allNavLinks.forEach(link => {
         link.addEventListener('shown.bs.tab', (e) => {
             const targetId = e.target.getAttribute('data-bs-target');
-            
+
             // Lazy load tab-specific logic
             if (!initializedTabs.has(targetId)) {
                 if (targetId === '#pills-manual') initManualCalcTab();
@@ -82,12 +82,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const correspondingLinks = document.querySelectorAll(`.nav-link[data-bs-toggle="pill"][data-bs-target="${targetId}"]`);
-            
+
             correspondingLinks.forEach(other => {
                 if (other !== e.target) {
                     other.classList.add('active');
                     other.setAttribute('aria-selected', 'true');
-                    
+
                     const container = other.closest('.nav');
                     if (container) {
                         container.querySelectorAll('.nav-link').forEach(sib => {
