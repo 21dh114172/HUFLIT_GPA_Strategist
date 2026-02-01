@@ -1,1725 +1,6127 @@
 /**
+
+
+
  * UI Event Handlers
+
+
+
  * Handles user interactions and coordinates between UI, state, and calculations
+
+
+
  */
 
+
+
+
+
+
+
 import { GRADE_SCALE } from '../core/constants.js';
+
+
+
 import { API_CONFIG, UI_CONFIG } from '../core/config.js';
+
+
+
 import { debounce, throttle, isMobileDevice } from '../core/helpers.js';
+
+
+
 import {
+
+
+
   getManualState,
+
+
+
   setManualState,
+
+
+
   addManualSemester,
+
+
+
   removeManualSemester,
+
+
+
   updateManualCourse,
+
+
+
   addManualCourse,
+
+
+
   removeManualCourse,
+
+
+
   loadManualStateFromStorage,
+
+
+
   getTargetState,
+
+
+
   setTargetState,
+
+
+
   loadTargetStateFromStorage,
+
+
+
   subscribe
+
+
+
 } from '../state/store.js';
+
+
+
 import {
+
+
+
   calculateManualGPA,
+
+
+
   calculateTargetResult,
+
+
+
   generateRetakeSuggestions,
+
+
+
   generateGradeCombinations,
+
+
+
   generateScenarioText
+
+
+
 } from '../core/calculator.js';
+
+
+
 import { ManualActions } from '../state/actions.js';
+
+
+
 import { renderManualSemesters } from './renderers.js';
+
+
+
 import { animateValue, triggerHapticFeedback } from './effects.js';
+
+
+
 import { parsePortalText } from '../core/utils.js';
+
+
+
 import { generateShareUrl } from '../core/share.js';
+
+
+
 import {
+
+
+
   getStatusInfo,
+
+
+
   renderMainResult,
+
+
+
   renderAlgorithmDetails,
+
+
+
   renderRetakeSuggestions
+
+
+
 } from './templates/target-result.js';
-import { PDFExportService } from '../services/pdf-export.js';
+
+
+
+
+
+
 
 // ==========================================
+
+
+
 // Performance Utilities
+
+
+
 // ==========================================
+
+
+
+
+
+
 
 const isMobile = isMobileDevice();
+
+
+
 const RENDER_DEBOUNCE_MS = isMobile ? 200 : 50;
+
+
+
 const throttledHaptic = throttle((duration) => triggerHapticFeedback(duration), 300);
 
-// ==========================================
-// Tab: Manual GPA Calculation
+
+
+
+
+
+
 // ==========================================
 
+
+
+// Tab: Manual GPA Calculation
+
+
+
+// ==========================================
+
+
+
+
+
+
+
 export function initManualCalcTab() {
+
+
+
   const elements = {
+
+
+
     addSemesterBtn: document.getElementById('add-semester-btn'),
+
+
+
     manualSemesterList: document.getElementById('manual-semester-list'),
+
+
+
     resetManualBtn: document.getElementById('reset-manual-btn'),
+
+
+
     manualInitialGpaInput: document.getElementById('manual-initial-gpa'),
+
+
+
     manualInitialCreditsInput: document.getElementById('manual-initial-credits'),
+
+
+
     processImportBtn: document.getElementById('process-import-btn'),
+
+
+
     applyBtn: document.getElementById('apply-manual-to-target-btn')
+
+
+
   };
+
+
+
+
+
+
 
   if (!elements.addSemesterBtn) return;
 
+
+
+
+
+
+
   setupManualCalcEventListeners(elements);
+
+
+
   setupImportHandler(elements.processImportBtn);
+
+
+
   setupApplyToTargetHandler(elements.applyBtn);
+
+
+
   
+
+
+
   // Subscribe to state changes
+
+
+
   subscribe(debounce(() => {
+
+
+
     renderManualSemesters();
+
+
+
     updateManualCalculationDisplay();
+
+
+
   }, RENDER_DEBOUNCE_MS));
 
+
+
+
+
+
+
   // Initial load
+
+
+
   loadManualStateFromStorage();
+
+
+
 }
+
+
+
+
+
+
 
 function setupManualCalcEventListeners(elements) {
+
+
+
   // Add semester
+
+
+
   elements.addSemesterBtn.addEventListener('click', handleAddSemester);
+
+
+
   
+
+
+
   // Reset
+
+
+
   elements.resetManualBtn.addEventListener('click', handleResetManual);
+
+
+
   
+
+
+
   // Initial data inputs
+
+
+
   elements.manualInitialGpaInput.addEventListener('input', (e) => {
+
+
+
     setManualState({ initialGpa: e.target.value });
+
+
+
   });
+
+
+
   
+
+
+
   elements.manualInitialCreditsInput.addEventListener('input', (e) => {
+
+
+
     setManualState({ initialCredits: e.target.value });
+
+
+
   });
+
+
+
+
+
+
 
   // Event delegation for dynamic elements
+
+
+
   setupSemesterListDelegation(elements.manualSemesterList);
+
+
+
 }
+
+
+
+
+
+
 
 function handleAddSemester() {
+
+
+
   const { semesters } = getManualState();
+
+
+
   const nextNum = semesters.length + 1;
+
+
+
   const nextName = generateNextSemesterName(semesters, nextNum);
 
+
+
+
+
+
+
   addManualSemester({
+
+
+
     id: Date.now(),
+
+
+
     name: nextName,
+
+
+
     courses: []
+
+
+
   });
+
+
+
   throttledHaptic(20);
+
+
+
 }
+
+
+
+
+
+
 
 function generateNextSemesterName(semesters, nextNum) {
-  if (semesters.length === 0) return `Học kỳ ${nextNum}`;
+
+
+
+  if (semesters.length === 0) return `Hoc ky ${nextNum}`;
+
+
+
   
+
+
+
   const lastSem = semesters[semesters.length - 1];
+
+
+
   const match = lastSem.name.match(/HK(\d+)\s*\((\d{4})-(\d{4})\)/);
+
+
+
   
-  if (!match) return `Học kỳ ${nextNum}`;
+
+
+
+  if (!match) return `Hoc ky ${nextNum}`;
+
+
+
   
+
+
+
   let hk = parseInt(match[1]);
+
+
+
   let y1 = parseInt(match[2]);
+
+
+
   let y2 = parseInt(match[3]);
 
+
+
+
+
+
+
   hk++;
+
+
+
   if (hk > 3) {
+
+
+
     hk = 1;
+
+
+
     y1++;
+
+
+
     y2++;
+
+
+
   }
+
+
+
   return `HK0${hk} (${y1}-${y2})`;
+
+
+
 }
+
+
+
+
+
+
 
 function handleResetManual() {
-  if (!confirm('Bạn có chắc muốn xóa toàn bộ dữ liệu tính thủ công?')) return;
+
+
+
+  if (!confirm('Ban co chac muon xoa toan bo du lieu tinh thu cong?')) return;
+
+
+
   
+
+
+
   setManualState({
+
+
+
     semesters: [],
+
+
+
     initialGpa: '',
+
+
+
     initialCredits: ''
+
+
+
   });
+
+
+
   
+
+
+
   const gpaInput = document.getElementById('manual-initial-gpa');
+
+
+
   const creditsInput = document.getElementById('manual-initial-credits');
+
+
+
   if (gpaInput) gpaInput.value = '';
+
+
+
   if (creditsInput) creditsInput.value = '';
+
+
+
 }
+
+
+
+
+
+
 
 function setupSemesterListDelegation(list) {
+
+
+
   let deleteTimeout = null;
 
+
+
+
+
+
+
   list.addEventListener('click', (e) => {
+
+
+
     const target = e.target;
+
+
+
+
+
+
 
     // Adjust credit
+
+
+
     const adjustBtn = target.closest('.adjust-credit-btn');
+
+
+
     if (adjustBtn) {
+
+
+
       handleAdjustCredit(adjustBtn);
+
+
+
       return;
+
+
+
     }
+
+
+
+
+
+
 
     // Delete semester (request confirmation)
+
+
+
     const deleteBtn = target.closest('.delete-semester-btn');
+
+
+
     if (deleteBtn) {
+
+
+
       handleDeleteRequest(deleteBtn, deleteTimeout);
+
+
+
       return;
+
+
+
     }
+
+
+
+
+
+
 
     // Confirm delete semester
+
+
+
     const confirmBtn = target.closest('.confirm-delete-semester-btn');
+
+
+
     if (confirmBtn) {
+
+
+
       handleConfirmDelete(confirmBtn, deleteTimeout);
+
+
+
       return;
+
+
+
     }
+
+
+
+
+
+
 
     // Add course
+
+
+
     if (target.closest('.add-course-btn')) {
+
+
+
       const semId = target.closest('.add-course-btn').dataset.id;
+
+
+
       addManualCourse(semId, {
+
+
+
         id: Date.now(),
+
+
+
         name: '',
+
+
+
         credits: 3,
+
+
+
         grade: '',
+
+
+
         isRetake: false,
+
+
+
         oldGrade: 'D'
+
+
+
       });
+
+
+
       throttledHaptic();
+
+
+
       return;
+
+
+
     }
+
+
+
+
+
+
 
     // Delete course
+
+
+
     if (target.closest('.delete-course-btn')) {
+
+
+
       const btn = target.closest('.delete-course-btn');
+
+
+
       removeManualCourse(btn.dataset.semId, btn.dataset.courseId);
+
+
+
       throttledHaptic(15);
+
+
+
     }
+
+
+
   });
+
+
+
+
+
+
 
   list.addEventListener('change', (e) => {
+
+
+
     const target = e.target;
+
+
+
     if (target.classList.contains('manual-input')) {
+
+
+
       const { semId, courseId, field } = target.dataset;
+
+
+
       const value = target.type === 'checkbox' ? target.checked : target.value;
+
+
+
       updateManualCourse(semId, courseId, field, value);
+
+
+
       throttledHaptic();
+
+
+
     }
+
+
+
   });
+
+
+
+
+
+
 
   list.addEventListener('input', (e) => {
+
+
+
     const target = e.target;
+
+
+
     if (target.classList.contains('manual-input') && target.dataset.field === 'credits') {
+
+
+
       const { semId, courseId } = target.dataset;
+
+
+
       updateManualCourse(semId, courseId, 'credits', target.value);
+
+
+
     }
+
+
+
   });
+
+
+
 }
+
+
+
+
+
+
 
 function handleAdjustCredit(btn) {
+
+
+
   const { semId, courseId, action } = btn.dataset;
+
+
+
   const delta = action === 'increase' ? 1 : -1;
 
+
+
+
+
+
+
   const { semesters } = getManualState();
+
+
+
   const semester = semesters.find(s => String(s.id) === String(semId));
+
+
+
   if (!semester) return;
 
+
+
+
+
+
+
   const course = semester.courses.find(c => String(c.id) === String(courseId));
+
+
+
   if (!course) return;
 
+
+
+
+
+
+
   let val = parseFloat(course.credits) || 0;
+
+
+
   val += delta;
+
+
+
   if (val < 0) val = 0;
+
+
+
   
+
+
+
   updateManualCourse(semId, courseId, 'credits', val);
+
+
+
   throttledHaptic();
+
+
+
 }
+
+
+
+
+
+
 
 function handleDeleteRequest(deleteBtn, deleteTimeout) {
+
+
+
   if (deleteTimeout) clearTimeout(deleteTimeout);
+
+
+
+
+
+
 
   deleteBtn.classList.remove('delete-semester-btn', 'text-danger', 'btn-link');
+
+
+
   deleteBtn.classList.add('confirm-delete-semester-btn', 'btn-danger', 'text-white');
-  deleteBtn.innerHTML = 'Xóa?';
+
+
+
+  deleteBtn.innerHTML = 'Xoa?';
+
+
+
+
+
+
 
   setTimeout(() => {
+
+
+
     if (deleteBtn && document.body.contains(deleteBtn) && deleteBtn.classList.contains('confirm-delete-semester-btn')) {
+
+
+
       deleteBtn.classList.add('delete-semester-btn', 'text-danger', 'btn-link');
+
+
+
       deleteBtn.classList.remove('confirm-delete-semester-btn', 'btn-danger', 'text-white');
+
+
+
       deleteBtn.innerHTML = '<i class="bi bi-trash"></i>';
+
+
+
     }
+
+
+
   }, 2000);
+
+
+
 }
+
+
+
+
+
+
 
 function handleConfirmDelete(confirmBtn, deleteTimeout) {
+
+
+
   if (deleteTimeout) clearTimeout(deleteTimeout);
+
+
+
   removeManualSemester(confirmBtn.dataset.id);
+
+
+
   throttledHaptic(25);
+
+
+
 }
 
+
+
+
+
+
+
 function setupApplyToTargetHandler(applyBtn) {
+
+
+
   if (!applyBtn) return;
 
+
+
+
+
+
+
   applyBtn.addEventListener('click', () => {
+
+
+
     const manualGpaDisplay = document.getElementById('manual-gpa');
+
+
+
     const manualCreditsDisplay = document.getElementById('manual-credits');
 
+
+
+
+
+
+
     const gpa = manualGpaDisplay?.textContent || '0';
+
+
+
     const credits = manualCreditsDisplay?.textContent || '0';
 
+
+
+
+
+
+
     const targetGpaInput = document.getElementById('current-gpa');
+
+
+
     const targetCreditsInput = document.getElementById('current-credits');
+
+
+
     const goalGpaInput = document.getElementById('target-gpa');
+
+
+
     const newCreditsInput = document.getElementById('new-credits');
+
+
+
+
+
+
 
     if (!targetGpaInput || !targetCreditsInput) return;
 
+
+
+
+
+
+
     const remainingCredits = calculateRemainingCredits();
 
+
+
+
+
+
+
     targetGpaInput.value = gpa;
+
+
+
     targetCreditsInput.value = credits;
+
+
+
     targetGpaInput.dispatchEvent(new Event('input'));
+
+
+
     targetCreditsInput.dispatchEvent(new Event('input'));
 
+
+
+
+
+
+
     if (newCreditsInput) {
+
+
+
       newCreditsInput.value = remainingCredits > 0 ? remainingCredits : '';
+
+
+
       newCreditsInput.dispatchEvent(new Event('input'));
+
+
+
       
+
+
+
       if (remainingCredits > 0) {
+
+
+
         const newCreditsGroup = document.getElementById('new-credits-group');
+
+
+
         const totalCreditsGroup = document.getElementById('total-credits-group');
+
+
+
         if (newCreditsGroup && totalCreditsGroup) {
+
+
+
           newCreditsGroup.classList.remove('d-none');
+
+
+
           totalCreditsGroup.classList.add('d-none');
+
+
+
         }
+
+
+
         newCreditsInput.classList.add('is-valid');
+
+
+
         setTimeout(() => newCreditsInput.classList.remove('is-valid'), 2000);
+
+
+
       }
+
+
+
     }
+
+
+
+
+
+
 
     suggestTargetGPA(goalGpaInput, parseFloat(gpa));
+
+
+
     switchToTargetTab();
+
+
+
     highlightInputs([targetGpaInput, targetCreditsInput]);
+
+
+
     focusCreditsInput(newCreditsInput);
+
+
+
   });
+
+
+
 }
+
+
+
+
+
+
 
 function calculateRemainingCredits() {
+
+
+
   const { semesters } = getManualState();
+
+
+
   let remainingCredits = 0;
 
+
+
+
+
+
+
   semesters.forEach(sem => {
+
+
+
     sem.courses?.forEach(course => {
+
+
+
       const hasValidGrade = course.grade && GRADE_SCALE.some(g => g.grade === course.grade);
+
+
+
       if (!hasValidGrade) {
+
+
+
         remainingCredits += parseFloat(course.credits) || 0;
+
+
+
       }
+
+
+
     });
+
+
+
   });
+
+
+
+
+
+
 
   return remainingCredits;
+
+
+
 }
+
+
+
+
+
+
 
 function suggestTargetGPA(goalGpaInput, currentGpaVal) {
+
+
+
   if (!goalGpaInput) return;
+
+
+
   
+
+
+
   let suggestedTarget = '4.0';
+
+
+
   if (currentGpaVal < 2.0) suggestedTarget = '2.0';
+
+
+
   else if (currentGpaVal < 2.5) suggestedTarget = '2.5';
+
+
+
   else if (currentGpaVal < 3.2) suggestedTarget = '3.2';
+
+
+
   else if (currentGpaVal < 3.6) suggestedTarget = '3.6';
 
+
+
+
+
+
+
   goalGpaInput.value = suggestedTarget;
+
+
+
   goalGpaInput.dispatchEvent(new Event('input'));
+
+
+
   goalGpaInput.classList.add('is-valid');
+
+
+
   setTimeout(() => goalGpaInput.classList.remove('is-valid'), 2000);
+
+
+
 }
+
+
+
+
+
+
 
 function switchToTargetTab() {
+
+
+
   const targetTabBtn = document.querySelector('button[data-bs-target="#pills-target"]');
+
+
+
   if (targetTabBtn) {
+
+
+
     const tab = bootstrap.Tab.getOrCreateInstance(targetTabBtn);
+
+
+
     tab.show();
+
+
+
   }
+
+
+
 }
+
+
+
+
+
+
 
 function highlightInputs(inputs) {
+
+
+
   inputs.forEach(input => {
+
+
+
     if (input) {
+
+
+
       input.classList.add('is-valid');
+
+
+
       setTimeout(() => input.classList.remove('is-valid'), 2000);
+
+
+
     }
+
+
+
   });
+
+
+
 }
+
+
+
+
+
+
 
 function focusCreditsInput(newCreditsInput) {
+
+
+
   const totalCreditsInput = document.getElementById('total-credits');
+
+
+
   
+
+
+
   if (newCreditsInput && newCreditsInput.offsetParent !== null) {
+
+
+
     newCreditsInput.focus();
+
+
+
     newCreditsInput.select();
+
+
+
   } else if (totalCreditsInput) {
+
+
+
     totalCreditsInput.focus();
+
+
+
     totalCreditsInput.select();
+
+
+
   }
+
+
+
 }
 
+
+
+
+
+
+
 function setupImportHandler(processImportBtn) {
+
+
+
   if (!processImportBtn) return;
 
+
+
+
+
+
+
   processImportBtn.addEventListener('click', () => {
+
+
+
     const text = document.getElementById('import-text-area')?.value || '';
+
+
+
     
+
+
+
     if (!text.trim()) {
-      alert('Vui lòng dán nội dung bảng điểm vào ô trống.');
+
+
+
+      alert('Vui long dan noi dung bang diem vao o trong.');
+
+
+
       return;
+
+
+
     }
+
+
+
+
+
+
 
     const importedSemesters = parsePortalText(text);
 
+
+
+
+
+
+
     if (importedSemesters.length === 0) {
-      alert('Không tìm thấy dữ liệu hợp lệ. Vui lòng kiểm tra lại định dạng copy.');
+
+
+
+      alert('Khong tim thay du lieu hop le. Vui long kiem tra lai dinh dang copy.');
+
+
+
       return;
+
+
+
     }
+
+
+
+
+
+
 
     // Clear input fields
+
+
+
     const manualInitialGpaInput = document.getElementById('manual-initial-gpa');
+
+
+
     const manualInitialCreditsInput = document.getElementById('manual-initial-credits');
+
+
+
     if (manualInitialGpaInput) manualInitialGpaInput.value = '';
+
+
+
     if (manualInitialCreditsInput) manualInitialCreditsInput.value = '';
 
+
+
+
+
+
+
     const success = ManualActions.importFromPortal(importedSemesters);
+
+
+
     
+
+
+
     if (!success) {
-      alert('Có lỗi xảy ra khi nhập dữ liệu. Vui lòng thử lại.');
+
+
+
+      alert('Co loi xay ra khi nhap du lieu. Vui long thu lai.');
+
+
+
       return;
+
+
+
     }
+
+
+
+
+
+
 
     const addedCount = importedSemesters.reduce((sum, sem) => sum + (sem.courses?.length || 0), 0);
 
+
+
+
+
+
+
     processImportBtn.blur();
+
+
+
     const modalEl = document.getElementById('importModal');
+
+
+
     const modal = bootstrap.Modal.getInstance(modalEl);
+
+
+
     modal?.hide();
+
+
+
     
+
+
+
     const textArea = document.getElementById('import-text-area');
+
+
+
     if (textArea) textArea.value = '';
 
+
+
+
+
+
+
     setTimeout(() => {
-      alert(`Đã nhập thành công ${importedSemesters.length} học kỳ với ${addedCount} môn học.`);
+
+
+
+      alert(`Da nhap thanh cong ${importedSemesters.length} hoc ky voi ${addedCount} mon hoc.`);
+
+
+
     }, 150);
+
+
+
   });
+
+
+
 }
+
+
+
+
+
+
 
 function updateManualCalculationDisplay() {
+
+
+
   const { semesters, initialGpa, initialCredits } = getManualState();
+
+
+
   const { gpa, totalCredits, rank } = calculateManualGPA(
+
+
+
     semesters, 
+
+
+
     parseFloat(initialGpa) || 0, 
+
+
+
     parseFloat(initialCredits) || 0
+
+
+
   );
 
+
+
+
+
+
+
   const manualGpaDisplay = document.getElementById('manual-gpa');
+
+
+
   const manualCreditsDisplay = document.getElementById('manual-credits');
+
+
+
   const manualRankDisplay = document.getElementById('manual-rank');
 
+
+
+
+
+
+
   if (manualGpaDisplay) {
+
+
+
     const currentVal = parseFloat(manualGpaDisplay.textContent) || 0;
+
+
+
     animateValue(manualGpaDisplay, currentVal, gpa, 800, 2);
+
+
+
     manualGpaDisplay.className = `display-1 fw-bold mb-2 ${gpa >= 3.2 ? 'text-success' : (gpa >= 2.5 ? 'text-primary' : 'text-danger')}`;
+
+
+
   }
+
+
+
   if (manualCreditsDisplay) manualCreditsDisplay.textContent = totalCredits;
+
+
+
   if (manualRankDisplay) manualRankDisplay.textContent = rank;
+
+
+
 }
 
+
+
+
+
+
+
 // ==========================================
+
+
+
 // Tab: Target GPA
+
+
+
 // ==========================================
+
+
+
+
+
+
 
 export function initTargetGPATab() {
+
+
+
   const elements = getTargetElements();
+
+
+
   if (!elements.calcTargetBtn) return;
 
+
+
+
+
+
+
   loadTargetStateFromStorage();
+
+
+
   restoreUIState(elements);
+
+
+
   setupTargetEventListeners(elements);
+
+
+
   
+
+
+
   subscribe(() => {
+
+
+
     // Update UI based on state if needed
+
+
+
   });
+
+
+
 }
+
+
+
+
+
+
 
 function getTargetElements() {
+
+
+
   return {
+
+
+
     calcTargetBtn: document.getElementById('calc-target-btn'),
+
+
+
     currentGpaInput: document.getElementById('current-gpa'),
+
+
+
     currentCreditsInput: document.getElementById('current-credits'),
+
+
+
     targetGpaInput: document.getElementById('target-gpa'),
+
+
+
     newCreditsInput: document.getElementById('new-credits'),
+
+
+
     totalCreditsInput: document.getElementById('total-credits'),
+
+
+
     retakeToggle: document.getElementById('retake-toggle'),
+
+
+
     retakeArea: document.getElementById('retake-area'),
+
+
+
     retakeList: document.getElementById('retake-list'),
+
+
+
     addRetakeBtn: document.getElementById('add-retake-btn'),
+
+
+
     btnSwitchToTotal: document.getElementById('btn-switch-to-total'),
+
+
+
     btnSwitchToNew: document.getElementById('btn-switch-to-new'),
+
+
+
     newCreditsGroup: document.getElementById('new-credits-group'),
+
+
+
     totalCreditsGroup: document.getElementById('total-credits-group'),
-    shareTargetBtn: document.getElementById('share-target-btn'),
-    exportPdfBtn: document.getElementById('export-pdf-btn')
+
+
+
+    shareTargetBtn: document.getElementById('share-target-btn')
+
+
+
   };
+
+
+
 }
+
+
+
+
+
+
 
 function restoreUIState(elements) {
+
+
+
   const initialState = getTargetState();
 
+
+
+
+
+
+
   if (elements.currentGpaInput) elements.currentGpaInput.value = initialState.currentGpa || '';
+
+
+
   if (elements.currentCreditsInput) elements.currentCreditsInput.value = initialState.currentCredits || '';
+
+
+
   if (elements.targetGpaInput) elements.targetGpaInput.value = initialState.targetGpa || '';
+
+
+
   if (elements.newCreditsInput) elements.newCreditsInput.value = initialState.newCredits || '';
+
+
+
   if (elements.totalCreditsInput) elements.totalCreditsInput.value = initialState.totalCredits || '';
 
+
+
+
+
+
+
   if (initialState.creditMode === 'total') {
+
+
+
     elements.newCreditsGroup?.classList.add('d-none');
+
+
+
     elements.totalCreditsGroup?.classList.remove('d-none');
+
+
+
   } else {
+
+
+
     elements.totalCreditsGroup?.classList.add('d-none');
+
+
+
     elements.newCreditsGroup?.classList.remove('d-none');
+
+
+
   }
+
+
+
+
+
+
 
   if (elements.retakeToggle) {
+
+
+
     elements.retakeToggle.checked = initialState.isRetake || false;
+
+
+
     if (initialState.isRetake) {
+
+
+
       elements.retakeArea?.classList.remove('d-none');
+
+
+
       elements.retakeList.innerHTML = '';
+
+
+
       initialState.retakes.forEach(r => addRetakeItemUI(r));
+
+
+
     } else {
+
+
+
       elements.retakeArea?.classList.add('d-none');
+
+
+
     }
+
+
+
   }
+
+
+
 }
+
+
+
+
+
+
 
 function setupTargetEventListeners(elements) {
+
+
+
   // Input listeners
+
+
+
   const inputs = [
+
+
+
     elements.currentGpaInput,
+
+
+
     elements.currentCreditsInput,
+
+
+
     elements.targetGpaInput,
+
+
+
     elements.newCreditsInput,
+
+
+
     elements.totalCreditsInput
+
+
+
   ].filter(Boolean);
 
+
+
+
+
+
+
   inputs.forEach(input => {
+
+
+
     input.addEventListener('input', () => saveStateFromInputs(elements));
+
+
+
   });
+
+
+
+
+
+
 
   // Credit mode switches
+
+
+
   setupCreditModeSwitches(elements);
 
+
+
+
+
+
+
   // Retake toggle
+
+
+
   elements.retakeToggle?.addEventListener('change', (e) => {
+
+
+
     if (e.target.checked) {
+
+
+
       elements.retakeArea?.classList.remove('d-none');
+
+
+
       if (elements.retakeList.children.length === 0) addRetakeItemUI();
+
+
+
     } else {
+
+
+
       elements.retakeArea?.classList.add('d-none');
+
+
+
       elements.retakeList.innerHTML = '';
+
+
+
     }
+
+
+
     saveStateFromInputs(elements);
+
+
+
   });
+
+
+
+
+
+
 
   // Add retake button
+
+
+
   elements.addRetakeBtn?.addEventListener('click', () => {
+
+
+
     addRetakeItemUI();
+
+
+
     saveStateFromInputs(elements);
+
+
+
   });
+
+
+
+
+
+
 
   // Calculate button
+
+
+
   elements.calcTargetBtn?.addEventListener('click', () => handleCalculateTarget(elements));
 
+
+
+
+
+
+
   // Share button
+
+
+
   elements.shareTargetBtn?.addEventListener('click', handleShareTarget);
 
-  // Export PDF button - open options modal
-  elements.exportPdfBtn?.addEventListener('click', () => {
-    showPDFExportModal();
-  });
+
+
 }
+
+
+
+
+
+
 
 function setupCreditModeSwitches(elements) {
+
+
+
   elements.btnSwitchToTotal?.addEventListener('click', () => {
+
+
+
     setTargetState({ creditMode: 'total' });
+
+
+
     elements.newCreditsGroup?.classList.add('d-none');
+
+
+
     elements.totalCreditsGroup?.classList.remove('d-none');
+
+
+
     
+
+
+
     const current = parseFloat(elements.currentCreditsInput?.value) || 0;
+
+
+
     const newCred = parseFloat(elements.newCreditsInput?.value) || 0;
+
+
+
     if (!elements.totalCreditsInput?.value) elements.totalCreditsInput.value = current + newCred;
+
+
+
     saveStateFromInputs(elements);
+
+
+
   });
+
+
+
+
+
+
 
   elements.btnSwitchToNew?.addEventListener('click', () => {
+
+
+
     setTargetState({ creditMode: 'new' });
+
+
+
     elements.totalCreditsGroup?.classList.add('d-none');
+
+
+
     elements.newCreditsGroup?.classList.remove('d-none');
+
+
+
     
+
+
+
     const current = parseFloat(elements.currentCreditsInput?.value) || 0;
+
+
+
     const total = parseFloat(elements.totalCreditsInput?.value) || 0;
+
+
+
     if (!elements.newCreditsInput?.value) elements.newCreditsInput.value = Math.max(0, total - current);
+
+
+
     saveStateFromInputs(elements);
+
+
+
   });
+
+
+
+
+
+
 
   // Sync logic
+
+
+
   elements.totalCreditsInput?.addEventListener('input', () => {
+
+
+
     const total = parseFloat(elements.totalCreditsInput.value) || 0;
+
+
+
     const current = parseFloat(elements.currentCreditsInput?.value) || 0;
+
+
+
     if (elements.newCreditsInput) elements.newCreditsInput.value = Math.max(0, total - current);
+
+
+
     saveStateFromInputs(elements);
+
+
+
   });
+
+
+
+
+
+
 
   elements.newCreditsInput?.addEventListener('input', () => {
+
+
+
     const newCred = parseFloat(elements.newCreditsInput?.value) || 0;
+
+
+
     const current = parseFloat(elements.currentCreditsInput?.value) || 0;
+
+
+
     if (elements.totalCreditsInput) elements.totalCreditsInput.value = current + newCred;
+
+
+
     saveStateFromInputs(elements);
+
+
+
   });
+
+
+
+
+
+
 
   elements.currentCreditsInput?.addEventListener('input', () => {
+
+
+
     const current = parseFloat(elements.currentCreditsInput.value) || 0;
+
+
+
     const { creditMode } = getTargetState();
+
+
+
     if (creditMode === 'total') {
+
+
+
       const total = parseFloat(elements.totalCreditsInput?.value) || 0;
+
+
+
       if (elements.newCreditsInput) elements.newCreditsInput.value = Math.max(0, total - current);
+
+
+
     } else {
+
+
+
       const newCred = parseFloat(elements.newCreditsInput?.value) || 0;
+
+
+
       if (elements.totalCreditsInput) elements.totalCreditsInput.value = current + newCred;
+
+
+
     }
+
+
+
     saveStateFromInputs(elements);
+
+
+
   });
+
+
+
 }
+
+
+
+
+
+
 
 function saveStateFromInputs(elements) {
+
+
+
   const retakes = [];
+
+
+
   if (elements.retakeToggle?.checked) {
+
+
+
     Array.from(elements.retakeList?.children || []).forEach(item => {
+
+
+
       const oldGradeSelect = item.querySelector('.retake-old-grade');
+
+
+
       const creditsInput = item.querySelector('.retake-credits');
+
+
+
       if (oldGradeSelect && creditsInput) {
+
+
+
         retakes.push({
+
+
+
           oldGrade: parseFloat(oldGradeSelect.value),
+
+
+
           credits: parseFloat(creditsInput.value)
+
+
+
         });
+
+
+
       }
+
+
+
     });
+
+
+
   }
+
+
+
+
+
+
 
   setTargetState({
+
+
+
     currentGpa: elements.currentGpaInput?.value || '',
+
+
+
     currentCredits: elements.currentCreditsInput?.value || '',
+
+
+
     targetGpa: elements.targetGpaInput?.value || '',
+
+
+
     newCredits: elements.newCreditsInput?.value || '',
+
+
+
     totalCredits: elements.totalCreditsInput?.value || '',
+
+
+
     isRetake: elements.retakeToggle?.checked || false,
+
+
+
     retakes
+
+
+
   });
+
+
+
 }
+
+
+
+
+
+
 
 function handleCalculateTarget(elements) {
+
+
+
   triggerHapticFeedback(30);
+
+
+
   
+
+
+
   const state = getTargetState();
+
+
+
   const currentGPA = parseFloat(state.currentGpa) || 0;
+
+
+
   const currentCredits = parseFloat(state.currentCredits) || 0;
+
+
+
   const targetGPA = parseFloat(state.targetGpa) || 0;
+
+
+
   let newCredits = parseFloat(state.newCredits) || 0;
 
+
+
+
+
+
+
   if (state.creditMode === 'total') {
+
+
+
     const total = parseFloat(state.totalCredits) || 0;
+
+
+
     newCredits = Math.max(0, total - currentCredits);
+
+
+
   }
+
+
+
+
+
+
 
   const result = calculateTargetResult(currentGPA, currentCredits, targetGPA, newCredits, state.retakes);
+
+
+
   const creditsToStudy = result.totalEffortCredits ?? result.newCredits;
 
+
+
+
+
+
+
   // Show action buttons
+
+
+
   elements.shareTargetBtn?.classList.remove('d-none');
+
+
+
   elements.exportPdfBtn?.classList.remove('d-none');
 
+
+
+
+
+
+
   renderTargetResult(result, creditsToStudy, currentCredits, targetGPA);
+
+
+
 }
 
+
+
+
+
+
+
 function renderTargetResult(result, creditsToStudy, currentCredits, targetGPA) {
+
+
+
   const container = document.getElementById('target-result-container');
+
+
+
   if (!container) return;
 
+
+
+
+
+
+
   // Calculate maximum achievable GPA when required > 4.0
+
+
+
   let maxAchievableGPA = null;
+
+
+
   if (result.requiredGPA > 4.0) {
+
+
+
     const maxPossiblePoints = result.effectiveCurrentPoints + (4.0 * creditsToStudy);
+
+
+
     maxAchievableGPA = maxPossiblePoints / result.totalFutureCredits;
+
+
+
   }
+
+
+
+
+
+
 
   const status = getStatusInfo(result.requiredGPA, creditsToStudy, result.requiredPoints, maxAchievableGPA);
+
+
+
   
+
+
+
   // Generate combinations if applicable
+
+
+
   let combinations = [];
+
+
+
   let scenarioText = '';
+
+
+
   const showCombinations = result.requiredGPA > 0 && result.requiredGPA <= 4.0 && creditsToStudy > 0;
+
+
+
   
+
+
+
   if (showCombinations) {
+
+
+
     combinations = generateGradeCombinations(creditsToStudy, result.requiredPoints);
+
+
+
     if (combinations.length > 0) {
+
+
+
       scenarioText = generateScenarioText(combinations[0]);
+
+
+
     }
+
+
+
   }
 
+
+
+
+
+
+
   // Build HTML
+
+
+
   container.className = 'card-body d-flex flex-column p-3 p-md-4';
+
+
+
   
+
+
+
   let html = renderMainResult({
+
+
+
     result,
+
+
+
     status,
+
+
+
     creditsToStudy,
+
+
+
     scenarioText,
+
+
+
     combinations,
+
+
+
     showCombinations,
+
+
+
     maxAchievableGPA
+
+
+
   });
+
+
+
+
+
+
 
   html += renderAlgorithmDetails({ targetGPA, currentCredits, result });
 
+
+
+
+
+
+
   // Add retake suggestions if impossible
+
+
+
   if (result.requiredGPA > 4.0) {
+
+
+
     const deficitPoints = result.requiredPoints - (4.0 * result.newCredits);
+
+
+
     const { semesters } = getManualState();
+
+
+
     const suggestions = generateRetakeSuggestions(deficitPoints, targetGPA, semesters);
+
+
+
     html += renderRetakeSuggestions(deficitPoints, suggestions);
+
+
+
   }
+
+
+
+
+
+
 
   container.innerHTML = html;
 
+
+
+
+
+
+
   // Animate GPA value - always show required GPA (even if > 4.0)
+
+
+
   animateGPAResult(result.requiredGPA, result.requiredPoints, result.requiredGPA > 4.0);
+
+
+
 }
+
+
+
+
+
+
 
 function animateGPAResult(displayGPA, requiredPoints, isImpossible = false) {
+
+
+
   const gpaTargetEl = document.getElementById('animated-required-gpa');
+
+
+
   if (!gpaTargetEl) return;
 
+
+
+
+
+
+
   if (displayGPA > 0) {
+
+
+
     // Show required GPA (even if > 4.0 for impossible case)
+
+
+
     animateValue(gpaTargetEl, 0, displayGPA, 1200, 2);
+
+
+
   } else if (displayGPA <= 0 && requiredPoints <= 0.01) {
-    gpaTargetEl.innerHTML = 'Đạt';
+
+
+
+    gpaTargetEl.innerHTML = 'Dat';
+
+
+
   } else {
+
+
+
     gpaTargetEl.innerHTML = '---';
+
+
+
   }
+
+
+
 }
+
+
+
+
+
+
 
 function handleShareTarget() {
+
+
+
   const state = getTargetState();
+
+
+
   const shareUrl = generateShareUrl(state);
 
+
+
+
+
+
+
   navigator.clipboard.writeText(shareUrl).then(() => {
+
+
+
     const btn = document.getElementById('share-target-btn');
+
+
+
     const originalText = btn?.innerHTML;
+
+
+
     if (btn) {
-      btn.innerHTML = '<i class="bi bi-check-lg me-1"></i>Đã chép!';
+
+
+
+      btn.innerHTML = '<i class="bi bi-check-lg me-1"></i>Da chep!';
+
+
+
       btn.classList.replace('btn-outline-primary', 'btn-success');
 
+
+
+
+
+
+
       setTimeout(() => {
+
+
+
         btn.innerHTML = originalText;
+
+
+
         btn.classList.replace('btn-success', 'btn-outline-primary');
+
+
+
       }, 2000);
+
+
+
     }
+
+
+
   }).catch(err => {
+
+
+
     console.error('Failed to copy:', err);
-    alert('Không thể sao chép liên kết. Bạn có thể chép thủ công từ thanh địa chỉ.');
+
+
+
+    alert('Khong the sao chep lien ket. Ban co the chep thu cong tu thanh dia chi.');
+
+
+
   });
+
+
+
 }
 
-/**
- * Show PDF export options modal
- */
-function showPDFExportModal() {
-  // Get or create modal
-  let modalEl = document.getElementById('pdfExportOptionsModal');
-  if (!modalEl) {
-    modalEl = createPDFExportModal();
-  }
-  
-  const modal = new bootstrap.Modal(modalEl);
-  modal.show();
-}
 
-/**
- * Create PDF export options modal
- */
-function createPDFExportModal() {
-  const modalHtml = `
-    <div class="modal fade" id="pdfExportOptionsModal" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header bg-light">
-            <h5 class="modal-title fw-bold text-danger">
-              <i class="bi bi-file-earmark-pdf me-2"></i>Xuất báo cáo PDF
-            </h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <div class="alert alert-info border-0 bg-info-subtle">
-              <i class="bi bi-info-circle-fill me-2"></i>
-              <strong>PDF Text chuyên nghiệp</strong> với đầy đủ font tiếng Việt, có thể chọn và copy nội dung.
-            </div>
-            
-            <div class="mb-3">
-              <label class="form-label fw-medium">Nội dung báo cáo</label>
-              <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" id="pdfIncludeCombinations" checked>
-                <label class="form-check-label" for="pdfIncludeCombinations">
-                  <i class="bi bi-layers me-1 text-success"></i>Các phương án GPA khả thi
-                </label>
-              </div>
 
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-light" data-bs-dismiss="modal">
-              <i class="bi bi-x-lg me-1"></i>Hủy
-            </button>
-            <button type="button" class="btn btn-danger" id="confirmExportPdf">
-              <i class="bi bi-file-earmark-pdf me-1"></i>Xuất PDF
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-  
-  // Append to body
-  const div = document.createElement('div');
-  div.innerHTML = modalHtml;
-  document.body.appendChild(div.firstElementChild);
-  
-  // Add event listener
-  const confirmBtn = document.getElementById('confirmExportPdf');
-  if (confirmBtn) {
-    confirmBtn.addEventListener('click', () => {
-      const includeCombinations = document.getElementById('pdfIncludeCombinations')?.checked ?? true;
-      
-      // Close modal
-      const modalEl = document.getElementById('pdfExportOptionsModal');
-      const modal = bootstrap.Modal.getInstance(modalEl);
-      modal?.hide();
-      
-      // Export with options (text mode only)
-      exportTargetToPDF({ includeCombinations });
-    });
-  }
-  
-  return document.getElementById('pdfExportOptionsModal');
-}
 
-/**
- * Export target calculation to PDF - Professional Text Mode Only
- */
-async function exportTargetToPDF(options = {}) {
-  const btn = document.getElementById('export-pdf-btn');
-  if (!btn) return;
 
-  const originalBtnContent = btn.innerHTML;
-  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Đang tạo PDF...';
-  btn.disabled = true;
 
-  try {
-    // Get all state data
-    const state = getTargetState();
-    const currentGPA = parseFloat(state.currentGpa) || 0;
-    const currentCredits = parseFloat(state.currentCredits) || 0;
-    const targetGPA = parseFloat(state.targetGpa) || 0;
-    let newCredits = parseFloat(state.newCredits) || 0;
-    
-    if (state.creditMode === 'total') {
-      const total = parseFloat(state.totalCredits) || 0;
-      newCredits = Math.max(0, total - currentCredits);
-    }
-    
-    // Calculate result
-    const result = calculateTargetResult(currentGPA, currentCredits, targetGPA, newCredits, state.retakes);
-    
-    // Get status info
-    let maxAchievableGPA = null;
-    if (result.requiredGPA > 4.0) {
-      const maxPossiblePoints = result.effectiveCurrentPoints + (4.0 * result.newCredits);
-      maxAchievableGPA = maxPossiblePoints / result.totalFutureCredits;
-    }
-    const status = getStatusInfo(result.requiredGPA, result.newCredits, result.requiredPoints, maxAchievableGPA);
-    
-    // Generate combinations if needed
-    let combinations = [];
-    let deficitPoints = 0;
-    let suggestions = [];
-    
-    if (result.requiredGPA > 0 && result.requiredGPA <= 4.0 && newCredits > 0 && options.includeCombinations !== false) {
-      combinations = generateGradeCombinations(newCredits, result.requiredPoints);
-    }
-    
-    if (result.requiredGPA > 4.0) {
-      deficitPoints = result.requiredPoints - (4.0 * result.newCredits);
-      const { semesters } = getManualState();
-      suggestions = generateRetakeSuggestions(deficitPoints, targetGPA, semesters);
-    }
-    
-    // Create PDF service with options
-    const pdfService = new PDFExportService();
-    pdfService.setOptions({
-      includeCombinations: options.includeCombinations ?? true
-    });
-    
-    // Export professional PDF
-    await pdfService.export({
-      result,
-      status,
-      combinations,
-      deficitPoints,
-      suggestions,
-      state: {
-        currentGpa: state.currentGpa,
-        currentCredits: state.currentCredits,
-        targetGpa: state.targetGpa,
-        newCredits: state.newCredits,
-        totalCredits: state.totalCredits,
-        creditMode: state.creditMode
-      }
-    });
-    
-    // Success feedback
-    btn.innerHTML = '<i class="bi bi-check-lg me-1"></i>Đã tải xuống!';
-    btn.classList.replace('btn-outline-success', 'btn-success');
-    setTimeout(() => {
-      btn.innerHTML = originalBtnContent;
-      btn.classList.replace('btn-success', 'btn-outline-success');
-    }, 2500);
-    
-  } catch (error) {
-    console.error('PDF Export Error:', error);
-    
-    // Detailed error messages
-    let errorMessage = 'Có lỗi xảy ra khi xuất PDF. Vui lòng thử lại.';
-    
-    if (error.message?.includes('font') || error.message?.includes('Font')) {
-      errorMessage = 'Không thể tải font tiếng Việt. Vui lòng kiểm tra kết nối mạng và thử lại.';
-    } else if (error.message?.includes('network') || error.message?.includes('fetch') || error.message?.includes('load')) {
-      errorMessage = 'Lỗi kết nối mạng khi tải font. Vui lòng kiểm tra kết nối và thử lại.';
-    } else if (error.message?.includes('memory')) {
-      errorMessage = 'Bộ nhớ không đủ. Vui lòng đóng các tab khác và thử lại.';
-    }
-    
-    alert(errorMessage);
-  } finally {
-    btn.disabled = false;
-    if (btn.innerHTML.includes('spinner')) {
-      btn.innerHTML = originalBtnContent;
-    }
-  }
-}
+
+
+
+
 
 function addRetakeItemUI(savedData = null) {
+
+
+
   const retakeList = document.getElementById('retake-list');
+
+
+
   if (!retakeList) return;
 
+
+
+
+
+
+
   const item = document.createElement('div');
+
+
+
   item.className = 'd-flex gap-2 mb-2 align-items-center flex-nowrap';
 
+
+
+
+
+
+
   const dGrade = GRADE_SCALE.find(g => g.grade === 'D');
+
+
+
   const defaultD_GPA = dGrade ? dGrade.gpa : 1.0;
+
+
+
   const defaultGrade = savedData ? savedData.oldGrade : defaultD_GPA;
+
+
+
   const defaultCredits = savedData ? savedData.credits : 3;
 
+
+
+
+
+
+
   item.innerHTML = `
+
+
+
     <div class="input-group flex-grow-1" style="min-width: 0;">
-      <span class="input-group-text bg-light text-muted small px-2">Điểm cũ</span>
+
+
+
+      <span class="input-group-text bg-light text-muted small px-2">Diem cu</span>
+
+
+
       <select class="form-select retake-old-grade" aria-label="Old Grade" style="text-overflow: ellipsis;">
+
+
+
         ${GRADE_SCALE
+
+
+
           .filter(g => !['A+', 'A', 'B+', 'B'].includes(g.grade))
+
+
+
           .map(g => `<option value="${g.gpa}" ${Math.abs(g.gpa - defaultGrade) < 0.01 ? 'selected' : ''}>${g.grade} (${g.gpa})</option>`)
+
+
+
           .join('')}
+
+
+
       </select>
+
+
+
     </div>
+
+
+
     <div class="input-group flex-nowrap" style="width: 90px; flex-shrink: 0;">
+
+
+
       <button class="btn btn-light border text-muted small px-2 btn-decrement" type="button">-</button>
+
+
+
       <input type="number" class="form-control retake-credits text-center px-0 border-start-0 border-end-0" placeholder="3" value="${defaultCredits}" min="1" max="10" readonly>
+
+
+
       <button class="btn btn-light border text-muted small px-2 btn-increment" type="button">+</button>
+
+
+
     </div>
+
+
+
     <button class="btn btn-light text-danger border-0 delete-retake-btn p-2 flex-shrink-0" type="button"><i class="bi bi-trash"></i></button>
+
+
+
   `;
 
+
+
+
+
+
+
   const select = item.querySelector('.retake-old-grade');
+
+
+
   const input = item.querySelector('.retake-credits');
+
+
+
   const btnDec = item.querySelector('.btn-decrement');
+
+
+
   const btnInc = item.querySelector('.btn-increment');
 
+
+
+
+
+
+
   const triggerSave = () => {
+
+
+
     const currentGpaInput = document.getElementById('current-gpa');
+
+
+
     if (currentGpaInput) currentGpaInput.dispatchEvent(new Event('input'));
+
+
+
   };
+
+
+
+
+
+
 
   select.addEventListener('change', triggerSave);
 
+
+
+
+
+
+
   btnDec.addEventListener('click', () => {
+
+
+
     let val = parseFloat(input.value) || 0;
+
+
+
     if (val > 1) {
+
+
+
       input.value = val - 1;
+
+
+
       triggerSave();
+
+
+
     }
+
+
+
   });
+
+
+
+
+
+
 
   btnInc.addEventListener('click', () => {
+
+
+
     let val = parseFloat(input.value) || 0;
+
+
+
     if (val < 10) {
+
+
+
       input.value = val + 1;
+
+
+
       triggerSave();
+
+
+
     }
+
+
+
   });
+
+
+
+
+
+
 
   item.querySelector('.delete-retake-btn').addEventListener('click', () => {
+
+
+
     item.remove();
+
+
+
     triggerSave();
+
+
+
   });
 
+
+
+
+
+
+
   retakeList.appendChild(item);
+
+
+
 }
 
-// ==========================================
-// Tab: Course Grade
+
+
+
+
+
+
 // ==========================================
 
+
+
+// Tab: Course Grade
+
+
+
+// ==========================================
+
+
+
+
+
+
+
 export function initCourseGradeTab() {
+
+
+
   const elements = {
+
+
+
     processScoreInput: document.getElementById('process-score-input'),
+
+
+
     processScoreRange: document.getElementById('process-score-range'),
+
+
+
     accumulatedScoreDisplay: document.getElementById('accumulated-score'),
+
+
+
     scoreToPassDisplay: document.getElementById('score-to-pass'),
+
+
+
     courseGradeResults: document.getElementById('course-grade-results')
+
+
+
   };
+
+
+
+
+
+
 
   if (!elements.processScoreInput) return;
 
+
+
+
+
+
+
   loadCourseGradeState(elements);
+
+
+
   calculateAndRenderCourseGrade(elements);
+
+
+
   setupCourseGradeListeners(elements);
+
+
+
 }
+
+
+
+
+
+
 
 function loadCourseGradeState(elements) {
+
+
+
   const saved = localStorage.getItem('courseGradeState');
+
+
+
   if (saved) {
+
+
+
     try {
+
+
+
       const state = JSON.parse(saved);
+
+
+
       if (state.ratio) {
+
+
+
         const radio = document.querySelector(`input[name="btnradio"][value="${state.ratio}"]`);
+
+
+
         if (radio) radio.checked = true;
+
+
+
       }
+
+
+
       if (state.processScore !== undefined) {
+
+
+
         elements.processScoreInput.value = state.processScore;
+
+
+
         elements.processScoreRange.value = state.processScore;
+
+
+
       }
+
+
+
     } catch (e) {
+
+
+
       console.error('Failed to load course grade state:', e);
+
+
+
     }
+
+
+
   } else {
+
+
+
     elements.processScoreInput.value = 7.0;
+
+
+
     elements.processScoreRange.value = 7.0;
+
+
+
   }
+
+
+
 }
+
+
+
+
+
+
 
 function setupCourseGradeListeners(elements) {
+
+
+
   const radioButtons = document.querySelectorAll('input[name="btnradio"]');
+
+
+
   radioButtons.forEach(radio => {
+
+
+
     radio.addEventListener('change', () => {
+
+
+
       calculateAndRenderCourseGrade(elements);
+
+
+
       saveCourseGradeState(elements);
+
+
+
     });
+
+
+
   });
+
+
+
+
+
+
 
   elements.processScoreRange.addEventListener('input', (e) => {
+
+
+
     elements.processScoreInput.value = e.target.value;
+
+
+
     calculateAndRenderCourseGrade(elements);
+
+
+
     saveCourseGradeState(elements);
+
+
+
   });
+
+
+
+
+
+
 
   elements.processScoreInput.addEventListener('input', (e) => {
+
+
+
     let val = parseFloat(e.target.value);
+
+
+
     if (val > 10) val = 10;
+
+
+
     if (val < 0) val = 0;
 
+
+
+
+
+
+
     if (!isNaN(val)) {
+
+
+
       elements.processScoreRange.value = val;
+
+
+
       calculateAndRenderCourseGrade(elements);
+
+
+
       saveCourseGradeState(elements);
+
+
+
     }
+
+
+
   });
+
+
+
 }
 
+
+
+
+
+
+
 function calculateAndRenderCourseGrade(elements) {
+
+
+
   const selectedRadio = document.querySelector('input[name="btnradio"]:checked');
+
+
+
   const processWeight = parseFloat(selectedRadio?.value) || 0.4;
+
+
+
   const finalWeight = 1 - processWeight;
+
+
+
+
+
+
 
   let processScore = parseFloat(elements.processScoreInput.value) || 0;
 
+
+
+
+
+
+
   const accumulated = processScore * processWeight;
+
+
+
   elements.accumulatedScoreDisplay.textContent = accumulated.toFixed(2);
 
+
+
+
+
+
+
   const passGrade = GRADE_SCALE.find(g => g.grade === 'D');
+
+
+
   const passTarget = passGrade ? passGrade.min : 4.0;
+
+
+
   let requiredPass = (passTarget - accumulated) / finalWeight;
 
+
+
+
+
+
+
   if (requiredPass <= 0) {
-    elements.scoreToPassDisplay.textContent = "Đã qua";
+
+
+
+    elements.scoreToPassDisplay.textContent = "Da qua";
+
+
+
   } else if (requiredPass > 10) {
-    elements.scoreToPassDisplay.textContent = "Không thể";
+
+
+
+    elements.scoreToPassDisplay.textContent = "Khong the";
+
+
+
   } else {
+
+
+
     elements.scoreToPassDisplay.textContent = requiredPass.toFixed(2);
+
+
+
   }
+
+
+
+
+
+
 
   elements.courseGradeResults.innerHTML = GRADE_SCALE.map(grade => 
+
+
+
     renderGradeCard(grade, accumulated, finalWeight)
+
+
+
   ).join('');
+
+
+
 }
+
+
+
+
+
+
 
 function renderGradeCard(grade, accumulated, finalWeight) {
+
+
+
   const targetScore = grade.min;
+
+
+
   let requiredFinal = (targetScore - accumulated) / finalWeight;
 
+
+
+
+
+
+
   const badgeColor = getBadgeColor(grade.grade);
+
+
+
   const { statusClass, progressColor, message, progressPercent } = getGradeStatus(requiredFinal, grade.gpa);
 
+
+
+
+
+
+
   return `
+
+
+
     <div class="p-3 rounded-3 border ${statusClass} mb-2">
+
+
+
       <div class="d-flex justify-content-between align-items-center">
+
+
+
         <div class="d-flex align-items-center">
+
+
+
           <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-sm ${badgeColor} me-3" 
+
+
+
                style="width: 40px; height: 40px; font-size: 1rem;">
+
+
+
             ${grade.grade}
+
+
+
           </div>
+
+
+
           <div class="d-flex flex-column">
+
+
+
             <span class="fw-bold text-dark small">GPA ${grade.gpa}</span>
+
+
+
             <span class="text-muted" style="font-size: 0.7rem;">${grade.min} - ${grade.max}</span>
+
+
+
           </div>
+
+
+
         </div>
+
+
+
         <div class="text-end">
+
+
+
           ${message}
+
+
+
         </div>
+
+
+
       </div>
+
+
+
       ${requiredFinal <= 10 && requiredFinal > 0 ? `
+
+
+
       <div class="progress mt-2" style="height: 4px;">
+
+
+
         <div class="progress-bar ${progressColor}" role="progressbar" style="width: ${progressPercent}%" aria-valuenow="${progressPercent}" aria-valuemin="0" aria-valuemax="100"></div>
+
+
+
       </div>
+
+
+
       ` : ''}
+
+
+
     </div>
+
+
+
   `;
+
+
+
 }
+
+
+
+
+
+
 
 function getBadgeColor(grade) {
+
+
+
   if (grade.startsWith('A')) return 'bg-success';
+
+
+
   if (grade.startsWith('B')) return 'bg-primary';
+
+
+
   if (grade.startsWith('C')) return 'bg-info text-dark';
+
+
+
   if (grade.startsWith('D')) return 'bg-warning text-dark';
+
+
+
   return 'bg-danger';
+
+
+
 }
+
+
+
+
+
+
 
 function getGradeStatus(requiredFinal, gpa) {
+
+
+
   if (requiredFinal <= 0) {
+
+
+
     if (gpa === 0) {
+
+
+
       return {
-        message: `<span class="text-danger fw-bold small"><i class="bi bi-x-circle-fill me-1"></i>Rớt</span>`,
+
+
+
+        message: `<span class="text-danger fw-bold small"><i class="bi bi-x-circle-fill me-1"></i>Rot</span>`,
+
+
+
         statusClass: 'bg-danger-subtle border-danger-subtle',
+
+
+
         progressColor: 'bg-danger',
+
+
+
         progressPercent: 100
+
+
+
       };
+
+
+
     }
+
+
+
     return {
-      message: `<span class="text-success fw-bold small"><i class="bi bi-check-circle-fill me-1"></i>Đạt</span>`,
+
+
+
+      message: `<span class="text-success fw-bold small"><i class="bi bi-check-circle-fill me-1"></i>Dat</span>`,
+
+
+
       statusClass: 'bg-success-subtle border-success-subtle',
+
+
+
       progressColor: 'bg-success',
+
+
+
       progressPercent: 100
+
+
+
     };
+
+
+
   }
+
+
+
+
+
+
 
   if (requiredFinal > 10) {
+
+
+
     return {
-      message: `<span class="text-muted small">Không thể (>10)</span>`,
+
+
+
+      message: `<span class="text-muted small">Khong the (>10)</span>`,
+
+
+
       statusClass: 'bg-light opacity-75 border-light',
+
+
+
       progressColor: 'bg-secondary',
+
+
+
       progressPercent: 0
+
+
+
     };
+
+
+
   }
 
+
+
+
+
+
+
   let progressColor = 'bg-success';
+
+
+
   if (requiredFinal >= 5) progressColor = 'bg-info';
+
+
+
   if (requiredFinal >= 7) progressColor = 'bg-warning';
+
+
+
   if (requiredFinal >= 8.5) progressColor = 'bg-danger';
 
+
+
+
+
+
+
   return {
-    message: `<div class="d-flex align-items-baseline"><span class="text-muted small me-2">Cần:</span><strong class="fs-5 text-dark">${requiredFinal.toFixed(2)}</strong></div>`,
+
+
+
+    message: `<div class="d-flex align-items-baseline"><span class="text-muted small me-2">Can:</span><strong class="fs-5 text-dark">${requiredFinal.toFixed(2)}</strong></div>`,
+
+
+
     statusClass: 'bg-white border-light-subtle shadow-sm',
+
+
+
     progressColor,
+
+
+
     progressPercent: (requiredFinal / 10) * 100
+
+
+
   };
+
+
+
 }
+
+
+
+
+
+
 
 function saveCourseGradeState(elements) {
+
+
+
   const state = {
+
+
+
     ratio: document.querySelector('input[name="btnradio"]:checked')?.value,
+
+
+
     processScore: elements.processScoreInput.value
+
+
+
   };
+
+
+
   localStorage.setItem('courseGradeState', JSON.stringify(state));
+
+
+
 }
 
-// ==========================================
-// Other Event Handlers
+
+
+
+
+
+
 // ==========================================
 
+
+
+// Other Event Handlers
+
+
+
+// ==========================================
+
+
+
+
+
+
+
 export function initContactButton() {
+
+
+
   const wrapper = document.getElementById('contact-floating-wrapper');
+
+
+
   const closeBtn = document.getElementById('close-contact-btn');
+
+
+
+
+
+
 
   if (!wrapper || !closeBtn) return;
 
+
+
+
+
+
+
   closeBtn.addEventListener('click', (e) => {
+
+
+
     e.preventDefault();
+
+
+
     e.stopPropagation();
+
+
+
     wrapper.classList.add('d-none');
+
+
+
     wrapper.style.setProperty('display', 'none', 'important');
+
+
+
   });
 
+
+
+
+
+
+
   const contactModal = document.getElementById('contactModal');
+
+
+
   if (contactModal) {
+
+
+
     contactModal.addEventListener('shown.bs.modal', () => {
+
+
+
       fetchVisitCount();
+
+
+
     });
+
+
+
   }
+
+
+
 }
 
+
+
+
+
+
+
 export function fetchVisitCount() {
+
+
+
   const containers = document.querySelectorAll('.visit-count-container');
+
+
+
   const countSpans = document.querySelectorAll('.visit-count-value');
+
+
+
+
+
+
 
   countSpans.forEach(span => span.textContent = '...');
 
+
+
+
+
+
+
   const url = `${API_CONFIG.GOAT_COUNTER_URL}?rnd=${Math.random()}`;
 
+
+
+
+
+
+
   fetch(url)
+
+
+
     .then(response => {
+
+
+
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+
+
       return response.json();
+
+
+
     })
+
+
+
     .then(data => {
+
+
+
       if (data?.count) {
+
+
+
         countSpans.forEach(span => span.textContent = data.count);
+
+
+
         containers.forEach(container => container.style.removeProperty('display'));
+
+
+
       }
+
+
+
     })
+
+
+
     .catch(error => {
+
+
+
       console.warn('Failed to fetch visit count:', error);
+
+
+
       containers.forEach(container => container.style.display = 'none');
+
+
+
     });
+
+
+
 }
 
+
+
+
+
+
+
 export function initThemeToggle() {
+
+
+
   const toggleBtns = document.querySelectorAll('#theme-toggle-mobile, #theme-toggle-desktop, #theme-toggle');
+
+
+
   const navbar = document.querySelector('.navbar');
+
+
+
+
+
+
 
   const getPreferredTheme = () => localStorage.getItem('theme') || 'light';
 
+
+
+
+
+
+
   const setTheme = (theme) => {
+
+
+
     document.documentElement.setAttribute('data-bs-theme', theme);
+
+
+
     localStorage.setItem('theme', theme);
 
+
+
+
+
+
+
     toggleBtns.forEach(btn => {
+
+
+
       const icon = btn.querySelector('i');
+
+
+
       if (theme === 'dark') {
+
+
+
         icon?.classList.remove('bi-moon-stars-fill');
+
+
+
         icon?.classList.add('bi-sun-fill');
+
+
+
         btn.classList.replace('btn-light', 'btn-dark');
+
+
+
         btn.classList.replace('border', 'border-secondary');
+
+
+
       } else {
+
+
+
         icon?.classList.remove('bi-sun-fill');
+
+
+
         icon?.classList.add('bi-moon-stars-fill');
+
+
+
         btn.classList.replace('btn-dark', 'btn-light');
+
+
+
         btn.classList.replace('border-secondary', 'border');
+
+
+
       }
+
+
+
     });
 
+
+
+
+
+
+
     if (navbar) {
+
+
+
       if (theme === 'dark') {
+
+
+
         navbar.classList.remove('navbar-light', 'bg-white');
+
+
+
         navbar.classList.add('navbar-dark', 'bg-dark');
+
+
+
       } else {
+
+
+
         navbar.classList.remove('navbar-dark', 'bg-dark');
+
+
+
         navbar.classList.add('navbar-light', 'bg-white');
+
+
+
       }
+
+
+
     }
+
+
+
   };
+
+
+
+
+
+
 
   setTheme(getPreferredTheme());
 
+
+
+
+
+
+
   toggleBtns.forEach(btn => {
+
+
+
     btn.addEventListener('click', () => {
+
+
+
       const currentTheme = document.documentElement.getAttribute('data-bs-theme');
+
+
+
       setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+
+
+
     });
+
+
+
   });
+
+
+
 }
+
+
+
+
+
+
 
 export function initUserGuide() {
+
+
+
   const modalEl = document.getElementById('userGuideModal');
+
+
+
   if (!modalEl) return;
 
+
+
+
+
+
+
   const headerCloseBtn = document.getElementById('guideHeaderCloseBtn');
+
+
+
   const checkContainer = document.getElementById('guideCheckContainer');
+
+
+
   const checkbox = document.getElementById('guideUnderstandCheck');
+
+
+
   const confirmBtn = document.getElementById('guideConfirmBtn');
 
+
+
+
+
+
+
   if (checkbox && confirmBtn) {
+
+
+
     checkbox.addEventListener('change', () => {
+
+
+
       confirmBtn.disabled = !checkbox.checked;
+
+
+
     });
+
+
+
   }
+
+
+
+
+
+
 
   modalEl.addEventListener('show.bs.modal', (event) => {
+
+
+
     const isManual = !!event.relatedTarget;
 
+
+
+
+
+
+
     if (isManual) {
+
+
+
       if (headerCloseBtn) headerCloseBtn.style.display = 'block';
+
+
+
       if (checkContainer) checkContainer.style.display = 'none';
+
+
+
       if (confirmBtn) {
+
+
+
         confirmBtn.disabled = false;
-        confirmBtn.textContent = 'Đóng';
+
+
+
+        confirmBtn.textContent = 'Dong';
+
+
+
         confirmBtn.classList.remove('btn-primary');
+
+
+
         confirmBtn.classList.add('btn-secondary');
+
+
+
       }
+
+
+
     } else {
+
+
+
       if (headerCloseBtn) headerCloseBtn.style.display = 'none';
+
+
+
       if (checkContainer) checkContainer.style.display = 'block';
+
+
+
       if (checkbox) checkbox.checked = false;
+
+
+
       if (confirmBtn) {
+
+
+
         confirmBtn.disabled = true;
-        confirmBtn.textContent = 'Bắt đầu sử dụng';
+
+
+
+        confirmBtn.textContent = 'Bat dau su dung';
+
+
+
         confirmBtn.classList.remove('btn-secondary');
+
+
+
         confirmBtn.classList.add('btn-primary');
+
+
+
       }
+
+
+
     }
+
+
+
   });
+
+
+
+
+
+
 
   modalEl.addEventListener('hidden.bs.modal', () => {
+
+
+
     if (!localStorage.getItem('hasSeenGuide')) {
+
+
+
       localStorage.setItem('hasSeenGuide', 'true');
+
+
+
     }
+
+
+
   });
+
+
+
+
+
+
 
   if (!localStorage.getItem('hasSeenGuide')) {
+
+
+
     setTimeout(() => {
+
+
+
       const guideModal = new bootstrap.Modal(modalEl);
+
+
+
       guideModal.show();
+
+
+
     }, 1000);
+
+
+
   }
+
+
+
 }
 
+
+
+
+
+
+
 // ==========================================
+
+
+
 // Feedback Form
+
+
+
 // ==========================================
+
+
+
+
+
+
 
 export function initFeedbackForm() {
+
+
+
   const form = document.getElementById('feedback-form');
+
+
+
   const submitBtn = document.getElementById('submit-feedback-btn');
+
+
+
   const listTabBtn = document.getElementById('feedback-list-tab');
+
+
+
   const refreshBtn = document.getElementById('refresh-feedback-btn');
+
+
+
   const fileInput = document.getElementById('feedback-image');
+
+
+
   const previewContainer = document.getElementById('feedback-image-preview');
+
+
+
   const previewImg = previewContainer?.querySelector('img');
+
+
+
   const removeImgBtn = document.getElementById('remove-image-btn');
 
+
+
+
+
+
+
   setupImagePreview(fileInput, previewContainer, previewImg, removeImgBtn);
+
+
+
   setupFormSubmission(form, submitBtn, listTabBtn, fileInput, previewContainer, previewImg);
+
+
+
   setupFeedbackList(listTabBtn, refreshBtn);
+
+
+
 }
+
+
+
+
+
+
 
 function setupImagePreview(fileInput, previewContainer, previewImg, removeImgBtn) {
+
+
+
   if (!fileInput || !previewContainer) return;
 
+
+
+
+
+
+
   fileInput.addEventListener('change', () => {
+
+
+
     const file = fileInput.files[0];
+
+
+
     if (!file) return;
 
+
+
+
+
+
+
     if (file.size > UI_CONFIG.MAX_IMAGE_SIZE) {
-      alert('Ảnh quá lớn! Vui lòng chọn ảnh dưới 5MB.');
+
+
+
+      alert('Anh qua lon! Vui long chon anh duoi 5MB.');
+
+
+
       fileInput.value = '';
+
+
+
       return;
+
+
+
     }
+
+
+
+
+
+
 
     const reader = new FileReader();
+
+
+
     reader.onload = (e) => {
+
+
+
       if (previewImg) previewImg.src = e.target.result;
+
+
+
       previewContainer.classList.remove('d-none');
+
+
+
     };
+
+
+
     reader.readAsDataURL(file);
+
+
+
   });
+
+
+
+
+
+
 
   removeImgBtn?.addEventListener('click', () => {
+
+
+
     fileInput.value = '';
+
+
+
     previewContainer.classList.add('d-none');
+
+
+
     if (previewImg) previewImg.src = '';
+
+
+
   });
+
+
+
 }
+
+
+
+
+
+
 
 function setupFormSubmission(form, submitBtn, listTabBtn, fileInput, previewContainer, previewImg) {
+
+
+
   if (!form || !submitBtn) return;
 
+
+
+
+
+
+
   form.addEventListener('submit', async (e) => {
+
+
+
     e.preventDefault();
 
+
+
+
+
+
+
     const originalBtnText = submitBtn.innerHTML;
+
+
+
     submitBtn.disabled = true;
-    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Đang xử lý...';
+
+
+
+    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Dang xu ly...';
+
+
+
+
+
+
 
     const name = document.getElementById('feedback-name')?.value || '';
+
+
+
     const type = document.getElementById('feedback-type')?.value || '';
+
+
+
     const content = document.getElementById('feedback-content')?.value || '';
+
+
+
     const file = fileInput?.files[0];
+
+
+
     let imageUrl = '';
 
+
+
+
+
+
+
     if (API_CONFIG.GOOGLE_SCRIPT_URL.includes('PLACEHOLDER')) {
-      alert('Tính năng đang được bảo trì (Chưa cấu hình Server). Vui lòng liên hệ qua Facebook.');
-      submitBtn.disabled = false;
+
+
+
+      alert('Tinh nang dang duoc bao tri (Chua cau hinh Server). Vui long lien he qua Facebook.');
+
+
+
+      alert('Tinh nang dang duoc bao tri (Chua cau hinh Server). Vui long lien he qua Facebook.');
+
+
+
       submitBtn.innerHTML = originalBtnText;
+
+
+
       return;
+
+
+
     }
 
+
+
+
+
+
+
     try {
+
+
+
       if (file) {
-        submitBtn.textContent = 'Đang upload ảnh...';
-        imageUrl = await uploadImageToImgur(file);
+
+
+
+        submitBtn.textContent = 'Dang upload anh...';
+
+
+
+        submitBtn.textContent = 'Dang upload anh...';
+
+
+
       }
 
-      submitBtn.textContent = 'Đang gửi góp ý...';
-      await submitFeedback({ name, type, content, imageUrl });
 
-      alert('Cảm ơn bạn đã đóng góp ý kiến! Chúng tôi sẽ xem xét sớm nhất.');
-      form.reset();
+
+
+
+
+
+      submitBtn.textContent = 'Dang gui gop y...';
+
+
+
+        submitBtn.textContent = 'Dang gui gop y...';
+
+
+
+
+
+
+
+      alert('Cam on ban da dong gop y kien! Chung toi se xem xet som nhat.');
+
+
+
+      alert('Cam on ban da dong gop y kien! Chung toi se xem xet som nhat.');
+
+
+
       if (previewContainer) {
+
+
+
         previewContainer.classList.add('d-none');
+
+
+
         if (previewImg) previewImg.src = '';
+
+
+
       }
+
+
+
+
+
+
 
       if (listTabBtn) {
+
+
+
         const tab = new bootstrap.Tab(listTabBtn);
+
+
+
         tab.show();
+
+
+
       }
 
+
+
+
+
+
+
     } catch (error) {
+
+
+
       console.error('Error submitting feedback:', error);
+
+
+
       if (error.message !== 'User cancelled due to upload failure') {
-        alert('Có lỗi xảy ra khi gửi góp ý. Vui lòng thử lại sau.');
+        alert('Co loi xay ra khi gui gop y. Vui long thu lai sau.');
       }
     } finally {
+
+
+
       submitBtn.disabled = false;
+
+
+
       submitBtn.innerHTML = originalBtnText;
+
+
+
     }
+
+
+
   });
+
+
+
 }
+
+
+
+
+
+
 
 async function uploadImageToImgur(file) {
+
+
+
   const formData = new FormData();
+
+
+
   formData.append('image', file);
 
+
+
+
+
+
+
   const response = await fetch(API_CONFIG.IMGUR_UPLOAD_URL, {
+
+
+
     method: 'POST',
+
+
+
     headers: { Authorization: `Client-ID ${API_CONFIG.IMGUR_CLIENT_ID}` },
+
+
+
     body: formData,
+
+
+
     referrer: ''
+
+
+
   });
+
+
+
+
+
+
 
   const data = await response.json();
+
+
+
   if (!data.success) {
+
+
+
     throw new Error('Imgur upload failed: ' + (data.data.error || 'Unknown error'));
+
+
+
   }
+
+
+
   return data.data.link;
+
+
+
 }
+
+
+
+
+
+
 
 async function submitFeedback({ name, type, content, imageUrl }) {
+
+
+
   await fetch(API_CONFIG.GOOGLE_SCRIPT_URL, {
+
+
+
     method: 'POST',
+
+
+
     mode: 'no-cors',
+
+
+
     headers: { 'Content-Type': 'text/plain' },
+
+
+
     body: JSON.stringify({
-      name: name || 'Ẩn danh',
+
+
+
+      name: name || 'An danh',
+
+
+
       type,
+
+
+
       content,
+
+
+
       image: imageUrl,
+
+
+
       timestamp: new Date().toLocaleString('vi-VN')
+
+
+
     })
+
+
+
   });
+
+
+
 }
+
+
+
+
+
+
 
 function setupFeedbackList(listTabBtn, refreshBtn) {
+
+
+
   const loadFeedbacks = async () => {
+
+
+
     const container = document.getElementById('feedback-list-container');
+
+
+
     if (!container) return;
 
+
+
+
+
+
+
     container.innerHTML = `
+
+
+
       <div class="text-center py-5 text-muted">
+
+
+
         <div class="spinner-border text-primary mb-2" role="status"></div>
-        <p class="small mb-0">Đang tải dữ liệu...</p>
+
+
+
+        <p class="small mb-0">Dang tai du lieu...</p>
+
+
+
       </div>
+
+
+
     `;
+
+
+
+
+
+
 
     try {
+
+
+
       const response = await fetch(API_CONFIG.GOOGLE_SCRIPT_URL);
+
+
+
       const data = await response.json();
 
+
+
+
+
+
+
       renderFeedbackList(container, data);
+
+
+
     } catch (error) {
+
+
+
       console.error('Error loading feedbacks:', error);
+
+
+
       container.innerHTML = `
+
+
+
         <div class="text-center py-5 text-danger">
+
+
+
           <i class="bi bi-exclamation-circle fs-1 mb-2"></i>
-          <p class="small mb-0">Không thể tải dữ liệu. Vui lòng thử lại sau.</p>
+
+
+
+          <p class="small mb-0">Khong the tai du lieu. Vui long thu lai sau.</p>
+
+
+
         </div>
+
+
+
       `;
+
+
+
     }
+
+
+
   };
+
+
+
+
+
+
 
   listTabBtn?.addEventListener('shown.bs.tab', loadFeedbacks);
+
+
+
   refreshBtn?.addEventListener('click', loadFeedbacks);
+
+
+
 }
+
+
+
+
+
+
 
 function renderFeedbackList(container, data) {
+
+
+
   container.innerHTML = '';
 
+
+
+
+
+
+
   if (!data || data.length === 0) {
+
+
+
     container.innerHTML = `
+
+
+
       <div class="text-center py-5 text-muted">
+
+
+
         <i class="bi bi-chat-square-dots fs-1 mb-2"></i>
-        <p class="small mb-0">Chưa có góp ý nào được hiển thị.</p>
+
+
+
+        <p class="small mb-0">Chua co gop y nao duoc hien thi.</p>
+
+
+
       </div>
+
+
+
     `;
+
+
+
     return;
+
+
+
   }
 
+
+
+
+
+
+
   data.forEach(item => {
+
+
+
     const card = createFeedbackCard(item);
+
+
+
     container.appendChild(card);
+
+
+
   });
+
+
+
 }
+
+
+
+
+
+
 
 function createFeedbackCard(item) {
+
+
+
   const typeBadge = getFeedbackTypeBadge(item.type);
+
+
+
   const card = document.createElement('div');
+
+
+
   card.className = 'card border-0 bg-light shadow-sm';
 
+
+
+
+
+
+
   const imageHtml = item.image ? `
+
+
+
     <div class="mt-2">
+
+
+
       <a href="${item.image}" target="_blank">
-        <img src="${item.image}" alt="Minh họa" class="img-fluid rounded border" style="max-height: 200px;">
+
+
+
+        <img src="${item.image}" alt="Minh hoa" class="img-fluid rounded border" style="max-height: 200px;">
+
+
+
       </a>
+
+
+
     </div>
+
+
+
   ` : '';
 
+
+
+
+
+
+
   card.innerHTML = `
+
+
+
     <div class="card-body p-3">
+
+
+
       <div class="d-flex justify-content-between align-items-start mb-2">
+
+
+
         <div class="d-flex align-items-center">
+
+
+
           <div class="bg-white rounded-circle border d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+
+
+
             <i class="bi bi-person-fill text-secondary"></i>
+
+
+
           </div>
+
+
+
           <div>
+
+
+
             <h6 class="fw-bold mb-0 text-dark" style="font-size: 0.9rem;">${escapeHtml(item.name)}</h6>
+
+
+
             <small class="text-muted" style="font-size: 0.75rem;">${item.timestamp}</small>
+
+
+
           </div>
+
+
+
         </div>
+
+
+
         ${typeBadge}
+
+
+
       </div>
+
+
+
       <p class="card-text text-secondary small mb-0" style="white-space: pre-line;">${escapeHtml(item.content)}</p>
+
+
+
       ${imageHtml}
+
+
+
     </div>
+
+
+
   `;
 
+
+
+
+
+
+
   return card;
+
+
+
 }
+
+
+
+
+
+
 
 function getFeedbackTypeBadge(type) {
+
+
+
   const badges = {
-    feature_request: '<span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill">Tính năng mới</span>',
-    bug_report: '<span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill">Báo lỗi</span>',
-    improvement: '<span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill">Cải tiến</span>'
+
+
+
+    feature_request: '<span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill">Tinh nang moi</span>',
+
+
+
+    bug_report: '<span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill">Bao loi</span>',
+
+
+
+    improvement: '<span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill">Cai tien</span>'
+
+
+
   };
-  return badges[type] || '<span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill">Khác</span>';
+
+
+
+  return badges[type] || '<span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill">Khac</span>';
+
+
+
 }
+
+
+
+
+
+
 
 function escapeHtml(text) {
+
+
+
   if (!text) return '';
+
+
+
   return text
+
+
+
     .replace(/&/g, "&amp;")
+
+
+
     .replace(/</g, "&lt;")
+
+
+
     .replace(/>/g, "&gt;")
+
+
+
     .replace(/"/g, "&quot;")
+
+
+
     .replace(/'/g, "&#039;");
+
+
+
 }
 
+
+
+
+
+
+
 // ==========================================
+
+
+
 // Tab: News
+
+
+
 // ==========================================
+
+
+
+
+
+
 
 export function initNewsTab() {
+
+
+
   setupNewsFilters();
+
+
+
   setupHandbookLazyLoad();
+
+
+
   setupImageViewer();
+
+
+
 }
+
+
+
+
+
+
 
 function setupNewsFilters() {
+
+
+
   const filterBtns = document.querySelectorAll('.news-filters .filter-btn');
+
+
+
   const newsCards = document.querySelectorAll('.news-card');
 
+
+
+
+
+
+
   filterBtns.forEach(btn => {
+
+
+
     btn.addEventListener('click', () => {
+
+
+
       const filter = btn.dataset.filter;
 
+
+
+
+
+
+
       filterBtns.forEach(b => {
+
+
+
         b.classList.replace('btn-primary', 'btn-outline-secondary');
+
+
+
         b.classList.remove('active');
+
+
+
       });
+
+
+
       btn.classList.replace('btn-outline-secondary', 'btn-primary');
+
+
+
       btn.classList.add('active');
 
+
+
+
+
+
+
       newsCards.forEach(card => {
+
+
+
         const category = card.dataset.category;
+
+
+
         if (filter === 'all' || category === filter) {
+
+
+
           card.style.display = 'flex';
+
+
+
           card.style.animation = 'none';
+
+
+
           card.offsetHeight;
+
+
+
           card.style.animation = null;
+
+
+
         } else {
+
+
+
           card.style.display = 'none';
+
+
+
         }
+
+
+
       });
+
+
+
     });
+
+
+
   });
+
+
+
 }
 
+
+
+
+
+
+
 function setupHandbookLazyLoad() {
+
+
+
   const loadHandbookBtn = document.getElementById('load-handbook-btn');
+
+
+
   const handbookPlaceholder = document.getElementById('handbook-placeholder');
+
+
+
   const handbookIframe = document.getElementById('handbook-iframe');
+
+
+
+
+
+
 
   if (!loadHandbookBtn || !handbookPlaceholder || !handbookIframe) return;
 
+
+
+
+
+
+
   loadHandbookBtn.addEventListener('click', () => {
+
+
+
     const src = handbookIframe.getAttribute('data-src');
+
+
+
     if (src) handbookIframe.src = src;
 
+
+
+
+
+
+
     handbookPlaceholder.style.transition = 'opacity 0.3s ease';
+
+
+
     handbookPlaceholder.style.opacity = '0';
+
+
+
     handbookPlaceholder.style.pointerEvents = 'none';
 
+
+
+
+
+
+
     setTimeout(() => handbookPlaceholder.remove(), 300);
+
+
+
   });
+
+
+
 }
+
+
+
+
+
+
 
 function setupImageViewer() {
+
+
+
   const imageViewerModal = document.getElementById('imageViewerModal');
+
+
+
   if (!imageViewerModal) return;
 
+
+
+
+
+
+
   imageViewerModal.addEventListener('show.bs.modal', event => {
+
+
+
     const button = event.relatedTarget;
+
+
+
     if (!button) return;
 
+
+
+
+
+
+
     const src = button.getAttribute('data-bs-src');
+
+
+
     const modalImage = imageViewerModal.querySelector('#imageViewerSrc');
+
+
+
     if (modalImage && src) modalImage.src = src;
+
+
+
   });
+
+
+
 }
 
+
+
+
+
+
+
 // ==========================================
+
+
+
 // Grade Scale Sort
+
+
+
 // ==========================================
+
+
+
+
+
+
 
 export function initGradeScaleSort() {
+
+
+
   const toggleSortBtn = document.getElementById('toggle-sort-scale-btn');
+
+
+
   const scaleContainer = document.getElementById('scale-list-container');
+
+
+
   const ORDER_KEY = 'HUFLIT_SCALE_ORDER';
 
+
+
+
+
+
+
   loadSavedOrder(scaleContainer, ORDER_KEY);
+
+
+
   setupSortModeToggle(toggleSortBtn, scaleContainer, ORDER_KEY);
+
+
+
   setupMoveHandlers(scaleContainer, ORDER_KEY);
+
+
+
 }
 
+
+
+
+
+
+
 function loadSavedOrder(scaleContainer, ORDER_KEY) {
+
+
+
   const savedOrder = JSON.parse(localStorage.getItem(ORDER_KEY) || '[]');
+
+
+
   if (savedOrder.length === 0 || !scaleContainer) return;
 
+
+
+
+
+
+
   const currentItems = Array.from(scaleContainer.children);
+
+
+
   const itemMap = new Map(currentItems.map(item => [item.id, item]));
+
+
+
+
+
+
 
   scaleContainer.innerHTML = '';
 
+
+
+
+
+
+
   savedOrder.forEach(id => {
+
+
+
     const item = itemMap.get(id);
+
+
+
     if (item) {
+
+
+
       scaleContainer.appendChild(item);
+
+
+
       itemMap.delete(id);
+
+
+
     }
+
+
+
   });
+
+
+
+
+
+
 
   itemMap.forEach(item => scaleContainer.appendChild(item));
+
+
+
 }
+
+
+
+
+
+
 
 function setupSortModeToggle(toggleSortBtn, scaleContainer, ORDER_KEY) {
+
+
+
   if (!toggleSortBtn || !scaleContainer) return;
 
+
+
+
+
+
+
   toggleSortBtn.addEventListener('click', () => {
+
+
+
     scaleContainer.classList.toggle('scale-sort-mode');
+
+
+
     toggleSortBtn.classList.toggle('active');
 
+
+
+
+
+
+
     if (scaleContainer.classList.contains('scale-sort-mode')) {
+
+
+
       toggleSortBtn.classList.remove('btn-outline-primary');
+
+
+
       toggleSortBtn.classList.add('btn-primary');
+
+
+
     } else {
+
+
+
       toggleSortBtn.classList.add('btn-outline-primary');
+
+
+
       toggleSortBtn.classList.remove('btn-primary');
+
+
+
     }
+
+
+
   });
+
+
+
 }
+
+
+
+
+
+
 
 function setupMoveHandlers(scaleContainer, ORDER_KEY) {
+
+
+
   if (!scaleContainer) return;
+
+
+
+
+
+
 
   scaleContainer.addEventListener('click', (e) => {
+
+
+
     const btn = e.target.closest('button');
+
+
+
     if (!btn) return;
 
+
+
+
+
+
+
     const card = btn.closest('.scale-card');
+
+
+
     if (!card) return;
 
+
+
+
+
+
+
     if (btn.classList.contains('btn-move-up')) {
+
+
+
       const prev = card.previousElementSibling;
+
+
+
       if (prev) {
+
+
+
         scaleContainer.insertBefore(card, prev);
+
+
+
         saveOrder(scaleContainer, ORDER_KEY);
+
+
+
       }
+
+
+
     } else if (btn.classList.contains('btn-move-down')) {
+
+
+
       const next = card.nextElementSibling;
+
+
+
       if (next) {
+
+
+
         scaleContainer.insertBefore(next, card);
+
+
+
         saveOrder(scaleContainer, ORDER_KEY);
+
+
+
       }
+
+
+
     }
+
+
+
   });
+
+
+
 }
 
+
+
+
+
+
+
 function saveOrder(scaleContainer, ORDER_KEY) {
+
+
+
   if (!scaleContainer) return;
+
+
+
   const newOrder = Array.from(scaleContainer.children).map(item => item.id);
+
+
+
   localStorage.setItem(ORDER_KEY, JSON.stringify(newOrder));
+
+
+
 }
+
+
+
+
+
+
+
