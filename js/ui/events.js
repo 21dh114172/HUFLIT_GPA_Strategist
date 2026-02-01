@@ -704,11 +704,11 @@ function addRetakeItemUI(savedData = null) {
 <span class="input-group-text bg-light text-muted small px-2">Điểm cũ</span>
 <select class="form-select retake-old-grade" aria-label="Old Grade" style="text-overflow: ellipsis;">
 ${GRADE_SCALE.filter((g) => !["A+", "A", "B+", "B"].includes(g.grade))
-  .map(
-    (g) =>
-      `<option value="${g.gpa}" ${Math.abs(g.gpa - defaultGrade) < 0.01 ? "selected" : ""}>${g.grade} (${g.gpa})</option>`,
-  )
-  .join("")}
+      .map(
+        (g) =>
+          `<option value="${g.gpa}" ${Math.abs(g.gpa - defaultGrade) < 0.01 ? "selected" : ""}>${g.grade} (${g.gpa})</option>`,
+      )
+      .join("")}
 </select>
 </div>
 <div class="input-group flex-nowrap" style="width: 90px; flex-shrink: 0;">
@@ -856,15 +856,14 @@ ${grade.grade}
 ${message}
 </div>
 </div>
-${
-  requiredFinal <= 10 && requiredFinal > 0
-    ? `
+${requiredFinal <= 10 && requiredFinal > 0
+      ? `
 <div class="progress mt-2" style="height: 4px;">
 <div class="progress-bar ${progressColor}" role="progressbar" style="width: ${progressPercent}%" aria-valuenow="${progressPercent}" aria-valuemin="0" aria-valuemax="100"></div>
 </div>
 `
-    : ""
-}
+      : ""
+    }
 </div>
 `;
 }
@@ -1304,6 +1303,7 @@ export function initNewsTab() {
   setupNewsFilters();
   setupHandbookLazyLoad();
   setupImageViewer();
+  initNewsSort();
 }
 function setupNewsFilters() {
   const filterBtns = document.querySelectorAll(".news-filters .filter-btn");
@@ -1354,6 +1354,68 @@ function setupImageViewer() {
     const src = button.getAttribute("data-bs-src");
     const modalImage = imageViewerModal.querySelector("#imageViewerSrc");
     if (modalImage && src) modalImage.src = src;
+  });
+}
+
+// ==========================================
+// News Sort
+// ==========================================
+export function initNewsSort() {
+  const toggleSortBtn = document.getElementById("toggle-sort-news-btn");
+  const newsContainer = document.getElementById("news-list-container");
+  const ORDER_KEY = "HUFLIT_NEWS_ORDER";
+
+  // Use the existing generic loadSavedOrder function (defined below)
+  loadSavedOrder(newsContainer, ORDER_KEY);
+
+  setupNewsSortModeToggle(toggleSortBtn, newsContainer);
+  setupNewsMoveHandlers(newsContainer, ORDER_KEY);
+}
+
+function setupNewsSortModeToggle(toggleSortBtn, container) {
+  if (!toggleSortBtn || !container) return;
+  toggleSortBtn.addEventListener("click", () => {
+    container.classList.toggle("news-sort-mode");
+    toggleSortBtn.classList.toggle("active");
+
+    if (container.classList.contains("news-sort-mode")) {
+      toggleSortBtn.classList.remove("btn-outline-primary");
+      toggleSortBtn.classList.add("btn-primary");
+    } else {
+      toggleSortBtn.classList.add("btn-outline-primary");
+      toggleSortBtn.classList.remove("btn-primary");
+    }
+  });
+}
+
+function setupNewsMoveHandlers(container, ORDER_KEY) {
+  if (!container) return;
+  container.addEventListener("click", (e) => {
+    const btn = e.target.closest("button");
+    if (!btn) return;
+
+    const card = btn.closest(".news-card");
+    if (!card) return;
+
+    if (btn.classList.contains("btn-move-up")) {
+      const prev = card.previousElementSibling;
+      if (prev) {
+        container.insertBefore(card, prev);
+        saveOrder(container, ORDER_KEY);
+      }
+    } else if (btn.classList.contains("btn-move-down")) {
+      const next = card.nextElementSibling;
+      if (next) {
+        // insertBefore next means insert before the one AFTER next?
+        // No, to swap down:
+        // [card] [next]
+        // We want: [next] [card]
+        // insertBefore(card, next.nextSibling) ? 
+        // Or simpler: insertBefore(next, card) puts next BEFORE card. Correct.
+        container.insertBefore(next, card);
+        saveOrder(container, ORDER_KEY);
+      }
+    }
   });
 }
 // ==========================================

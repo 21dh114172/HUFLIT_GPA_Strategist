@@ -1206,6 +1206,10 @@
                                 <h4 class="fw-bold text-primary mb-0 lh-sm"
                                     style="font-size: clamp(1.1rem, 4vw, 1.5rem);">Tin tức & Thông báo</h4>
                             </div>
+                            <button class="btn btn-outline-primary btn-sm rounded-pill flex-shrink-0"
+                                id="toggle-sort-news-btn">
+                                <i class="bi bi-arrow-down-up me-1"></i>Sắp xếp
+                            </button>
                         </div>
 
                         <!-- News Filter Buttons -->
@@ -1226,21 +1230,26 @@
                             </div>
                         </div>
 
-                        <div class="news-bento-grid-v2">
+                        <div class="news-bento-grid-v2" id="news-list-container">
 
                             <!-- 1. HERO ITEM: Holiday Plan (Visual Heavy) -->
-                            <div class="glass-card-premium news-grid-hero news-card" data-category="announcement">
+                            <div class="glass-card-premium news-grid-hero news-card" data-category="announcement"
+                                style="background-color: #f7f3e8;" id="news-item-holiday">
+                                <div
+                                    class="news-sort-controls position-absolute top-0 end-0 m-2 d-none gap-1 bg-white rounded shadow-sm p-1 z-3">
+                                    <button class="btn btn-sm btn-light border btn-move-up" title="Lên"><i
+                                            class="bi bi-chevron-up"></i></button>
+                                    <button class="btn btn-sm btn-light border btn-move-down" title="Xuống"><i
+                                            class="bi bi-chevron-down"></i></button>
+                                </div>
                                 <div class="position-absolute top-0 start-0 w-100 h-100 overflow-hidden">
                                     <img src="assets/images/NghiTet.jpg" class="news-img-cover clickable-image"
                                         alt="Kế hoạch Nghỉ Tết" data-bs-toggle="modal"
                                         data-bs-target="#imageViewerModal" data-bs-src="assets/images/NghiTet.jpg"
-                                        style="cursor: zoom-in;">
+                                        style="cursor: zoom-in; object-fit: contain;">
                                 </div>
                                 <div class="news-overlay-gradient">
                                     <div class="news-overlay-content">
-                                        <span class="news-tag bg-white bg-opacity-25 backdrop-blur">
-                                            <i class="bi bi-star-fill text-warning"></i> Nổi bật
-                                        </span>
                                         <h3 class="fw-bold text-white mb-2 text-shadow-sm">Kế hoạch Nghỉ Tết - Kỳ 2</h3>
                                         <p class="text-white text-opacity-75 small mb-0"><i
                                                 class="bi bi-zoom-in me-1"></i>Nhấn vào ảnh để xem chi tiết lịch nghỉ
@@ -1250,7 +1259,15 @@
                             </div>
 
                             <!-- 2. SIDE TOP: Announcement (Text Based) -->
-                            <div class="glass-card-premium news-grid-side news-card" data-category="announcement">
+                            <div class="glass-card-premium news-grid-side news-card" data-category="announcement"
+                                id="news-item-activity">
+                                <div
+                                    class="news-sort-controls position-absolute top-0 end-0 m-2 d-none gap-1 bg-white rounded shadow-sm p-1 z-3">
+                                    <button class="btn btn-sm btn-light border btn-move-up" title="Lên"><i
+                                            class="bi bi-chevron-up"></i></button>
+                                    <button class="btn btn-sm btn-light border btn-move-down" title="Xuống"><i
+                                            class="bi bi-chevron-down"></i></button>
+                                </div>
                                 <div class="decoration-circle"
                                     style="top: -20px; right: -20px; width: 100px; height: 100px; background: radial-gradient(circle, #dc3545 0%, transparent 70%);">
                                 </div>
@@ -1266,7 +1283,7 @@
                                             <a href="https://portal.huflit.edu.vn/News/Detail/3794/Thong-bao-ve-viec-to-chuc-hoat-dong-ren-luyen-hoc-ky-2-nam-hoc-2025-2026"
                                                 target="_blank" rel="noopener noreferrer"
                                                 class="text-decoration-none text-dark stretched-link link-hover-primary">
-                                                Tổ chức hoạt động rèn luyện HK2
+                                                Hoạt động rèn luyện HK2
                                             </a>
                                         </h5>
                                         <p class="news-desc-premium text-secondary clamp-lines-3">
@@ -1280,7 +1297,15 @@
                             </div>
 
                             <!-- 3. SIDE BOTTOM: Handbook (Utility/Interactive) -->
-                            <div class="glass-card-premium news-grid-side news-card" data-category="handbook">
+                            <div class="glass-card-premium news-grid-side news-card" data-category="handbook"
+                                id="news-item-handbook">
+                                <div
+                                    class="news-sort-controls position-absolute top-0 end-0 m-2 d-none gap-1 bg-white rounded shadow-sm p-1 z-3">
+                                    <button class="btn btn-sm btn-light border btn-move-up" title="Lên"><i
+                                            class="bi bi-chevron-up"></i></button>
+                                    <button class="btn btn-sm btn-light border btn-move-down" title="Xuống"><i
+                                            class="bi bi-chevron-down"></i></button>
+                                </div>
                                 <div class="news-content-box p-0 h-100 position-relative">
                                     <div class="p-3 pb-0 z-2 position-relative pointer-events-none">
                                         <div class="d-flex justify-content-between align-items-center">
@@ -1311,49 +1336,60 @@
                             </div>
 
                             <!-- 4. BOTTOM WIDE: Calendar (Horizontal Strip) -->
-                            <div class="glass-card-premium news-grid-long news-card" data-category="calendar">
-                                <div class="row g-0 h-100">
-                                    <div
-                                        class="col-md-4 bg-success-subtle d-flex align-items-center justify-content-center p-4">
-                                        <div class="text-center">
-                                            <div class="bg-white rounded-circle shadow-sm d-inline-flex align-items-center justify-content-center mb-3"
-                                                style="width: 60px; height: 60px;">
-                                                <i class="bi bi-calendar-check-fill text-success fs-3"></i>
-                                            </div>
-                                            <h5 class="fw-bold text-success-emphasis mb-1">Kế hoạch Năm học</h5>
-                                            <span class="badge bg-white text-success border">2025 - 2026</span>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-8">
-                                        <div class="news-content-box">
+                            <div class="glass-card-premium news-grid-long news-card" data-category="calendar"
+                                style="background-color: #fff;" id="news-item-calendar">
+                                <div
+                                    class="news-sort-controls position-absolute top-0 end-0 m-2 d-none gap-1 bg-white rounded shadow-sm p-1 z-3">
+                                    <button class="btn btn-sm btn-light border btn-move-up" title="Lên"><i
+                                            class="bi bi-chevron-up"></i></button>
+                                    <button class="btn btn-sm btn-light border btn-move-down" title="Xuống"><i
+                                            class="bi bi-chevron-down"></i></button>
+                                </div>
+                                <div class="position-absolute top-0 start-0 w-100 h-100 overflow-hidden">
+                                    <img src="assets/images/academic-calendar-2025-2026.png"
+                                        class="news-img-cover clickable-image" alt="Kế hoạch Năm học 2025-2026"
+                                        data-bs-toggle="modal" data-bs-target="#imageViewerModal"
+                                        data-bs-src="assets/images/academic-calendar-2025-2026.png"
+                                        style="cursor: zoom-in; object-position: center; object-fit: contain;">
+                                </div>
+                                <div class="news-overlay-gradient">
+                                    <div class="news-overlay-content p-3 p-md-4">
+                                        <div class="d-flex justify-content-between align-items-end">
                                             <div>
-                                                <h5 class="fw-bold mb-2">Biểu đồ Kế hoạch đào tạo</h5>
-                                                <p class="text-secondary small mb-3">
-                                                    Chi tiết các mốc thời gian quan trọng: đăng ký môn học, thi cuối kỳ,
-                                                    nghỉ lễ dành cho sinh viên khóa 2023, 2024, 2025...
+                                                <span
+                                                    class="badge bg-white bg-opacity-25 backdrop-blur text-white border border-white border-opacity-25 mb-2 rounded-pill px-3">
+                                                    <i class="bi bi-calendar-event me-1"></i>Kế hoạch
+                                                </span>
+                                                <h4 class="fw-bold text-white mb-1 text-shadow-sm">Kế hoạch Năm học
+                                                    2025-2026</h4>
+                                                <p class="text-white text-opacity-75 small mb-0 d-none d-sm-block">
+                                                    Chi tiết lịch trình học tập, thi cử và các sự kiện quan trọng trong
+                                                    năm.
                                                 </p>
                                             </div>
-                                            <div>
-                                                <a href="assets/images/Biểu đồ KH năm học 25 26 (18.12.2025).pdf"
-                                                    target="_blank"
-                                                    class="btn btn-outline-success rounded-pill fw-medium px-4">
-                                                    <i class="bi bi-file-earmark-pdf-fill me-2"></i>Tải file PDF
-                                                </a>
-                                            </div>
+                                            <button
+                                                class="btn btn-white bg-white rounded-circle shadow-lg d-none d-md-flex align-items-center justify-content-center flex-shrink-0 ms-3"
+                                                style="width: 45px; height: 45px;"
+                                                onclick="this.closest('.glass-card-premium').querySelector('img').click()">
+                                                <i class="bi bi-arrows-fullscreen text-primary"></i>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 </div>
+
             </div>
-
         </div>
+    </div>
+    </div>
 
-        <!-- Mobile Spacer to prevent content from being hidden behind bottom nav -->
-        <div class="d-lg-none" style="height: 120px;"></div>
+    </div>
+
+    <!-- Mobile Spacer to prevent content from being hidden behind bottom nav -->
+    <div class="d-lg-none" style="height: 120px;"></div>
     </div>
 
     <!-- Image Viewer Modal -->

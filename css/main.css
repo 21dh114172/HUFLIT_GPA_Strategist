@@ -741,7 +741,8 @@ body {
     .news-grid-hero,
     .news-grid-vertical,
     .news-grid-item,
-    .news-grid-side {
+    .news-grid-side,
+    .news-grid-long {
         grid-column: span 1;
         grid-row: auto;
         min-height: 250px;
