@@ -323,8 +323,8 @@
                                         <label class="form-check-label fw-bold text-dark" for="retake-toggle">
                                             <i class="bi bi-arrow-repeat me-2 text-primary"></i>Học cải thiện
                                         </label>
-                                        <input class="form-check-input ms-0 form-switch-lg" type="checkbox" role="switch"
-                                            id="retake-toggle">
+                                        <input class="form-check-input ms-0 form-switch-lg" type="checkbox"
+                                            role="switch" id="retake-toggle">
 
                                     </div>
 
@@ -373,7 +373,8 @@
                             </div>
                             <div class="card-body d-flex flex-column justify-content-center align-items-center text-center p-4"
                                 id="target-result-container">
-                                <div class="bg-light rounded-circle mb-3 d-flex align-items-center justify-content-center icon-box-lg">
+                                <div
+                                    class="bg-light rounded-circle mb-3 d-flex align-items-center justify-content-center icon-box-lg">
 
                                     <i class="bi bi-graph-up-arrow text-secondary icon-size-3rem"></i>
 
@@ -544,8 +545,7 @@
                                                     class="bi bi-pencil"></i></span>
                                             <input type="number"
                                                 class="form-control border-start-0 text-center fw-bold text-primary fs-5 input-height-40"
-                                                min="0" max="10" step="0.1"
-                                                id="process-score-input">
+                                                min="0" max="10" step="0.1" id="process-score-input">
 
                                         </div>
                                     </div>
@@ -602,7 +602,8 @@
             <div class="tab-pane fade" id="pills-scale" role="tabpanel" tabindex="0">
                 <div class="d-flex align-items-center justify-content-between mb-4">
                     <div class="d-flex align-items-center me-2">
-                        <div class="bg-primary bg-opacity-10 rounded-circle me-2 me-md-3 d-flex align-items-center justify-content-center flex-shrink-0 scale-icon-box">
+                        <div
+                            class="bg-primary bg-opacity-10 rounded-circle me-2 me-md-3 d-flex align-items-center justify-content-center flex-shrink-0 scale-icon-box">
 
                             <i class="bi bi-table text-primary fs-4"></i>
                         </div>
@@ -1225,110 +1226,125 @@
                             </div>
                         </div>
 
-                        <div class="news-bento-grid">
-                            <!-- Item 1: Holiday (Large) -->
-                            <div class="bento-item item-large news-card" data-category="announcement"
-                                id="bento-holiday">
-                                <div class="bento-img-container">
-                                    <img src="assets/images/NghiTet.jpg" class="news-image clickable-image"
+                        <div class="news-bento-grid-v2">
+
+                            <!-- 1. HERO ITEM: Holiday Plan (Visual Heavy) -->
+                            <div class="glass-card-premium news-grid-hero news-card" data-category="announcement">
+                                <div class="position-absolute top-0 start-0 w-100 h-100 overflow-hidden">
+                                    <img src="assets/images/NghiTet.jpg" class="news-img-cover clickable-image"
                                         alt="Kế hoạch Nghỉ Tết" data-bs-toggle="modal"
                                         data-bs-target="#imageViewerModal" data-bs-src="assets/images/NghiTet.jpg"
                                         style="cursor: zoom-in;">
                                 </div>
-                                <span
-                                    class="badge bento-badge text-success border border-success-subtle fw-bold shadow-sm">
-                                    <i class="bi bi-calendar-event me-1"></i>Hoạt động
-                                </span>
-                                <div class="bento-content">
-                                    <h5 class="bento-title mb-1">Kế hoạch Nghỉ Tết - Kỳ 2</h5>
-                                    <p class="small mb-0 opacity-75"><i class="bi bi-zoom-in me-1"></i>Nhấn vào ảnh để
-                                        phóng to</p>
+                                <div class="news-overlay-gradient">
+                                    <div class="news-overlay-content">
+                                        <span class="news-tag bg-white bg-opacity-25 backdrop-blur">
+                                            <i class="bi bi-star-fill text-warning"></i> Nổi bật
+                                        </span>
+                                        <h3 class="fw-bold text-white mb-2 text-shadow-sm">Kế hoạch Nghỉ Tết - Kỳ 2</h3>
+                                        <p class="text-white text-opacity-75 small mb-0"><i
+                                                class="bi bi-zoom-in me-1"></i>Nhấn vào ảnh để xem chi tiết lịch nghỉ
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
 
-                            <!-- Item 2: Announcement (Medium) -->
-                            <div class="bento-item news-card" data-category="announcement" id="bento-announcement">
-                                <div class="bento-content">
-                                    <div class="mb-2">
-                                        <span
-                                            class="badge bg-danger-subtle text-danger rounded-pill px-3 py-1 fw-bold">Thông
-                                            báo</span>
-                                        <span class="text-muted small ms-2"><i class="bi bi-clock me-1"></i>HK2
-                                            (2025-2026)</span>
+                            <!-- 2. SIDE TOP: Announcement (Text Based) -->
+                            <div class="glass-card-premium news-grid-side news-card" data-category="announcement">
+                                <div class="decoration-circle"
+                                    style="top: -20px; right: -20px; width: 100px; height: 100px; background: radial-gradient(circle, #dc3545 0%, transparent 70%);">
+                                </div>
+                                <div class="news-content-box">
+                                    <div>
+                                        <div class="d-flex justify-content-between align-items-start mb-3">
+                                            <span
+                                                class="badge bg-danger-subtle text-danger rounded-pill px-3 py-1">Thông
+                                                báo</span>
+                                            <small class="text-muted" style="font-size: 0.7rem;">Mới nhất</small>
+                                        </div>
+                                        <h5 class="news-title-premium text-dark">
+                                            <a href="https://portal.huflit.edu.vn/News/Detail/3794/Thong-bao-ve-viec-to-chuc-hoat-dong-ren-luyen-hoc-ky-2-nam-hoc-2025-2026"
+                                                target="_blank" rel="noopener noreferrer"
+                                                class="text-decoration-none text-dark stretched-link link-hover-primary">
+                                                Tổ chức hoạt động rèn luyện HK2
+                                            </a>
+                                        </h5>
+                                        <p class="news-desc-premium text-secondary clamp-lines-3">
+                                            Thông tin chi tiết quy chế điểm rèn luyện và lịch trình thực hiện.
+                                        </p>
                                     </div>
-                                    <h5 class="bento-title">
-                                        <a href="https://portal.huflit.edu.vn/News/Detail/3794/Thong-bao-ve-viec-to-chuc-hoat-dong-ren-luyen-hoc-ky-2-nam-hoc-2025-2026"
-                                            target="_blank" rel="noopener noreferrer"
-                                            class="text-decoration-none text-dark stretched-link">
-                                            Tổ chức hoạt động rèn luyện
-                                        </a>
-                                    </h5>
-                                    <p class="bento-desc mb-0">
-                                        Thông tin chi tiết về các hoạt động, quy chế điểm rèn luyện và lịch trình thực
-                                        hiện trong học kỳ mới. Sinh viên cần theo dõi để đảm bảo quyền lợi.
-                                    </p>
+                                    <div class="d-flex align-items-center text-primary small fw-semibold mt-2">
+                                        Xem chi tiết <i class="bi bi-arrow-right ms-2"></i>
+                                    </div>
                                 </div>
                             </div>
 
-                            <!-- Item 3: Handbook (Medium) -->
-                            <div class="bento-item news-card" data-category="handbook" id="bento-handbook">
-                                <div class="bento-content h-100 d-flex flex-column">
-                                    <div class="mb-2">
-                                        <span
-                                            class="badge bg-info-subtle text-info-emphasis rounded-pill px-3 py-1 fw-bold">Tài
-                                            liệu</span>
+                            <!-- 3. SIDE BOTTOM: Handbook (Utility/Interactive) -->
+                            <div class="glass-card-premium news-grid-side news-card" data-category="handbook">
+                                <div class="news-content-box p-0 h-100 position-relative">
+                                    <div class="p-3 pb-0 z-2 position-relative pointer-events-none">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span
+                                                class="badge bg-info-subtle text-info-emphasis rounded-pill px-3 py-1">Tài
+                                                liệu</span>
+                                        </div>
+                                        <h6 class="fw-bold text-dark mt-2 mb-0">Cẩm nang Đại học</h6>
                                     </div>
-                                    <h5 class="bento-title mb-3">Cẩm nang Đại học</h5>
 
-                                    <div class="rounded-3 overflow-hidden border shadow-sm position-relative flex-grow-1"
-                                        style="min-height: 200px;">
-                                        <!-- Placeholder with Load Button -->
+                                    <!-- Interactive Area -->
+                                    <div class="flex-grow-1 position-relative overflow-hidden mt-2"
+                                        style="border-radius: 0 0 1.5rem 1.5rem;">
+                                        <!-- Placeholder -->
                                         <div id="handbook-placeholder"
-                                            class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center bg-white z-2">
-                                            <div class="mb-2">
-                                                <div class="bg-primary-subtle p-2 rounded-circle d-flex align-items-center justify-content-center"
-                                                    style="width: 50px; height: 50px;">
-                                                    <i class="bi bi-journal-bookmark-fill fs-4 text-primary"></i>
-                                                </div>
-                                            </div>
+                                            class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center bg-light z-2">
                                             <button id="load-handbook-btn"
-                                                class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-medium">
-                                                <i class="bi bi-eye me-1"></i>Xem Sổ tay
+                                                class="btn btn-primary rounded-pill px-4 shadow-sm btn-sm">
+                                                <i class="bi bi-book-half me-2"></i>Mở Sổ tay
                                             </button>
                                         </div>
-
-                                        <!-- Iframe (Initially Hidden) -->
+                                        <!-- Iframe (Lazy) -->
                                         <iframe id="handbook-iframe" allowfullscreen="allowfullscreen" scrolling="no"
-                                            class="fp-iframe w-100 h-100 border-0"
+                                            class="w-100 h-100 border-0"
                                             data-src="https://heyzine.com/flip-book/feafd1ca30.html"></iframe>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Item 4: Academic Calendar (Medium) -->
-                            <div class="bento-item news-card" data-category="calendar" id="bento-calendar">
-                                <div class="bento-content h-100 d-flex flex-column">
-                                    <div class="mb-2">
-                                        <span
-                                            class="badge bg-success-subtle text-success rounded-pill px-3 py-1 fw-bold">Kế
-                                            hoạch</span>
-                                        <span class="text-muted small ms-2"><i class="bi bi-calendar3 me-1"></i>2025 -
-                                            2026</span>
+                            <!-- 4. BOTTOM WIDE: Calendar (Horizontal Strip) -->
+                            <div class="glass-card-premium news-grid-long news-card" data-category="calendar">
+                                <div class="row g-0 h-100">
+                                    <div
+                                        class="col-md-4 bg-success-subtle d-flex align-items-center justify-content-center p-4">
+                                        <div class="text-center">
+                                            <div class="bg-white rounded-circle shadow-sm d-inline-flex align-items-center justify-content-center mb-3"
+                                                style="width: 60px; height: 60px;">
+                                                <i class="bi bi-calendar-check-fill text-success fs-3"></i>
+                                            </div>
+                                            <h5 class="fw-bold text-success-emphasis mb-1">Kế hoạch Năm học</h5>
+                                            <span class="badge bg-white text-success border">2025 - 2026</span>
+                                        </div>
                                     </div>
-                                    <h5 class="bento-title">Biểu đồ Kế hoạch năm học</h5>
-                                    <p class="bento-desc mb-3">
-                                        Lịch học tập, thời gian đăng ký môn học và các mốc thời gian quan trọng trong
-                                        năm học 2025-2026 dành cho sinh viên.
-                                    </p>
-                                    <div class="mt-auto">
-                                        <a href="assets/images/Biểu đồ KH năm học 25 26 (18.12.2025).pdf"
-                                            target="_blank"
-                                            class="btn btn-sm btn-outline-success w-100 rounded-pill fw-medium">
-                                            <i class="bi bi-file-earmark-pdf-fill me-1"></i>Xem file PDF
-                                        </a>
+                                    <div class="col-md-8">
+                                        <div class="news-content-box">
+                                            <div>
+                                                <h5 class="fw-bold mb-2">Biểu đồ Kế hoạch đào tạo</h5>
+                                                <p class="text-secondary small mb-3">
+                                                    Chi tiết các mốc thời gian quan trọng: đăng ký môn học, thi cuối kỳ,
+                                                    nghỉ lễ dành cho sinh viên khóa 2023, 2024, 2025...
+                                                </p>
+                                            </div>
+                                            <div>
+                                                <a href="assets/images/Biểu đồ KH năm học 25 26 (18.12.2025).pdf"
+                                                    target="_blank"
+                                                    class="btn btn-outline-success rounded-pill fw-medium px-4">
+                                                    <i class="bi bi-file-earmark-pdf-fill me-2"></i>Tải file PDF
+                                                </a>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+
                         </div>
                     </div>
                 </div>
