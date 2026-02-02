@@ -4,9 +4,9 @@
  */
 
 import { GRADE_SCALE } from '../core/constants.js';
-import { 
-  calculateYearlyStats, 
-  getYearInfo, 
+import {
+  calculateYearlyStats,
+  getYearInfo,
   calculateManualGPA,
   getGradeColor,
   classifyGPA
@@ -36,7 +36,7 @@ async function ensureChartJsLoaded() {
     chartJsLoaded = true;
     return true;
   }
-  
+
   return new Promise((resolve) => {
     const checkChart = () => {
       if (typeof Chart !== 'undefined') {
@@ -78,7 +78,7 @@ function generateStateHash(semesters, initialGpa, initialCredits) {
     gpa: initialGpa,
     credits: initialCredits
   });
-  
+
   let hash = 0;
   for (let i = 0; i < stateString.length; i++) {
     const char = stateString.charCodeAt(i);
@@ -113,8 +113,8 @@ function renderClassificationTable() {
   const rows = Object.values(GPA_RANKS).map(rank => {
     const isActive = hasData && currentGPA >= rank.min && currentGPA <= (rank.max + 0.001);
     const rowClass = isActive ? `table-${rank.color} animate-pulse shadow-sm` : '';
-    const badge = isActive 
-      ? `<span class="badge bg-white text-${rank.color} ms-2 px-2 py-1 border border-${rank.color} shadow-sm" style="font-size: 0.7rem; font-weight: 800;">BẠN ĐANG Ở ĐÂY <i class="bi bi-geo-alt-fill"></i></span>` 
+    const badge = isActive
+      ? `<span class="badge bg-white text-${rank.color} ms-2 px-2 py-1 border border-${rank.color} shadow-sm" style="font-size: 0.7rem; font-weight: 800;">BẠN ĐANG Ở ĐÂY <i class="bi bi-geo-alt-fill"></i></span>`
       : '';
 
     let textColorClass = `text-${rank.color}`;
@@ -142,7 +142,7 @@ function renderGradeScaleTable() {
 
   const currentGPA = getCurrentGPAForDisplay();
   const hasData = currentGPA !== null;
-  
+
   // Get current rank to determine which grade to highlight
   const currentRank = hasData ? classifyGPA(currentGPA) : null;
 
@@ -186,15 +186,15 @@ function renderGradeScaleTable() {
 function getCurrentGPAForDisplay() {
   const { semesters, initialGpa, initialCredits } = getManualState();
   const { gpa: manualCalcGpa } = calculateManualGPA(
-    semesters, 
-    parseFloat(initialGpa) || 0, 
+    semesters,
+    parseFloat(initialGpa) || 0,
     parseFloat(initialCredits) || 0
   );
 
   const targetState = getTargetState();
   const targetTabGpa = parseFloat(targetState.currentGpa) || 0;
 
-  const totalManualCredits = semesters.reduce((sum, sem) => 
+  const totalManualCredits = semesters.reduce((sum, sem) =>
     sum + sem.courses.reduce((s, c) => s + (parseFloat(c.credits) || 0), 0), 0
   ) + (parseFloat(initialCredits) || 0);
 
@@ -229,8 +229,8 @@ export function renderManualSemesters() {
 
   // Calculate cumulative GPAs
   const semesterCumulativeGPAs = calculateSemesterCumulativeGPAs(
-    manualSemesters, 
-    parseFloat(initialGpa) || 0, 
+    manualSemesters,
+    parseFloat(initialGpa) || 0,
     parseFloat(initialCredits) || 0
   );
 
@@ -284,8 +284,8 @@ function calculateSemesterCumulativeGPAs(semesters, initialGpa, initialCredits) 
       }
     });
 
-    return runningTotalCredits > 0 
-      ? (runningTotalPoints / runningTotalCredits).toFixed(2) 
+    return runningTotalCredits > 0
+      ? (runningTotalPoints / runningTotalCredits).toFixed(2)
       : '0.00';
   });
 }
@@ -429,9 +429,9 @@ function renderCourseRow(semId, course) {
         <select class="form-select form-select-sm manual-input ${gradeClass}"
                 data-sem-id="${semId}" data-course-id="${course.id}" data-field="grade">
           <option value="" ${course.grade === '' ? 'selected' : ''}>--</option>
-          ${raw(GRADE_SCALE.map(g => 
-            html`<option value="${g.grade}" ${course.grade === g.grade ? 'selected' : ''}>${g.grade}</option>`
-          ).join(''))}
+          ${raw(GRADE_SCALE.map(g =>
+    html`<option value="${g.grade}" ${course.grade === g.grade ? 'selected' : ''}>${g.grade}</option>`
+  ).join(''))}
         </select>
       </td>
       <td>
@@ -441,7 +441,7 @@ function renderCourseRow(semId, course) {
                    ${course.isRetake ? 'checked' : ''}
                    data-sem-id="${semId}" data-course-id="${course.id}" data-field="isRetake">
           </div>
-          ${course.isRetake ? renderRetakeSelect(semId, course) : ''}
+          ${course.isRetake ? raw(renderRetakeSelect(semId, course)) : ''}
         </div>
       </td>
       <td>
@@ -461,7 +461,7 @@ function renderCourseRow(semId, course) {
  * @returns {string} HTML string
  */
 function renderRetakeSelect(semId, course) {
-  const improvableGrades = GRADE_SCALE.filter(g => 
+  const improvableGrades = GRADE_SCALE.filter(g =>
     !['A+', 'A', 'B+', 'B'].includes(g.grade)
   );
 
@@ -469,9 +469,9 @@ function renderRetakeSelect(semId, course) {
     <select class="form-select form-select-xs manual-input" style="font-size: 0.75rem; padding: 2px;"
             data-sem-id="${semId}" data-course-id="${course.id}" data-field="oldGrade">
       <option value="" disabled>Điểm cũ</option>
-      ${raw(improvableGrades.map(g => 
-        html`<option value="${g.grade}" ${course.oldGrade === g.grade ? 'selected' : ''}>${g.grade}</option>`
-      ).join(''))}
+      ${raw(improvableGrades.map(g =>
+    html`<option value="${g.grade}" ${course.oldGrade === g.grade ? 'selected' : ''}>${g.grade}</option>`
+  ).join(''))}
     </select>
   `;
 }
@@ -548,7 +548,7 @@ export async function renderGPAChart(semesters, initialGpa, initialCredits) {
 
   const dataPoints = [];
   const labels = [];
-  
+
   calculateChartData(semesters, initialGpa, initialCredits, dataPoints, labels);
 
   if (gpaChart) {
@@ -591,10 +591,10 @@ function calculateChartData(semesters, initialGpa, initialCredits, dataPoints, l
       }
     }
 
-    const cumGPA = runningTotalCredits > 0 
-      ? (runningTotalPoints / runningTotalCredits).toFixed(2) 
+    const cumGPA = runningTotalCredits > 0
+      ? (runningTotalPoints / runningTotalCredits).toFixed(2)
       : '0.00';
-    
+
     dataPoints.push(parseFloat(cumGPA));
     labels.push(sem.name.replace('Năm học: ', '').replace(' - Học kỳ: ', ' '));
   }
@@ -702,7 +702,7 @@ export function getTargetStatusInfo(requiredGPA, creditsToStudy, requiredPoints,
         badgeClass: 'bg-danger-subtle text-danger-emphasis border-danger-subtle'
       };
     }
-    
+
     return {
       icon: 'bi-trophy-fill',
       color: 'primary',

@@ -714,6 +714,15 @@ body {
     grid-column: span 6;
 }
 
+/* Missing Base Definitions (Fix for Tablet) */
+.news-grid-side {
+    grid-column: span 6;
+}
+
+.news-grid-long {
+    grid-column: span 12;
+}
+
 /* Desktop Optimizations */
 @media (min-width: 992px) {
     .news-grid-hero {
@@ -1107,6 +1116,12 @@ body {
    ========================================== */
 [data-bs-theme="dark"] {
     --secondary-color: #2b3035;
+    color-scheme: dark;
+}
+
+[data-bs-theme="dark"] option {
+    background-color: #212529;
+    color: #f8f9fa;
 }
 
 [data-bs-theme="dark"] body {

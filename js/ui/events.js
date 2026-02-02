@@ -1276,11 +1276,11 @@ ${imageHtml}
 function getFeedbackTypeBadge(type) {
   const badges = {
     feature_request:
-      '<span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill">Tinh nang moi</span>',
+      '<span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill">Tính năng mới</span>',
     bug_report:
-      '<span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill">Bao loi</span>',
+      '<span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill">Báo lỗi</span>',
     improvement:
-      '<span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill">Cai tien</span>',
+      '<span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill">Cải tiến</span>',
   };
   return (
     badges[type] ||
