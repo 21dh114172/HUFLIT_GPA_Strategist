@@ -723,16 +723,18 @@ body {
     grid-column: span 12;
 }
 
-/* Desktop Optimizations */
+/* Desktop Optimizations - Balanced 2x2 Grid Layout */
 @media (min-width: 992px) {
     .news-grid-hero {
-        grid-column: span 8;
-        grid-row: span 2;
+        grid-column: span 6;
+        grid-row: span 1;
+        min-height: 280px;
     }
 
     .news-grid-side {
-        grid-column: span 4;
+        grid-column: span 6;
         grid-row: span 1;
+        min-height: 280px;
     }
 
     .news-grid-long {

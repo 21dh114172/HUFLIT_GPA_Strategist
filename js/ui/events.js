@@ -160,7 +160,7 @@ function setupSemesterListDelegation(list) {
         credits: 3,
         grade: "",
         isRetake: false,
-        oldGrade: "D",
+        oldGrade: "",
       });
       throttledHaptic();
       return;
@@ -693,40 +693,48 @@ function handleShareTarget() {
 function addRetakeItemUI(savedData = null) {
   const retakeList = document.getElementById("retake-list");
   if (!retakeList) return;
-  const item = document.createElement("div");
-  item.className = "d-flex gap-2 mb-2 align-items-center flex-nowrap";
+  const item = document.createElement("tr");
+
   const dGrade = GRADE_SCALE.find((g) => g.grade === "D");
   const defaultD_GPA = dGrade ? dGrade.gpa : 1.0;
   const defaultGrade = savedData ? savedData.oldGrade : defaultD_GPA;
   const defaultCredits = savedData ? savedData.credits : 3;
+
   item.innerHTML = `
-<div class="input-group flex-grow-1" style="min-width: 0;">
-<span class="input-group-text bg-light text-muted small px-2">Điểm cũ</span>
-<select class="form-select retake-old-grade" aria-label="Old Grade" style="text-overflow: ellipsis;">
-${GRADE_SCALE.filter((g) => !["A+", "A", "B+", "B"].includes(g.grade))
+    <td>
+      <select class="form-select form-select-sm retake-old-grade" aria-label="Old Grade">
+        ${GRADE_SCALE.filter((g) => !["A+", "A", "B+", "B"].includes(g.grade))
       .map(
         (g) =>
           `<option value="${g.gpa}" ${Math.abs(g.gpa - defaultGrade) < 0.01 ? "selected" : ""}>${g.grade} (${g.gpa})</option>`,
       )
       .join("")}
-</select>
-</div>
-<div class="input-group flex-nowrap" style="width: 90px; flex-shrink: 0;">
-<button class="btn btn-light border text-muted small px-2 btn-decrement" type="button">-</button>
-<input type="number" class="form-control retake-credits text-center px-0 border-start-0 border-end-0" placeholder="3" value="${defaultCredits}" min="1" max="10" readonly>
-<button class="btn btn-light border text-muted small px-2 btn-increment" type="button">+</button>
-</div>
-<button class="btn btn-light text-danger border-0 delete-retake-btn p-2 flex-shrink-0" type="button"><i class="bi bi-trash"></i></button>
+      </select>
+    </td>
+    <td>
+      <div class="input-group input-group-sm flex-nowrap" style="min-width: 80px;">
+        <button class="btn btn-outline-secondary px-1 btn-decrement" type="button">-</button>
+        <input type="number" class="form-control form-control-sm retake-credits text-center px-0" value="${defaultCredits}" min="1" max="10" readonly>
+        <button class="btn btn-outline-secondary px-1 btn-increment" type="button">+</button>
+      </div>
+    </td>
+    <td class="text-end">
+      <button class="btn btn-sm text-danger delete-retake-btn" type="button"><i class="bi bi-trash"></i></button>
+    </td>
 `;
+
   const select = item.querySelector(".retake-old-grade");
   const input = item.querySelector(".retake-credits");
   const btnDec = item.querySelector(".btn-decrement");
   const btnInc = item.querySelector(".btn-increment");
+
   const triggerSave = () => {
     const currentGpaInput = document.getElementById("current-gpa");
     if (currentGpaInput) currentGpaInput.dispatchEvent(new Event("input"));
   };
+
   select.addEventListener("change", triggerSave);
+
   btnDec.addEventListener("click", () => {
     let val = parseFloat(input.value) || 0;
     if (val > 1) {
@@ -734,6 +742,7 @@ ${GRADE_SCALE.filter((g) => !["A+", "A", "B+", "B"].includes(g.grade))
       triggerSave();
     }
   });
+
   btnInc.addEventListener("click", () => {
     let val = parseFloat(input.value) || 0;
     if (val < 10) {
@@ -741,10 +750,12 @@ ${GRADE_SCALE.filter((g) => !["A+", "A", "B+", "B"].includes(g.grade))
       triggerSave();
     }
   });
+
   item.querySelector(".delete-retake-btn").addEventListener("click", () => {
     item.remove();
     triggerSave();
   });
+
   retakeList.appendChild(item);
 }
 // ==========================================
@@ -966,7 +977,13 @@ export function initThemeToggle() {
     "#theme-toggle-mobile, #theme-toggle-desktop, #theme-toggle",
   );
   const navbar = document.querySelector(".navbar");
-  const getPreferredTheme = () => localStorage.getItem("theme") || "light";
+  const getPreferredTheme = () => {
+    const storedTheme = localStorage.getItem("theme");
+    if (storedTheme) {
+      return storedTheme;
+    }
+    return "light";
+  };
   const setTheme = (theme) => {
     document.documentElement.setAttribute("data-bs-theme", theme);
     localStorage.setItem("theme", theme);

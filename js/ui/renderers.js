@@ -383,9 +383,9 @@ function renderCourseTable(sem) {
           <thead class="text-muted small border-bottom text-nowrap">
             <tr>
               <th style="width: 35%">Môn học</th>
-              <th style="width: 20%; min-width: 70px;">TC</th>
+              <th style="width: 20%; min-width: 70px;">Tín chỉ</th>
               <th style="width: 20%; min-width: 75px;">Điểm</th>
-              <th style="width: 20%; min-width: 50px;">Lại?</th>
+              <th style="width: 20%; min-width: 50px;">Học cải thiện?</th>
               <th style="width: 5%"></th>
             </tr>
           </thead>
@@ -468,7 +468,7 @@ function renderRetakeSelect(semId, course) {
   return html`
     <select class="form-select form-select-xs manual-input" style="font-size: 0.75rem; padding: 2px;"
             data-sem-id="${semId}" data-course-id="${course.id}" data-field="oldGrade">
-      <option value="" disabled>Điểm cũ</option>
+      <option value="" disabled ${!course.oldGrade ? 'selected' : ''}>Điểm cũ</option>
       ${raw(improvableGrades.map(g =>
     html`<option value="${g.grade}" ${course.oldGrade === g.grade ? 'selected' : ''}>${g.grade}</option>`
   ).join(''))}
