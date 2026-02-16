@@ -649,8 +649,11 @@ function createChart(ctx, labels, dataPoints) {
           min: 0,
           max: 4.0,
           ticks: {
-            stepSize: 0.5,
-            color: textColor
+            stepSize: 1,
+            color: textColor,
+            callback: function(value) {
+              return value === 0 ? '0' : value.toFixed(1);
+            }
           },
           grid: {
             color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)'

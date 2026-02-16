@@ -462,14 +462,24 @@
                             </div>
 
                             <!-- GPA Progress Chart Card -->
-                            <div class="card shadow-sm border-primary ani-fade-in-up delay-300 hover-translate-y">
-                                <div class="card-header border-bottom py-3">
-                                    <h6 class="card-title fw-bold text-primary mb-0"><i
-                                            class="bi bi-graph-up me-2"></i>Biến động GPA</h6>
-                                    <p class="text-muted small mt-1 mb-0">Theo dõi tiến trình học tập</p>
+                            <div class="card shadow-sm border-0 h-100 ani-fade-in-up delay-300 hover-translate-y"
+                                style="border-radius: 1rem; overflow: hidden;">
+                                <div class="card-header border-0 bg-transparent pt-4 pb-2 px-4">
+                                    <div class="d-flex align-items-center mb-1">
+                                        <div class="rounded-circle bg-primary bg-opacity-10 p-2 me-3 d-flex align-items-center justify-content-center"
+                                            style="width: 40px; height: 40px;">
+                                            <i class="bi bi-graph-up-arrow text-primary fs-5"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="card-title fw-bold text-dark mb-0">Biến động GPA</h5>
+                                            <p class="text-muted small mb-0">Theo dõi tiến trình học tập qua các kỳ</p>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="card-body p-3">
-                                    <canvas id="gpa-chart" style="max-height: 180px;"></canvas>
+                                <div class="card-body px-3 pb-4 pt-2">
+                                    <div class="position-relative" style="height: 200px; width: 100%;">
+                                        <canvas id="gpa-chart"></canvas>
+                                    </div>
                                 </div>
                             </div>
                         </div>
