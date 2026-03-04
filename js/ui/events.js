@@ -3,8 +3,9 @@
  * Handles user interactions and coordinates between UI, state, and calculations
  */
 import { GRADE_SCALE } from "../core/constants.js";
-import { API_CONFIG, UI_CONFIG } from "../core/config.js";
+import { API_CONFIG } from "../core/config.js";
 import { debounce, throttle, isMobileDevice } from "../core/helpers.js";
+import { validateFeedbackContent } from "../core/validators.js";
 import {
   getManualState,
   setManualState,
@@ -216,7 +217,7 @@ function handleDeleteRequest(deleteBtn, deleteTimeout) {
     "btn-danger",
     "text-white",
   );
-  deleteBtn.innerHTML = "Xoa?";
+  deleteBtn.innerHTML = "Xóa?";
   setTimeout(() => {
     if (
       deleteBtn &&
@@ -1049,7 +1050,7 @@ export function initUserGuide() {
       if (checkbox) checkbox.checked = false;
       if (confirmBtn) {
         confirmBtn.disabled = true;
-        confirmBtn.textContent = "Bat dau su dung";
+        confirmBtn.textContent = "Bắt đầu sử dụng";
         confirmBtn.classList.remove("btn-secondary");
         confirmBtn.classList.add("btn-primary");
       }
@@ -1075,96 +1076,55 @@ export function initFeedbackForm() {
   const submitBtn = document.getElementById("submit-feedback-btn");
   const listTabBtn = document.getElementById("feedback-list-tab");
   const refreshBtn = document.getElementById("refresh-feedback-btn");
-  const fileInput = document.getElementById("feedback-image");
-  const previewContainer = document.getElementById("feedback-image-preview");
-  const previewImg = previewContainer?.querySelector("img");
-  const removeImgBtn = document.getElementById("remove-image-btn");
-  setupImagePreview(fileInput, previewContainer, previewImg, removeImgBtn);
-  setupFormSubmission(
-    form,
-    submitBtn,
-    listTabBtn,
-    fileInput,
-    previewContainer,
-    previewImg,
-  );
+  setupFormSubmission(form, submitBtn, listTabBtn);
   setupFeedbackList(listTabBtn, refreshBtn);
 }
-function setupImagePreview(
-  fileInput,
-  previewContainer,
-  previewImg,
-  removeImgBtn,
-) {
-  if (!fileInput || !previewContainer) return;
-  fileInput.addEventListener("change", () => {
-    const file = fileInput.files[0];
-    if (!file) return;
-    if (file.size > UI_CONFIG.MAX_IMAGE_SIZE) {
-      showToast("Ảnh quá lớn! Vui lòng chọn ảnh dưới 5MB.", "warning");
-      fileInput.value = "";
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      if (previewImg) previewImg.src = e.target.result;
-      previewContainer.classList.remove("d-none");
-    };
-    reader.readAsDataURL(file);
-  });
-  removeImgBtn?.addEventListener("click", () => {
-    fileInput.value = "";
-    previewContainer.classList.add("d-none");
-    if (previewImg) previewImg.src = "";
-  });
-}
-function setupFormSubmission(
-  form,
-  submitBtn,
-  listTabBtn,
-  fileInput,
-  previewContainer,
-  previewImg,
-) {
+function setupFormSubmission(form, submitBtn, listTabBtn) {
   if (!form || !submitBtn) return;
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
+    
+    const name = document.getElementById("feedback-name")?.value || "";
+    const type = document.getElementById("feedback-type")?.value || "";
+    const content = document.getElementById("feedback-content")?.value || "";
+    
+    // Validate content
+    const contentValidation = validateFeedbackContent(content);
+    if (!contentValidation.valid) {
+      showToast(contentValidation.error, "error");
+      return;
+    }
+    
     const originalBtnText = submitBtn.innerHTML;
     submitBtn.disabled = true;
     submitBtn.innerHTML =
       '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Đang xử lý...';
-    const name = document.getElementById("feedback-name")?.value || "";
-    const type = document.getElementById("feedback-type")?.value || "";
-    const content = document.getElementById("feedback-content")?.value || "";
-    const file = fileInput?.files[0];
-    let imageUrl = "";
+    
     if (API_CONFIG.GOOGLE_SCRIPT_URL.includes("PLACEHOLDER")) {
       showToast(
         "Tính năng đang được bảo trì (Chưa cấu hình Server). Vui lòng liên hệ qua Facebook.",
         "warning",
       );
+      submitBtn.disabled = false;
       submitBtn.innerHTML = originalBtnText;
       return;
     }
     try {
-      if (file) {
-        submitBtn.textContent = "Đang upload ảnh...";
-        submitBtn.textContent = "Đang upload ảnh...";
-      }
-      submitBtn.textContent = "Đang gửi góp ý...";
-      submitBtn.textContent = "Đang gửi góp ý...";
+      // Submit feedback
+      submitBtn.innerHTML =
+        '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Đang gửi góp ý...';
+      await submitFeedback({ name, type, content: contentValidation.value, imageUrl: "" });
+      
+      // Success
       showToast(
         "Cảm ơn bạn đã đóng góp ý kiến! Chúng tôi sẽ xem xét sớm nhất.",
         "success",
       );
-      showToast(
-        "Cam on ban da dong gop y kien! Chung toi se xem xet som nhat.",
-        "success",
-      );
-      if (previewContainer) {
-        previewContainer.classList.add("d-none");
-        if (previewImg) previewImg.src = "";
-      }
+      
+      // Reset form
+      form.reset();
+      
+      // Switch to feedback list tab
       if (listTabBtn) {
         const tab = new bootstrap.Tab(listTabBtn);
         tab.show();
@@ -1182,23 +1142,6 @@ function setupFormSubmission(
       submitBtn.innerHTML = originalBtnText;
     }
   });
-}
-async function uploadImageToImgur(file) {
-  const formData = new FormData();
-  formData.append("image", file);
-  const response = await fetch(API_CONFIG.IMGUR_UPLOAD_URL, {
-    method: "POST",
-    headers: { Authorization: `Client-ID ${API_CONFIG.IMGUR_CLIENT_ID}` },
-    body: formData,
-    referrer: "",
-  });
-  const data = await response.json();
-  if (!data.success) {
-    throw new Error(
-      "Imgur upload failed: " + (data.data.error || "Unknown error"),
-    );
-  }
-  return data.data.link;
 }
 async function submitFeedback({ name, type, content, imageUrl }) {
   await fetch(API_CONFIG.GOOGLE_SCRIPT_URL, {
