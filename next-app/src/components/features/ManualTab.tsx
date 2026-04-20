@@ -83,30 +83,30 @@ const CourseRow = memo(({
   isOnlyCourse: boolean;
 }) => {
   return (
-    <TableRow className="hover:bg-blue-50/30 group transition-colors border-slate-100">
-      <TableCell className="ps-6">
+    <TableRow className="hover:bg-slate-50/80 group transition-colors border-b border-slate-200 last:border-0">
+      <TableCell className="ps-6 py-3">
         <Input 
           placeholder="Tên môn học..." 
           value={course.name}
           onChange={(e) => onUpdate(sIdx, cIdx, "name", e.target.value)}
-          className="bg-white/50 backdrop-blur-sm border-slate-200 h-9 text-sm focus:ring-blue-500 focus:bg-white/80 transition-all"
+          className="bg-white border-slate-300 h-9 text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm"
         />
       </TableCell>
-      <TableCell>
+      <TableCell className="py-3">
         <Input 
           type="number" 
           min="1" 
           value={course.credits}
           onChange={(e) => onUpdate(sIdx, cIdx, "credits", parseInt(e.target.value) || 0)}
-          className="bg-white/50 backdrop-blur-sm border-slate-200 h-9 text-sm text-center font-medium focus:ring-blue-500 focus:bg-white/80 transition-all"
+          className="bg-white border-slate-300 h-9 text-sm text-center font-semibold focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm"
         />
       </TableCell>
-      <TableCell>
+      <TableCell className="py-3">
         <Select 
           value={course.grade} 
           onValueChange={(val) => onUpdate(sIdx, cIdx, "grade", val)}
         >
-          <SelectTrigger className="bg-white/50 backdrop-blur-sm border-slate-200 h-9 text-sm font-bold text-blue-600 focus:ring-blue-500 focus:bg-white/80 transition-all">
+          <SelectTrigger className="bg-white border-slate-300 h-9 text-sm font-bold text-blue-600 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -116,19 +116,19 @@ const CourseRow = memo(({
           </SelectContent>
         </Select>
       </TableCell>
-      <TableCell className="text-center">
-        <div className="flex flex-col items-center gap-1.5 py-1">
+      <TableCell className="text-center py-3">
+        <div className="flex flex-col items-center gap-1.5">
           <Switch 
             checked={!!course.isRetake} 
             onCheckedChange={(val) => onUpdate(sIdx, cIdx, "isRetake", val)}
-            className="focus:ring-blue-500"
+            className="scale-90"
           />
           {course.isRetake && (
             <Select 
               value={course.oldGrade || "D"} 
               onValueChange={(val) => onUpdate(sIdx, cIdx, "oldGrade", val)}
             >
-              <SelectTrigger className="h-6 w-14 text-[10px] uppercase font-bold px-1 bg-white/50 backdrop-blur-sm border-slate-200 text-slate-500">
+              <SelectTrigger className="h-6 w-14 text-[10px] uppercase font-bold px-1 bg-slate-100/50 border-slate-200 text-slate-500">
                 <SelectValue placeholder="Cũ" />
               </SelectTrigger>
               <SelectContent>
@@ -140,10 +140,10 @@ const CourseRow = memo(({
           )}
         </div>
       </TableCell>
-      <TableCell className="pe-6 text-right">
+      <TableCell className="pe-6 text-right py-3">
         <button 
           onClick={() => onRemove(sIdx, cIdx)}
-          className={`text-slate-300 hover:text-red-500 transition-all ${isOnlyCourse ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+          className={`text-slate-300 hover:text-red-500 transition-all p-1.5 rounded-lg hover:bg-red-50 ${isOnlyCourse ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
         >
           <Trash2 className="h-4 w-4" />
         </button>
@@ -192,20 +192,20 @@ const SemesterCard = memo(({
 
   return (
     <div className="space-y-6">
-      <Card className="ring-0 border border-white/20 bg-white/40 backdrop-blur-xl shadow-xl shadow-blue-500/5 hover:shadow-blue-500/10 transition-all duration-500 overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-300 gap-0">
-        <CardHeader className="bg-white/20 border-b border-white/10 py-5 px-6 flex flex-row items-center justify-between">
+      <Card className="ring-0 border border-slate-200 bg-white/80 backdrop-blur-xl shadow-xl shadow-blue-500/5 hover:shadow-blue-500/10 transition-all duration-500 overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-300 gap-0">
+        <CardHeader className="bg-slate-50 border-b border-slate-200 py-4 px-6 flex flex-row items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="bg-blue-600 h-9 w-9 rounded-xl flex items-center justify-center font-bold text-white shadow-xl shadow-blue-500/20 text-sm shrink-0">
+            <div className="bg-blue-600 h-8 w-8 rounded-lg flex items-center justify-center font-bold text-white shadow-lg shadow-blue-500/20 text-xs shrink-0">
               {sIdx + 1}
             </div>
             <Input 
               value={sem.name}
               onChange={(e) => onUpdateName(sIdx, e.target.value)}
-              className="bg-transparent border-none text-lg font-black text-slate-800 p-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-auto w-auto min-w-[150px]"
+              className="bg-transparent border-none text-base font-bold text-slate-800 p-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-auto w-auto min-w-[150px]"
             />
             {semStats?.isWarning && (
-              <Badge variant="destructive" className="animate-pulse py-1 px-2.5 rounded-full font-black text-[9px] uppercase tracking-tighter shrink-0 shadow-lg shadow-red-500/20 border-none">
-                <AlertTriangle className="h-3 w-3 mr-1.5" /> Cảnh báo Học vụ
+              <Badge variant="destructive" className="py-0.5 px-2 rounded-full font-bold text-[9px] uppercase tracking-tighter shrink-0 shadow-sm border-none">
+                <AlertTriangle className="h-3 w-3 mr-1" /> Cảnh báo
               </Badge>
             )}
           </div>
@@ -215,21 +215,21 @@ const SemesterCard = memo(({
               size="icon" 
               disabled={isOnlySemester}
               onClick={() => onRemoveSemester(sIdx)}
-              className="h-9 w-9 text-slate-400 hover:text-red-500 hover:bg-red-50/50 transition-all rounded-full"
+              className="h-8 w-8 text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all rounded-lg"
             >
-              <Trash2 className="h-4.5 w-4.5" />
+              <Trash2 className="h-4 w-4" />
             </Button>
           </div>
         </CardHeader>
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <Table>
-              <TableHeader>
-                <TableRow className="bg-white/30 border-b border-white/10">
-                  <TableHead className="w-[45%] text-[10px] font-black uppercase text-blue-400 tracking-[0.15em] ps-6 py-4">Tên môn học</TableHead>
-                  <TableHead className="w-[15%] text-[10px] font-black uppercase text-blue-400 tracking-[0.15em] text-center">Tín chỉ</TableHead>
-                  <TableHead className="w-[20%] text-[10px] font-black uppercase text-blue-400 tracking-[0.15em] text-center">Điểm chữ</TableHead>
-                  <TableHead className="w-[10%] text-[10px] font-black uppercase text-blue-400 tracking-[0.15em] text-center">Học lại</TableHead>
+              <TableHeader className="sticky top-0 bg-white border-b border-slate-200 z-10">
+                <TableRow className="border-b border-slate-200">
+                  <TableHead className="w-[45%] text-[10px] font-bold uppercase text-slate-600 tracking-wider ps-6 py-3">Môn học</TableHead>
+                  <TableHead className="w-[15%] text-[10px] font-bold uppercase text-slate-600 tracking-wider text-center py-3">Tín chỉ</TableHead>
+                  <TableHead className="w-[20%] text-[10px] font-bold uppercase text-slate-600 tracking-wider text-center py-3">Điểm</TableHead>
+                  <TableHead className="w-[10%] text-[10px] font-bold uppercase text-slate-600 tracking-wider text-center py-3">Lại</TableHead>
                   <TableHead className="w-[10%] text-right pe-6"></TableHead>
                 </TableRow>
               </TableHeader>
@@ -248,46 +248,46 @@ const SemesterCard = memo(({
               </TableBody>
             </Table>
           </div>
-          <div className="p-5 bg-blue-50/20 backdrop-blur-md border-t border-white/20 flex flex-col items-center gap-6">
+          <div className="p-4 bg-slate-50 border-t border-slate-200 flex flex-col items-center gap-4">
              <Button 
                variant="outline" 
                size="sm" 
                onClick={() => onAddCourse(sIdx)}
-               className="bg-white/40 border-blue-200/50 text-blue-700 font-black px-10 rounded-full hover:bg-blue-50 border-dashed w-full sm:w-auto shadow-sm overflow-hidden group"
+               className="bg-white border-slate-300 text-blue-600 font-bold px-8 rounded-xl hover:bg-blue-50 transition-all w-full sm:w-auto shadow-sm group"
              >
                <Plus className="h-4 w-4 mr-2 group-hover:rotate-90 transition-transform duration-300" /> Thêm môn học
              </Button>
 
              {semStats && (
-               <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 w-full">
+               <div className="grid grid-cols-2 lg:grid-cols-5 gap-2 w-full">
                   {/* Chip 1: Passed */}
-                  <div className="bg-emerald-400/10 border border-emerald-400/20 rounded-2xl p-3 flex flex-col items-center justify-center gap-0.5">
-                    <span className="text-[9px] font-black text-emerald-600/60 uppercase tracking-widest whitespace-nowrap">Số TC đạt</span>
-                    <span className="text-lg font-black text-emerald-600">{semStats.passedCredits}</span>
+                  <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-2 flex flex-col items-center justify-center gap-0.5">
+                    <span className="text-[8px] font-bold text-emerald-700 uppercase tracking-widest whitespace-nowrap">TC Đạt</span>
+                    <span className="text-base font-bold text-emerald-600">{semStats.passedCredits}</span>
                   </div>
                   
                   {/* Chip 2: Failed */}
-                  <div className={`border rounded-2xl p-3 flex flex-col items-center justify-center gap-0.5 ${semStats.failedCredits > 0 ? "bg-rose-400/10 border-rose-400/20" : "bg-slate-400/5 border-slate-400/10"}`}>
-                    <span className={`text-[9px] font-black uppercase tracking-widest whitespace-nowrap ${semStats.failedCredits > 0 ? "text-rose-600/60" : "text-slate-400"}`}>Số TC rớt</span>
-                    <span className={`text-lg font-black ${semStats.failedCredits > 0 ? "text-rose-600" : "text-slate-400"}`}>{semStats.failedCredits}</span>
+                  <div className={`border rounded-xl p-2 flex flex-col items-center justify-center gap-0.5 ${semStats.failedCredits > 0 ? "bg-rose-50 border-rose-200" : "bg-slate-50 border-slate-200"}`}>
+                    <span className={`text-[8px] font-bold uppercase tracking-widest whitespace-nowrap ${semStats.failedCredits > 0 ? "text-rose-700" : "text-slate-500"}`}>TC Rớt</span>
+                    <span className={`text-base font-bold ${semStats.failedCredits > 0 ? "text-rose-600" : "text-slate-500"}`}>{semStats.failedCredits}</span>
                   </div>
 
                   {/* Chip 3: Semester GPA */}
-                  <div className={`border rounded-2xl p-3 flex flex-col items-center justify-center gap-0.5 ${semStats.isWarning ? "bg-red-400/10 border-red-400/20" : "bg-blue-400/10 border-blue-400/20"}`}>
-                    <span className={`text-[9px] font-black uppercase tracking-widest whitespace-nowrap ${semStats.isWarning ? "text-red-600/60" : "text-blue-600/60"}`}>GPA Học kỳ</span>
-                    <span className={`text-lg font-black ${semStats.isWarning ? "text-red-500" : "text-blue-600"}`}>{semStats.gpa.toFixed(2)}</span>
+                  <div className={`border rounded-xl p-2 flex flex-col items-center justify-center gap-0.5 ${semStats.isWarning ? "bg-rose-50 border-rose-200" : "bg-blue-50 border-blue-200"}`}>
+                    <span className={`text-[8px] font-bold uppercase tracking-widest whitespace-nowrap ${semStats.isWarning ? "text-rose-700" : "text-blue-700"}`}>GPA HK</span>
+                    <span className={`text-base font-bold ${semStats.isWarning ? "text-rose-500" : "text-blue-600"}`}>{semStats.gpa.toFixed(2)}</span>
                   </div>
 
                   {/* Chip 4: Cum Credits */}
-                  <div className="bg-blue-400/10 border border-blue-400/20 rounded-2xl p-3 flex flex-col items-center justify-center gap-0.5">
-                    <span className="text-[9px] font-black text-blue-600/60 uppercase tracking-widest whitespace-nowrap">TC Tích lũy</span>
-                    <span className="text-lg font-black text-slate-700">{semStats.cumulativeCredits}</span>
+                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-2 flex flex-col items-center justify-center gap-0.5">
+                    <span className="text-[8px] font-bold text-slate-600 uppercase tracking-widest whitespace-nowrap">Tích lũy</span>
+                    <span className="text-base font-bold text-slate-700">{semStats.cumulativeCredits}</span>
                   </div>
 
                   {/* Chip 5: Cum GPA */}
-                  <div className="col-span-2 lg:col-span-1 bg-white/60 border border-white rounded-2xl p-3 flex flex-col items-center justify-center gap-0.5 shadow-xl shadow-blue-500/5">
-                    <span className="text-[9px] font-black text-blue-600 uppercase tracking-widest whitespace-nowrap">GPA Tích lũy</span>
-                    <span className="text-xl font-black text-blue-700">{semStats.cumulativeGPA.toFixed(2)}</span>
+                  <div className="col-span-2 lg:col-span-1 bg-white border border-blue-200 rounded-xl p-2 flex flex-col items-center justify-center gap-0.5 shadow-sm">
+                    <span className="text-[8px] font-bold text-blue-700 uppercase tracking-widest whitespace-nowrap">GPA Tích lũy</span>
+                    <span className="text-lg font-bold text-blue-700">{semStats.cumulativeGPA.toFixed(2)}</span>
                   </div>
                </div>
              )}
@@ -296,49 +296,53 @@ const SemesterCard = memo(({
       </Card>
 
       {showYearSummary && yearData && (
-        <div className="mt-2 mb-8 animate-in fade-in duration-500">
-          <div className="bg-white/40 backdrop-blur-xl border border-white/20 rounded-2xl py-3 px-6 flex flex-wrap md:flex-row items-center justify-between gap-4 shadow-xl shadow-blue-500/5 hover:border-blue-200 transition-all">
+        <div className="mt-4 mb-10 animate-in fade-in slide-in-from-top-2 duration-500">
+          <div className="bg-white border border-slate-300 rounded-2xl py-3.5 px-6 flex flex-wrap md:flex-row items-center justify-between gap-4 shadow-xl shadow-blue-500/5 hover:border-blue-400 transition-all group/year">
             {/* Section 1: Year */}
-            <div className="flex items-center gap-3">
-              <div className="bg-blue-600 h-9 w-9 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-500/20 shrink-0">
-                <History className="h-4.5 w-4.5" />
+            <div className="flex items-center gap-4">
+              <div className="bg-gradient-to-br from-blue-600 to-blue-700 h-10 w-10 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-500/20 shrink-0 group-hover/year:scale-110 transition-transform duration-300">
+                <History className="h-5 w-5" />
               </div>
-              <div className="flex flex-col md:flex-row md:items-baseline md:gap-2">
-                <div className="text-[10px] font-black text-blue-400 uppercase tracking-[0.15em]">Năm học</div>
-                <div className="text-sm font-black text-slate-700 whitespace-nowrap">{currentYear}</div>
+              <div className="flex flex-col">
+                <div className="text-[9px] font-black text-blue-500 uppercase tracking-[0.2em] mb-0.5">Năm học</div>
+                <div className="text-base font-black text-slate-800 whitespace-nowrap tracking-tight">{currentYear}</div>
               </div>
             </div>
 
-            <div className="hidden lg:block h-6 w-px bg-white/20"></div>
+            <div className="hidden lg:block h-8 w-px bg-slate-200"></div>
 
             {/* Section 2: GPA */}
-            <div className="flex items-center gap-2">
-              <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest hidden sm:block">GPA NĂM</div>
+            <div className="flex items-center gap-3">
+              <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest hidden sm:block">GPA NĂM</div>
               <div className="flex items-baseline gap-1">
-                <span className={`text-xl font-black ${(yearData.points / yearData.credits) >= 3.2 ? "text-blue-600" : "text-amber-600"}`}>
+                <span className={`text-2xl font-black ${(yearData.points / yearData.credits) >= 3.2 ? "text-blue-600" : "text-amber-600"}`}>
                   {(yearData.points / yearData.credits).toFixed(2)}
                 </span>
                 <span className="text-[10px] font-bold text-slate-300">/ 4.0</span>
               </div>
             </div>
 
-            <div className="hidden lg:block h-6 w-px bg-white/20"></div>
+            <div className="hidden lg:block h-8 w-px bg-slate-200"></div>
 
             {/* Section 3: Credits */}
-            <div className="flex items-center gap-2">
-              <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest hidden sm:block">Tín chỉ</div>
-              <div className="text-lg font-black text-slate-700">{yearData.credits}</div>
+            <div className="flex items-center gap-3">
+              <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest hidden sm:block">Tín chỉ</div>
+              <div className="text-xl font-black text-slate-800">{yearData.credits}</div>
             </div>
 
             {/* Section 4: Status */}
             <div className="md:ms-auto">
-              <Badge variant="outline" className={`py-1.5 px-4 rounded-full font-black text-[9px] uppercase tracking-widest border-none pointer-events-none shadow-sm ${
-                 (yearData.points / yearData.credits) >= 3.6 ? "bg-emerald-500/10 text-emerald-600" :
-                 (yearData.points / yearData.credits) >= 3.2 ? "bg-blue-500/10 text-blue-600" : "bg-slate-100 text-slate-600"
+              <div className={`py-1.5 px-5 rounded-xl font-black text-[10px] uppercase tracking-widest pointer-events-none shadow-sm border flex items-center gap-2 ${
+                 (yearData.points / yearData.credits) >= 3.6 ? "bg-emerald-50 border-emerald-200 text-emerald-600" :
+                 (yearData.points / yearData.credits) >= 3.2 ? "bg-blue-50 border-blue-200 text-blue-600" : "bg-slate-50 border-slate-200 text-slate-600"
               }`}>
+                 <div className={`h-1.5 w-1.5 rounded-full animate-pulse ${
+                    (yearData.points / yearData.credits) >= 3.6 ? "bg-emerald-500" :
+                    (yearData.points / yearData.credits) >= 3.2 ? "bg-blue-500" : "bg-slate-400"
+                 }`}></div>
                  {(yearData.points / yearData.credits) >= 3.6 ? "Xuất sắc" : 
                   (yearData.points / yearData.credits) >= 3.2 ? "Phong độ tốt" : "Cần cố gắng"}
-              </Badge>
+              </div>
             </div>
           </div>
         </div>
@@ -514,43 +518,43 @@ export function ManualTab({ onSwitchToRoadmap }: ManualTabProps) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start pb-20">
       
-      <div className="lg:col-span-4 lg:sticky lg:top-24 space-y-6 order-last lg:order-first">
-        <Card className="ring-0 border border-white/20 bg-white/40 backdrop-blur-xl shadow-2xl shadow-blue-500/5 overflow-hidden gap-0">
-          <CardHeader className="pb-0 border-b border-white/10 px-5">
-            <div className="flex items-center justify-between py-4">
+      <div className="lg:col-span-4 lg:sticky lg:top-20 space-y-6 order-last lg:order-first h-fit z-30">
+        <Card className="ring-0 border border-slate-300 bg-white shadow-xl shadow-blue-500/5 overflow-hidden">
+          <CardHeader className="pb-1 border-b border-slate-200 px-5">
+            <div className="flex items-center justify-between py-2.5">
               <div className="flex items-center gap-3">
-                <div className="bg-blue-600 p-2 rounded-xl shadow-lg shadow-blue-500/20">
-                  <Calculator className="h-6 w-6 text-white" />
+                <div className="bg-blue-600 p-1.5 rounded-lg shadow-lg shadow-blue-500/20">
+                  <Calculator className="h-5 w-5 text-white" />
                 </div>
-                <CardTitle className="text-2xl text-slate-800 font-black tracking-tight">Tổng kết</CardTitle>
+                <CardTitle className="text-xl text-slate-800 font-bold tracking-tight">Tổng kết</CardTitle>
               </div>
-              <Button variant="ghost" size="icon" onClick={resetAll} className="h-10 w-10 text-slate-300 hover:text-red-500 hover:bg-red-50/50 rounded-full transition-all">
-                <RotateCcw className="h-5 w-5" />
+              <Button variant="ghost" size="icon" onClick={resetAll} className="h-8 w-8 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all">
+                <RotateCcw className="h-4 w-4" />
               </Button>
             </div>
           </CardHeader>
-          <CardContent className="pt-6 px-5 pb-6 space-y-6">
+          <CardContent className="pt-4 px-5 pb-5 space-y-4">
             
             {/* Initial Inputs Box */}
-            <div className="bg-white/30 backdrop-blur-md p-5 rounded-3xl border border-white/20 space-y-4 shadow-inner">
-              <div className="text-[10px] font-black text-blue-400 uppercase tracking-[0.2em]">Dữ liệu ban đầu</div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <Label className="text-[9px] font-bold text-slate-400 uppercase ps-1">GPA Hiện tại</Label>
+            <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2 shadow-sm">
+              <div className="text-[8px] font-bold text-slate-500 uppercase tracking-widest">Dữ liệu hiện tại</div>
+              <div className="grid grid-cols-2 gap-2.5">
+                <div className="space-y-1">
+                  <Label className="text-[8px] font-bold text-slate-600 uppercase ps-1">GPA Hiện tại</Label>
                   <Input 
                     type="number" 
                     step="0.01"
-                    className="bg-white/50 border-white/40 rounded-2xl h-11 text-center font-black text-blue-600 placeholder:text-slate-300 shadow-sm focus:ring-blue-500 focus:bg-white transition-all"
+                    className="bg-white border-slate-300 rounded-xl h-9 text-center font-bold text-blue-600 placeholder:text-slate-300 shadow-sm focus:ring-1 focus:ring-blue-500 transition-all"
                     value={initialGPA || ""}
                     onChange={(e) => setInitialGPA(parseFloat(e.target.value) || 0)}
                     placeholder="0.00"
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <Label className="text-[9px] font-bold text-slate-400 uppercase ps-1">Số TC cũ</Label>
+                <div className="space-y-1">
+                  <Label className="text-[8px] font-bold text-slate-600 uppercase ps-1">Tích lũy</Label>
                   <Input 
                     type="number" 
-                    className="bg-white/50 border-white/40 rounded-2xl h-11 text-center font-black text-blue-600 placeholder:text-slate-300 shadow-sm focus:ring-blue-500 focus:bg-white transition-all"
+                    className="bg-white border-slate-300 rounded-xl h-9 text-center font-bold text-blue-600 placeholder:text-slate-300 shadow-sm focus:ring-1 focus:ring-blue-500 transition-all"
                     value={initialCredits || ""}
                     onChange={(e) => setInitialCredits(parseInt(e.target.value) || 0)}
                     placeholder="0"
@@ -560,10 +564,10 @@ export function ManualTab({ onSwitchToRoadmap }: ManualTabProps) {
             </div>
 
             {/* MAIN GPA DISPLAY */}
-            <div className="text-center py-4 relative">
-              <div className="absolute inset-0 bg-blue-500/5 blur-3xl rounded-full -z-10"></div>
-              <div className="text-[10px] font-black text-blue-400 uppercase tracking-[0.3em] mb-3">GPA TÍCH LŨY MỚI</div>
-              <div className={`text-8xl font-black leading-none tracking-tighter drop-shadow-2xl ${
+            <div className="text-center py-1 relative">
+              <div className="absolute inset-0 bg-blue-500/5 blur-2xl rounded-full -z-10"></div>
+              <div className="text-[8px] font-bold text-blue-500/60 uppercase tracking-[0.2em] mb-1">GPA TÍCH LŨY MỚI</div>
+              <div className={`text-5xl font-black leading-none tracking-tighter drop-shadow-sm ${
                 result.gpa >= 3.6 ? "text-emerald-500" :
                 result.gpa >= 3.2 ? "text-blue-600" :
                 result.gpa >= 2.5 ? "text-amber-500" : "text-rose-500"
@@ -573,14 +577,14 @@ export function ManualTab({ onSwitchToRoadmap }: ManualTabProps) {
             </div>
 
             {/* Bottom Stats Grid */}
-            <div className="grid grid-cols-2 pt-6 pb-2 border-t border-white/10">
-              <div className="flex flex-col items-center justify-center space-y-1.5 py-4 border-r border-white/10">
-                <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Tổng Tín chỉ</div>
-                <div className="text-4xl font-black text-slate-800">{result.totalCredits}</div>
+            <div className="grid grid-cols-2 pt-3 pb-1 border-t border-slate-300">
+              <div className="flex flex-col items-center justify-center space-y-0.5 py-1.5 border-r border-slate-300">
+                <div className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Tổng Tín chỉ</div>
+                <div className="text-3xl font-bold text-slate-800">{result.totalCredits}</div>
               </div>
-              <div className="flex flex-col items-center justify-center space-y-1.5 py-4">
-                <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Xếp loại</div>
-                <div className={`text-2xl font-black whitespace-nowrap ${
+              <div className="flex flex-col items-center justify-center space-y-1 py-1.5">
+                <div className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Xếp loại</div>
+                <div className={`text-xl font-bold whitespace-nowrap ${
                    result.rank === "Xuất sắc" ? "text-emerald-500" :
                    result.rank === "Giỏi" ? "text-blue-600" :
                    result.rank === "Khá" ? "text-amber-500" : "text-slate-700"
@@ -592,7 +596,6 @@ export function ManualTab({ onSwitchToRoadmap }: ManualTabProps) {
 
             <Button 
               onClick={() => {
-                // ... same logic ...
                 let remainingCredits = 0;
                 let pendingRetakes: any[] = [];
                 
@@ -621,17 +624,17 @@ export function ManualTab({ onSwitchToRoadmap }: ManualTabProps) {
                   pendingRetakes
                 });
               }}
-              className="w-full h-14 rounded-2xl font-black text-md shadow-xl shadow-blue-500/20 bg-blue-600 hover:bg-blue-700 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              className="w-full h-11 rounded-xl font-bold text-sm shadow-lg shadow-blue-500/10 bg-blue-600 hover:bg-blue-700 transition-all active:scale-95"
             >
-              Tìm Lộ trình Học Tập <Target className="ml-2 h-5 w-5" />
+              Tìm Lộ trình Học Tập <Target className="ml-2 h-4 w-4" />
             </Button>
           </CardContent>
         </Card>
 
         {/* Biểu đồ biến động GPA */}
         {chartData.length > 1 && (
-          <Card className="ring-0 border border-white/20 bg-white/40 backdrop-blur-xl shadow-2xl shadow-blue-500/5 overflow-hidden gap-0">
-            <CardHeader className="pb-2 pt-5 px-6">
+          <Card className="ring-0 border border-slate-300 bg-white shadow-xl shadow-blue-500/5 overflow-hidden">
+            <CardHeader className="pb-2 pt-5 px-6 border-b border-slate-100">
                <div className="flex items-center gap-2">
                  <ChartIcon className="h-4 w-4 text-blue-400" />
                  <CardTitle className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Biến động GPA</CardTitle>
@@ -694,22 +697,24 @@ export function ManualTab({ onSwitchToRoadmap }: ManualTabProps) {
       {/* Cột phải: Thống kê học kỳ */}
       <div className="lg:col-span-8 space-y-6">
         
-        {/* Toolbar */}
-         <div className="flex items-center justify-between mb-2">
-          <div className="flex gap-2">
+        {/* Toolbar chuyên nghiệp */}
+         <div className="bg-slate-50 border border-slate-200 p-3 rounded-2xl flex items-center justify-between mb-2 shadow-sm">
+          <div className="flex items-center gap-3">
+             <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ps-2">Công cụ nhanh</div>
+             <div className="h-4 w-px bg-slate-200"></div>
              <Dialog open={isImportOpen} onOpenChange={setIsImportOpen}>
                <DialogTrigger
                  render={
-                   <Button variant="outline" className="bg-white/4 backdrop-blur-md border border-white/20 text-blue-700 font-black shadow-xl shadow-blue-500/5 hover:bg-blue-600 hover:text-white transition-all rounded-full px-6">
+                   <Button variant="outline" className="bg-white border-blue-200 text-blue-700 font-bold shadow-sm hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all rounded-xl px-5 h-9 text-xs">
                       <CloudUpload className="h-4 w-4 mr-2" /> Nhập từ Portal
                    </Button>
                  }
                />
-               <DialogContent className="max-w-2xl bg-white/90 backdrop-blur-2xl border-white/20">
+               <DialogContent className="max-w-2xl bg-white border-slate-200 shadow-2xl">
                  <DialogHeader>
-                   <DialogTitle className="text-2xl font-black text-blue-600">Nhập dữ liệu từ HUFLIT Portal</DialogTitle>
+                   <DialogTitle className="text-2xl font-bold text-slate-800">Nhập dữ liệu từ HUFLIT Portal</DialogTitle>
                    <DialogDescription>
-                     Copy toàn bộ bảng điểm từ trang "Kết quả học tập" và dán vào bên dưới.
+                     Copy toàn bộ bảng điểm từ trang &quot;Kết quả học tập&quot; và dán vào bên dưới.
                    </DialogDescription>
                  </DialogHeader>
                  <div className="space-y-4 py-4">
@@ -727,7 +732,7 @@ export function ManualTab({ onSwitchToRoadmap }: ManualTabProps) {
                     />
                  </div>
                  <DialogFooter>
-                   <Button onClick={handleImport} className="bg-blue-600 hover:bg-blue-700 font-bold px-8">
+                   <Button onClick={handleImport} className="bg-blue-600 hover:bg-blue-700 font-bold px-8 rounded-xl h-11">
                      Phân tích & Nhập ngay
                    </Button>
                  </DialogFooter>
@@ -769,12 +774,12 @@ export function ManualTab({ onSwitchToRoadmap }: ManualTabProps) {
 
         <Button 
           onClick={addSemester}
-          className="w-full h-20 bg-white/30 backdrop-blur-md border-2 border-dashed border-white/30 text-blue-400 hover:border-blue-300 hover:text-blue-600 hover:bg-white/50 transition-all rounded-3xl group shadow-sm"
+          className="w-full h-14 bg-white border border-dashed border-slate-400 text-slate-600 hover:border-blue-500 hover:text-blue-700 hover:bg-slate-50 transition-all rounded-2xl group shadow-sm"
         >
-          <div className="bg-white p-2 rounded-xl shadow-sm mr-4 group-hover:scale-110 transition-transform">
-             <Plus className="h-6 w-6 text-blue-600" />
+          <div className="bg-white p-1.5 rounded-lg shadow-sm mr-3 group-hover:scale-110 transition-transform">
+             <Plus className="h-4 w-4 text-blue-600" />
           </div>
-          <span className="font-black text-xl tracking-tight">Thêm Học kỳ mới</span>
+          <span className="font-bold text-base tracking-tight">Thêm Học kỳ mới</span>
         </Button>
       </div>
     </div>

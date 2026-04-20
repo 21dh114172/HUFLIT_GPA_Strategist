@@ -22,6 +22,7 @@ export default function RootLayout({
     <html
       lang="vi"
       className={`${beVietnamPro.variable} font-sans h-full antialiased`}
+      suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col font-sans">
 {children}</body>
