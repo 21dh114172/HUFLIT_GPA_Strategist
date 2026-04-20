@@ -51,7 +51,7 @@ export default function Home() {
   };
 
   return (
-    <main className="relative min-h-screen bg-slate-50/50 text-slate-900 pb-20">
+    <main className="relative min-h-screen bg-slate-50/50 text-slate-900 pb-20 overflow-x-hidden">
       {/* Background Blobs for Glassmorphism */}
       <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-blue-200/40 blur-[120px] pointer-events-none -z-10 animate-pulse"></div>
       <div className="absolute bottom-[10%] right-[-5%] w-[35%] h-[35%] rounded-full bg-cyan-100/40 blur-[100px] pointer-events-none -z-10"></div>

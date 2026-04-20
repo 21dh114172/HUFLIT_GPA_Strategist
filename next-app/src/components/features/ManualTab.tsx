@@ -92,7 +92,7 @@ const CourseRow = memo(({
           className="bg-white border-slate-300 h-9 text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm"
         />
       </TableCell>
-      <TableCell className="py-3">
+      <TableCell className="text-center py-3">
         <Input 
           type="number" 
           min="1" 
@@ -101,12 +101,12 @@ const CourseRow = memo(({
           className="bg-white border-slate-300 h-9 text-sm text-center font-semibold focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm"
         />
       </TableCell>
-      <TableCell className="py-3">
+      <TableCell className="text-center py-3">
         <Select 
           value={course.grade} 
           onValueChange={(val) => onUpdate(sIdx, cIdx, "grade", val)}
         >
-          <SelectTrigger className="bg-white border-slate-300 h-9 text-sm font-bold text-blue-600 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm">
+          <SelectTrigger className="bg-white border-slate-300 h-9 w-20 text-sm font-bold text-blue-600 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm mx-auto">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -128,7 +128,7 @@ const CourseRow = memo(({
               value={course.oldGrade || "D"} 
               onValueChange={(val) => onUpdate(sIdx, cIdx, "oldGrade", val)}
             >
-              <SelectTrigger className="h-6 w-14 text-[10px] uppercase font-bold px-1 bg-slate-100/50 border-slate-200 text-slate-500">
+              <SelectTrigger className="h-6 w-14 text-[11px] uppercase font-bold px-1 bg-slate-100/50 border-slate-200 text-slate-600">
                 <SelectValue placeholder="Cũ" />
               </SelectTrigger>
               <SelectContent>
@@ -143,7 +143,7 @@ const CourseRow = memo(({
       <TableCell className="pe-6 text-right py-3">
         <button 
           onClick={() => onRemove(sIdx, cIdx)}
-          className={`text-slate-300 hover:text-red-500 transition-all p-1.5 rounded-lg hover:bg-red-50 ${isOnlyCourse ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+          className={`text-slate-500 hover:text-red-500 transition-all p-1.5 rounded-lg hover:bg-red-50 ${isOnlyCourse ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
         >
           <Trash2 className="h-4 w-4" />
         </button>
@@ -204,7 +204,7 @@ const SemesterCard = memo(({
               className="bg-transparent border-none text-base font-bold text-slate-800 p-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-auto w-auto min-w-[150px]"
             />
             {semStats?.isWarning && (
-              <Badge variant="destructive" className="py-0.5 px-2 rounded-full font-bold text-[9px] uppercase tracking-tighter shrink-0 shadow-sm border-none">
+              <Badge variant="destructive" className="py-0.5 px-2 rounded-full font-bold text-[11px] uppercase tracking-tighter shrink-0 shadow-sm border-none">
                 <AlertTriangle className="h-3 w-3 mr-1" /> Cảnh báo
               </Badge>
             )}
@@ -215,7 +215,7 @@ const SemesterCard = memo(({
               size="icon" 
               disabled={isOnlySemester}
               onClick={() => onRemoveSemester(sIdx)}
-              className="h-8 w-8 text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all rounded-lg"
+              className="h-8 w-8 text-slate-500 hover:text-red-500 hover:bg-red-50 transition-all rounded-lg"
             >
               <Trash2 className="h-4 w-4" />
             </Button>
@@ -226,10 +226,10 @@ const SemesterCard = memo(({
             <Table>
               <TableHeader className="sticky top-0 bg-white border-b border-slate-200 z-10">
                 <TableRow className="border-b border-slate-200">
-                  <TableHead className="w-[45%] text-[10px] font-bold uppercase text-slate-600 tracking-wider ps-6 py-3">Môn học</TableHead>
-                  <TableHead className="w-[15%] text-[10px] font-bold uppercase text-slate-600 tracking-wider text-center py-3">Tín chỉ</TableHead>
-                  <TableHead className="w-[20%] text-[10px] font-bold uppercase text-slate-600 tracking-wider text-center py-3">Điểm</TableHead>
-                  <TableHead className="w-[10%] text-[10px] font-bold uppercase text-slate-600 tracking-wider text-center py-3">Lại</TableHead>
+                  <TableHead className="w-[45%] text-[11px] font-bold uppercase text-slate-700 tracking-wider ps-6 py-3">Môn học</TableHead>
+                  <TableHead className="w-[15%] text-[11px] font-bold uppercase text-slate-700 tracking-wider text-center py-3">Tín chỉ</TableHead>
+                  <TableHead className="w-[20%] text-[11px] font-bold uppercase text-slate-700 tracking-wider text-center py-3">Điểm</TableHead>
+                  <TableHead className="w-[10%] text-[11px] font-bold uppercase text-slate-700 tracking-wider text-center py-3">Học Lại</TableHead>
                   <TableHead className="w-[10%] text-right pe-6"></TableHead>
                 </TableRow>
               </TableHeader>
@@ -262,31 +262,31 @@ const SemesterCard = memo(({
                <div className="grid grid-cols-2 lg:grid-cols-5 gap-2 w-full">
                   {/* Chip 1: Passed */}
                   <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-2 flex flex-col items-center justify-center gap-0.5">
-                    <span className="text-[8px] font-bold text-emerald-700 uppercase tracking-widest whitespace-nowrap">TC Đạt</span>
+                    <span className="text-[11px] font-bold text-emerald-700 uppercase tracking-widest whitespace-nowrap">TC Đạt</span>
                     <span className="text-base font-bold text-emerald-600">{semStats.passedCredits}</span>
                   </div>
                   
                   {/* Chip 2: Failed */}
                   <div className={`border rounded-xl p-2 flex flex-col items-center justify-center gap-0.5 ${semStats.failedCredits > 0 ? "bg-rose-50 border-rose-200" : "bg-slate-50 border-slate-200"}`}>
-                    <span className={`text-[8px] font-bold uppercase tracking-widest whitespace-nowrap ${semStats.failedCredits > 0 ? "text-rose-700" : "text-slate-500"}`}>TC Rớt</span>
+                    <span className={`text-[11px] font-bold uppercase tracking-widest whitespace-nowrap ${semStats.failedCredits > 0 ? "text-rose-700" : "text-slate-600"}`}>TC Rớt</span>
                     <span className={`text-base font-bold ${semStats.failedCredits > 0 ? "text-rose-600" : "text-slate-500"}`}>{semStats.failedCredits}</span>
                   </div>
 
                   {/* Chip 3: Semester GPA */}
                   <div className={`border rounded-xl p-2 flex flex-col items-center justify-center gap-0.5 ${semStats.isWarning ? "bg-rose-50 border-rose-200" : "bg-blue-50 border-blue-200"}`}>
-                    <span className={`text-[8px] font-bold uppercase tracking-widest whitespace-nowrap ${semStats.isWarning ? "text-rose-700" : "text-blue-700"}`}>GPA HK</span>
+                    <span className={`text-[11px] font-bold uppercase tracking-widest whitespace-nowrap ${semStats.isWarning ? "text-rose-700" : "text-blue-700"}`}>GPA HK</span>
                     <span className={`text-base font-bold ${semStats.isWarning ? "text-rose-500" : "text-blue-600"}`}>{semStats.gpa.toFixed(2)}</span>
                   </div>
 
                   {/* Chip 4: Cum Credits */}
                   <div className="bg-slate-50 border border-slate-200 rounded-xl p-2 flex flex-col items-center justify-center gap-0.5">
-                    <span className="text-[8px] font-bold text-slate-600 uppercase tracking-widest whitespace-nowrap">Tích lũy</span>
+                    <span className="text-[11px] font-bold text-slate-700 uppercase tracking-widest whitespace-nowrap">Tích lũy</span>
                     <span className="text-base font-bold text-slate-700">{semStats.cumulativeCredits}</span>
                   </div>
 
                   {/* Chip 5: Cum GPA */}
                   <div className="col-span-2 lg:col-span-1 bg-white border border-blue-200 rounded-xl p-2 flex flex-col items-center justify-center gap-0.5 shadow-sm">
-                    <span className="text-[8px] font-bold text-blue-700 uppercase tracking-widest whitespace-nowrap">GPA Tích lũy</span>
+                    <span className="text-[11px] font-bold text-blue-700 uppercase tracking-widest whitespace-nowrap">GPA Tích lũy</span>
                     <span className="text-lg font-bold text-blue-700">{semStats.cumulativeGPA.toFixed(2)}</span>
                   </div>
                </div>
@@ -304,7 +304,7 @@ const SemesterCard = memo(({
                 <History className="h-5 w-5" />
               </div>
               <div className="flex flex-col">
-                <div className="text-[9px] font-black text-blue-500 uppercase tracking-[0.2em] mb-0.5">Năm học</div>
+                <div className="text-[11px] font-black text-blue-600 uppercase tracking-[0.2em] mb-0.5">Năm học</div>
                 <div className="text-base font-black text-slate-800 whitespace-nowrap tracking-tight">{currentYear}</div>
               </div>
             </div>
@@ -313,12 +313,12 @@ const SemesterCard = memo(({
 
             {/* Section 2: GPA */}
             <div className="flex items-center gap-3">
-              <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest hidden sm:block">GPA NĂM</div>
+              <div className="text-[11px] font-black text-slate-600 uppercase tracking-widest hidden sm:block">GPA NĂM</div>
               <div className="flex items-baseline gap-1">
                 <span className={`text-2xl font-black ${(yearData.points / yearData.credits) >= 3.2 ? "text-blue-600" : "text-amber-600"}`}>
                   {(yearData.points / yearData.credits).toFixed(2)}
                 </span>
-                <span className="text-[10px] font-bold text-slate-300">/ 4.0</span>
+                <span className="text-[11px] font-bold text-slate-500">/ 4.0</span>
               </div>
             </div>
 
@@ -326,7 +326,7 @@ const SemesterCard = memo(({
 
             {/* Section 3: Credits */}
             <div className="flex items-center gap-3">
-              <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest hidden sm:block">Tín chỉ</div>
+              <div className="text-[11px] font-black text-slate-600 uppercase tracking-widest hidden sm:block">Tín chỉ</div>
               <div className="text-xl font-black text-slate-800">{yearData.credits}</div>
             </div>
 
@@ -528,7 +528,7 @@ export function ManualTab({ onSwitchToRoadmap }: ManualTabProps) {
                 </div>
                 <CardTitle className="text-xl text-slate-800 font-bold tracking-tight">Tổng kết</CardTitle>
               </div>
-              <Button variant="ghost" size="icon" onClick={resetAll} className="h-8 w-8 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all">
+              <Button variant="ghost" size="icon" onClick={resetAll} className="h-8 w-8 text-slate-500 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all">
                 <RotateCcw className="h-4 w-4" />
               </Button>
             </div>
@@ -537,24 +537,23 @@ export function ManualTab({ onSwitchToRoadmap }: ManualTabProps) {
             
             {/* Initial Inputs Box */}
             <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2 shadow-sm">
-              <div className="text-[8px] font-bold text-slate-500 uppercase tracking-widest">Dữ liệu hiện tại</div>
               <div className="grid grid-cols-2 gap-2.5">
                 <div className="space-y-1">
-                  <Label className="text-[8px] font-bold text-slate-600 uppercase ps-1">GPA Hiện tại</Label>
+                  <Label className="text-[11px] font-bold text-slate-700 uppercase ps-1">GPA Hiện tại</Label>
                   <Input 
                     type="number" 
                     step="0.01"
-                    className="bg-white border-slate-300 rounded-xl h-9 text-center font-bold text-blue-600 placeholder:text-slate-300 shadow-sm focus:ring-1 focus:ring-blue-500 transition-all"
+                    className="bg-white border-slate-300 rounded-xl h-9 text-center font-bold text-blue-600 placeholder:text-slate-500 shadow-sm focus:ring-1 focus:ring-blue-500 transition-all"
                     value={initialGPA || ""}
                     onChange={(e) => setInitialGPA(parseFloat(e.target.value) || 0)}
                     placeholder="0.00"
                   />
                 </div>
                 <div className="space-y-1">
-                  <Label className="text-[8px] font-bold text-slate-600 uppercase ps-1">Tích lũy</Label>
+                  <Label className="text-[11px] font-bold text-slate-700 uppercase ps-1">Tích lũy</Label>
                   <Input 
                     type="number" 
-                    className="bg-white border-slate-300 rounded-xl h-9 text-center font-bold text-blue-600 placeholder:text-slate-300 shadow-sm focus:ring-1 focus:ring-blue-500 transition-all"
+                    className="bg-white border-slate-300 rounded-xl h-9 text-center font-bold text-blue-600 placeholder:text-slate-500 shadow-sm focus:ring-1 focus:ring-blue-500 transition-all"
                     value={initialCredits || ""}
                     onChange={(e) => setInitialCredits(parseInt(e.target.value) || 0)}
                     placeholder="0"
@@ -566,7 +565,7 @@ export function ManualTab({ onSwitchToRoadmap }: ManualTabProps) {
             {/* MAIN GPA DISPLAY */}
             <div className="text-center py-1 relative">
               <div className="absolute inset-0 bg-blue-500/5 blur-2xl rounded-full -z-10"></div>
-              <div className="text-[8px] font-bold text-blue-500/60 uppercase tracking-[0.2em] mb-1">GPA TÍCH LŨY MỚI</div>
+              <div className="text-[11px] font-bold text-blue-600/80 uppercase tracking-[0.2em] mb-1">GPA TÍCH LŨY MỚI</div>
               <div className={`text-5xl font-black leading-none tracking-tighter drop-shadow-sm ${
                 result.gpa >= 3.6 ? "text-emerald-500" :
                 result.gpa >= 3.2 ? "text-blue-600" :
@@ -579,11 +578,11 @@ export function ManualTab({ onSwitchToRoadmap }: ManualTabProps) {
             {/* Bottom Stats Grid */}
             <div className="grid grid-cols-2 pt-3 pb-1 border-t border-slate-300">
               <div className="flex flex-col items-center justify-center space-y-0.5 py-1.5 border-r border-slate-300">
-                <div className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Tổng Tín chỉ</div>
+                <div className="text-[11px] font-bold text-slate-600 uppercase tracking-widest">Tổng Tín chỉ</div>
                 <div className="text-3xl font-bold text-slate-800">{result.totalCredits}</div>
               </div>
               <div className="flex flex-col items-center justify-center space-y-1 py-1.5">
-                <div className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Xếp loại</div>
+                <div className="text-[11px] font-bold text-slate-600 uppercase tracking-widest">Xếp loại</div>
                 <div className={`text-xl font-bold whitespace-nowrap ${
                    result.rank === "Xuất sắc" ? "text-emerald-500" :
                    result.rank === "Giỏi" ? "text-blue-600" :
@@ -637,7 +636,7 @@ export function ManualTab({ onSwitchToRoadmap }: ManualTabProps) {
             <CardHeader className="pb-2 pt-5 px-6 border-b border-slate-100">
                <div className="flex items-center gap-2">
                  <ChartIcon className="h-4 w-4 text-blue-400" />
-                 <CardTitle className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Biến động GPA</CardTitle>
+                 <CardTitle className="text-[11px] font-black text-blue-600 uppercase tracking-widest">Biến động GPA</CardTitle>
                </div>
             </CardHeader>
             <CardContent className="h-[200px] pt-4 pb-6 px-2">
@@ -659,10 +658,10 @@ export function ManualTab({ onSwitchToRoadmap }: ManualTabProps) {
                     ticks={[1, 2, 3, 4]} 
                     fontSize={11} 
                     fontWeight={800}
-                    stroke="#94a3b8"
+                    stroke="#64748b"
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fill: '#94a3b8' }}
+                    tick={{ fill: '#64748b' }}
                   />
                   <Tooltip 
                     contentStyle={{ 
@@ -700,7 +699,7 @@ export function ManualTab({ onSwitchToRoadmap }: ManualTabProps) {
         {/* Toolbar chuyên nghiệp */}
          <div className="bg-slate-50 border border-slate-200 p-3 rounded-2xl flex items-center justify-between mb-2 shadow-sm">
           <div className="flex items-center gap-3">
-             <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ps-2">Công cụ nhanh</div>
+             <div className="text-[11px] font-bold text-slate-600 uppercase tracking-widest ps-2">Công cụ nhanh</div>
              <div className="h-4 w-px bg-slate-200"></div>
              <Dialog open={isImportOpen} onOpenChange={setIsImportOpen}>
                <DialogTrigger
