@@ -93,8 +93,22 @@ export function calculateManualGPA(
 
   const semesterStats: GPAResult["semesterStats"] = [];
 
+  if (!Array.isArray(semesters)) return { gpa: 0, totalCredits: 0, totalPoints: 0, rank: "N/A", semesterStats: [] };
+
   semesters.forEach((semester, sIdx) => {
-    if (!semester?.courses?.length) return;
+    if (!semester?.courses?.length) {
+      semesterStats.push({
+        name: semester?.name || `Học kỳ ${sIdx + 1}`,
+        gpa: 0,
+        credits: 0,
+        passedCredits: 0,
+        failedCredits: 0,
+        cumulativeGPA: state.totalCredits > 0 ? state.totalPoints / state.totalCredits : 0,
+        cumulativeCredits: state.totalCredits,
+        isWarning: false
+      });
+      return;
+    }
 
     let semPoints = 0;
     let semCredits = 0;
