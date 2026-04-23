@@ -8,9 +8,7 @@ export const useManualGPA = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [initialGPA, setInitialGPA] = useState<number>(0);
   const [initialCredits, setInitialCredits] = useState<number>(0);
-  const [semesters, setSemesters] = useState<Semester[]>([
-    { name: "Học kỳ 1", courses: [{ name: "", credits: 3, grade: "A", isRetake: false }] }
-  ]);
+  const [semesters, setSemesters] = useState<Semester[]>([]);
 
   // Load from localStorage
   useEffect(() => {
@@ -162,7 +160,7 @@ export const useManualGPA = () => {
     if (confirm("Bạn có chắc muốn xóa toàn bộ dữ liệu hiện tại?")) {
       setInitialGPA(0);
       setInitialCredits(0);
-      setSemesters([{ name: "Học kỳ 1", courses: [{ name: "", credits: 3, grade: "A", isRetake: false }] }]);
+      setSemesters([]);
       toast.success("Đã đặt lại dữ liệu.");
     }
   }, []);

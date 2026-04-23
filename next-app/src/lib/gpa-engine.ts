@@ -346,7 +346,7 @@ export interface GradeCombination {
 export function generateGradeCombinations(credits: number, targetPoints: number): GradeCombination[] {
   const combinations: GradeCombination[] = [];
   const grades = GRADE_SCALE
-    .filter(g => g.gpa > 0)
+    .filter(g => g.gpa > 0 && g.grade !== 'A+')
     .map(g => ({ 
       grade: g.grade, 
       gpa: g.gpa

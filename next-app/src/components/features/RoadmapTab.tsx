@@ -79,7 +79,7 @@ export function RoadmapTab({ initialData }: RoadmapTabProps) {
 
   const [currentGPA, setCurrentGPA] = useState<number>(initialData?.gpa ?? savedState?.currentGPA ?? 0);
   const [currentCredits, setCurrentCredits] = useState<number>(initialData?.credits ?? savedState?.currentCredits ?? 0);
-  const [targetGPA, setTargetGPA] = useState<number>(savedState?.targetGPA ?? 3.2);
+  const [targetGPA, setTargetGPA] = useState<number>(savedState?.targetGPA ?? 0);
   const [remainingCredits, setRemainingCredits] = useState<number>(initialData?.remainingCredits ?? savedState?.remainingCredits ?? 0);
   const [retakes, setRetakes] = useState<RetakeItem[]>(initialData?.pendingRetakes ?? savedState?.retakes ?? []);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -100,7 +100,7 @@ export function RoadmapTab({ initialData }: RoadmapTabProps) {
       setRemainingCredits(initialData.remainingCredits || 0);
       setRetakes(initialData.pendingRetakes || []);
       const milestones = [2.0, 2.5, 3.2, 3.6];
-      const nextTarget = milestones.find(m => m > initialData.gpa) || 4.0;
+      const nextTarget = milestones.find(m => m > initialData.gpa) || 0;
       setTargetGPA(nextTarget);
     }
   }, [initialData]);
@@ -129,6 +129,15 @@ export function RoadmapTab({ initialData }: RoadmapTabProps) {
 
   const result = useMemo(() => calculateTargetResult(currentGPA, currentCredits, targetGPA, remainingCredits, retakes),
     [currentGPA, currentCredits, targetGPA, remainingCredits, retakes]);
+
+  const maxPossibleGPA = useMemo(() => {
+    if (!result || result.totalFutureCredits === 0) return currentGPA;
+    const pointsToReplace = retakes.reduce((acc, r) => acc + (r.oldGrade * r.credits), 0);
+    const effectiveCurrentPoints = (currentGPA * currentCredits) - pointsToReplace;
+    const fixedTargetPoints = retakes.filter(r => r.targetGrade !== undefined).reduce((acc, r) => acc + (r.targetGrade! * r.credits), 0);
+    const maxEffortPoints = result.totalEffortCredits * 4.0;
+    return (effectiveCurrentPoints + fixedTargetPoints + maxEffortPoints) / result.totalFutureCredits;
+  }, [currentGPA, currentCredits, retakes, result]);
 
   const combinations = useMemo(() => {
     if (result.requiredGPA > 4.0 || result.requiredGPA <= 0) return [];
@@ -221,8 +230,14 @@ export function RoadmapTab({ initialData }: RoadmapTabProps) {
               </div>
 
               <Input
-                type="number" step="0.05" value={targetGPA || ""}
-                onChange={(e) => setTargetGPA(parseFloat(e.target.value) || 0)}
+                type="number" step="0.05" min={0} max={4.0} value={targetGPA || ""}
+                onChange={(e) => {
+                  let val = parseFloat(e.target.value);
+                  if (isNaN(val)) setTargetGPA(0);
+                  else if (val > 4.0) setTargetGPA(4.0);
+                  else if (val < 0) setTargetGPA(0);
+                  else setTargetGPA(val);
+                }}
                 placeholder="GPA mục tiêu"
                 className="text-center text-2xl font-black text-blue-800 bg-white border-2 border-blue-100 focus:border-blue-500 rounded-2xl h-14"
               />
@@ -235,13 +250,33 @@ export function RoadmapTab({ initialData }: RoadmapTabProps) {
                 <Label className="text-[12px] font-black text-slate-600 uppercase tracking-widest">Kế hoạch nỗ lực</Label>
               </div>
 
-              <div className="space-y-1.5">
-                <Input
-                  type="number" value={remainingCredits || ""}
-                  onChange={(e) => setRemainingCredits(parseInt(e.target.value) || 0)}
-                  placeholder="Số tín chỉ dự kiến học tiếp..."
-                  className="h-10 font-bold text-blue-700 bg-white border-slate-200 rounded-xl focus:border-blue-500 transition-all"
-                />
+              <div className="relative grid grid-cols-2 gap-4">
+                <div className="space-y-1 relative">
+                  <Input
+                    type="number" value={(currentCredits + remainingCredits) || ""}
+                    onChange={(e) => {
+                      const total = parseInt(e.target.value) || 0;
+                      setRemainingCredits(Math.max(0, total - currentCredits));
+                    }}
+                    placeholder="TC tốt nghiệp"
+                    className="h-10 font-bold text-blue-700 bg-white border-slate-200 rounded-xl focus:border-blue-500 transition-all text-center"
+                  />
+                  <div className="text-[10px] font-bold text-slate-600 text-center uppercase tracking-tighter">Tổng TC ra trường</div>
+                </div>
+                
+                <div className="absolute left-1/2 top-5 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center z-10 pointer-events-none">
+                  <div className="bg-white text-slate-400 border border-slate-100 text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-widest shadow-sm">Hoặc</div>
+                </div>
+
+                <div className="space-y-1">
+                  <Input
+                    type="number" value={remainingCredits || ""}
+                    onChange={(e) => setRemainingCredits(parseInt(e.target.value) || 0)}
+                    placeholder="TC học tiếp"
+                    className="h-10 font-bold text-blue-700 bg-white border-slate-200 rounded-xl focus:border-blue-500 transition-all text-center"
+                  />
+                  <div className="text-[10px] font-bold text-slate-600 text-center uppercase tracking-tighter">TC dự kiến học</div>
+                </div>
               </div>
 
               <div className="pt-4 border-t border-slate-100">
@@ -343,50 +378,56 @@ export function RoadmapTab({ initialData }: RoadmapTabProps) {
       </div>
 
       <div className="lg:col-span-8 space-y-4">
-        <Card className={`border-none shadow-2xl shadow-blue-500/10 overflow-hidden text-white transition-all duration-700 rounded-[2.5rem] relative ${result.requiredGPA > 4.0 ? "bg-gradient-to-br from-red-600 to-rose-800" :
-            result.requiredGPA > 3.6 ? "bg-gradient-to-br from-amber-500 to-orange-700" :
-              result.requiredGPA > 3.2 ? "bg-gradient-to-br from-blue-500 to-violet-800" : "bg-gradient-to-br from-emerald-500 to-teal-800"
+        <div className={`p-8 sm:p-10 border shadow-sm overflow-hidden bg-white transition-all duration-700 rounded-[2.5rem] flex flex-col items-center text-center space-y-8 ${result.requiredGPA > 4.0 || (result.totalEffortCredits === 0 && currentGPA < targetGPA) ? "border-rose-100" :
+            result.requiredGPA > 3.6 ? "border-amber-100" :
+              result.requiredGPA > 3.2 ? "border-blue-100" : "border-emerald-100"
           }`}>
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.2),transparent)] pointer-events-none"></div>
-          <CardContent className="p-6 flex flex-col items-center text-center space-y-3">
+
+          <div className="space-y-2">
+            <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+              {result.totalEffortCredits === 0 && currentGPA < targetGPA ? "Yêu cầu hành động" : "GPA Cần đạt trung bình"}
+            </div>
+            <div className={`text-6xl sm:text-7xl font-black tracking-tighter py-1 ${result.requiredGPA > 4.0 || (result.totalEffortCredits === 0 && currentGPA < targetGPA) ? "text-rose-500" :
+                result.requiredGPA > 3.6 ? "text-amber-500" :
+                  result.requiredGPA > 3.2 ? "text-blue-500" : "text-emerald-500"
+              }`}>
+              {result.totalEffortCredits === 0 && currentGPA < targetGPA ? "RETAKE" :
+                result.requiredGPA <= 0 ? "ĐẠT" :
+                  result.requiredGPA.toFixed(2)}
+            </div>
+          </div>
+
+          <div className={`flex items-center justify-center gap-2 ${result.requiredGPA > 4.0 || (result.totalEffortCredits === 0 && currentGPA < targetGPA) ? "text-rose-500" :
+              result.requiredGPA > 3.6 ? "text-amber-500" :
+                result.requiredGPA > 3.2 ? "text-blue-500" : "text-emerald-500"
+            }`}>
+            {result.totalEffortCredits === 0 && currentGPA < targetGPA || result.requiredGPA > 4.0 ? <AlertCircle className="h-4 w-4" /> : <TrendingUp className="h-4 w-4" />}
+            <span className="font-bold text-[11px] uppercase tracking-widest">
+              {result.totalEffortCredits === 0 && currentGPA < targetGPA ? "Cần thêm môn học lại" :
+                result.requiredGPA > 4.0 ? `Không khả thi • GPA tối đa có thể đạt: ${maxPossibleGPA.toFixed(2)}` :
+                  result.requiredGPA > 3.7 ? "Cần nỗ lực cực kỳ lớn" :
+                    result.requiredGPA > 3.2 ? "Đòi hỏi tập trung cao" : "Khá khả thi, hãy duy trì"}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-3 gap-4 sm:gap-8 w-full pt-8 border-t border-slate-100">
             <div className="space-y-1">
-              <Badge className="bg-white/20 hover:bg-white/30 text-white border-none py-1 px-4 text-[10px] font-bold uppercase tracking-widest backdrop-blur-md">
-                {result.totalEffortCredits === 0 && currentGPA < targetGPA ? "Yêu cầu hành động" : "GPA Cần đạt trung bình"}
-              </Badge>
-              <div className="text-5xl font-black tracking-tighter drop-shadow-md py-1">
-                {result.totalEffortCredits === 0 && currentGPA < targetGPA ? "RETAKE" :
-                  result.requiredGPA <= 0 ? "ĐẠT" :
-                    result.requiredGPA > 4.0 ? "---" :
-                      result.requiredGPA.toFixed(2)}
-              </div>
+              <div className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Tín chỉ tích lũy</div>
+              <div className="text-2xl font-black text-slate-800">{result.totalFutureCredits}</div>
+              <div className="text-[9px] text-slate-500 font-medium leading-tight">Tổng TC khi ra trường</div>
             </div>
-
-            <div className="flex items-center gap-2 py-1.5 px-6 bg-black/10 rounded-full backdrop-blur-sm border border-white/10 shadow-inner">
-              {result.totalEffortCredits === 0 && currentGPA < targetGPA || result.requiredGPA > 4.0 ? <AlertCircle className="h-4 w-4 text-white" /> : <TrendingUp className="h-4 w-4 text-white" />}
-              <span className="font-bold text-sm uppercase tracking-tight">
-                {result.totalEffortCredits === 0 && currentGPA < targetGPA ? "Cần thêm môn học lại" :
-                  result.requiredGPA > 4.0 ? "Mục tiêu không khả thi" :
-                    result.requiredGPA > 3.7 ? "Cần nỗ lực cực kỳ lớn" :
-                      result.requiredGPA > 3.2 ? "Đòi hỏi tập trung cao" : "Khá khả thi, hãy duy trì"}
-              </span>
+            <div className="space-y-1">
+              <div className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Tín chỉ nỗ lực</div>
+              <div className="text-2xl font-black text-slate-800">{result.totalEffortCredits}</div>
+              <div className="text-[9px] text-slate-500 font-medium leading-tight">Bao gồm TC mới & học lại/học cải thiện</div>
             </div>
-
-            <div className="grid grid-cols-3 gap-8 w-full pt-4 border-t border-white/10">
-              <div className="space-y-0.5">
-                <div className="text-[10px] opacity-70 font-bold uppercase tracking-wider">Tín chỉ mới</div>
-                <div className="text-xl font-black">{result.totalFutureCredits}</div>
-              </div>
-              <div className="space-y-0.5">
-                <div className="text-[10px] opacity-70 font-bold uppercase tracking-wider">TC cần thi</div>
-                <div className="text-xl font-black">{result.totalEffortCredits}</div>
-              </div>
-              <div className="space-y-0.5">
-                <div className="text-[10px] opacity-70 font-bold uppercase tracking-wider">GPA cuối</div>
-                <div className="text-xl font-black">{targetGPA.toFixed(2)}</div>
-              </div>
+            <div className="space-y-1">
+              <div className="text-[10px] text-slate-400 font-black uppercase tracking-widest">{result.requiredGPA > 4.0 ? "GPA TỐI ĐA" : "GPA MỤC TIÊU"}</div>
+              <div className="text-2xl font-black text-slate-800">{result.requiredGPA > 4.0 ? maxPossibleGPA.toFixed(2) : targetGPA.toFixed(2)}</div>
+              <div className="text-[9px] text-slate-500 font-medium leading-tight">{result.requiredGPA > 4.0 ? "Khả năng cao nhất" : "Mục tiêu ra trường"}</div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         <div className="flex justify-center">
           <Dialog>
@@ -396,126 +437,65 @@ export function RoadmapTab({ initialData }: RoadmapTabProps) {
                 Chi tiết thuật toán & Đối soát
               </Button>
             } />
-            <DialogContent className="sm:max-w-4xl w-[95vw] sm:w-[90vw] max-h-[92vh] rounded-[2rem] border-none shadow-2xl p-0 overflow-hidden bg-slate-50 transition-all duration-500 flex flex-col">
-              <div className="bg-gradient-to-br from-blue-600 to-indigo-700 p-6 sm:p-10 text-white relative overflow-hidden shrink-0">
-                <div className="absolute top-0 right-0 p-6 opacity-10 scale-150 rotate-12 transition-transform duration-700 group-hover:rotate-0">
-                  <Calculator className="h-40 w-40" />
+            <DialogContent className="sm:max-w-2xl w-[95vw] sm:w-[90vw] max-h-[90vh] rounded-[2.5rem] border border-slate-100 shadow-xl p-8 sm:p-12 overflow-y-auto bg-white flex flex-col gap-10">
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 opacity-60">
+                  <Info className="h-4 w-4" />
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Cơ chế tính toán</span>
                 </div>
-                <div className="relative z-10 space-y-3">
-                  <div className="flex items-center gap-2 px-4 py-1.5 bg-white/20 rounded-full w-fit backdrop-blur-md">
-                    <Info className="h-4 w-4" />
-                    <span className="text-[11px] font-black uppercase tracking-[0.2em]">Cơ chế tính toán nâng cao</span>
-                  </div>
-                  <DialogTitle className="text-4xl font-black tracking-tight leading-none">Thuật toán lộ trình & Đối soát dữ liệu</DialogTitle>
-                  <DialogDescription className="text-blue-100 font-medium text-base opacity-90 max-w-xl">
-                    Hệ thống tự động bóc tách từng con số để tính toán chính xác lộ trình nỗ lực tối ưu nhất cho mục tiêu của bạn.
-                  </DialogDescription>
-                </div>
+                <DialogTitle className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900">Thuật toán lộ trình & Đối soát</DialogTitle>
+                <DialogDescription className="text-sm font-medium text-slate-500 max-w-lg leading-relaxed">
+                  Kiểm tra chi tiết các bước tính toán để đảm bảo lộ trình chính xác.
+                </DialogDescription>
               </div>
 
-              <div className="p-6 sm:p-10 space-y-8 sm:space-y-10 overflow-y-auto flex-1 scrollbar-thin scrollbar-thumb-slate-200 bg-white/50 backdrop-blur-sm">
+              <div className="space-y-8">
                 {/* STEP 1 */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-black text-sm">01</div>
-                    <div className="text-sm font-black text-slate-800 uppercase tracking-wider">Xác định điểm hiệu dụng hiện tại</div>
+                <div className="space-y-3">
+                  <div className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                    <span className="text-blue-600">01.</span> Điểm hiện có
                   </div>
-                  <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm space-y-4">
-                    <p className="text-sm text-slate-600 leading-relaxed font-medium">
-                      Hệ thống sẽ lấy tổng điểm hiện tại của bạn và <strong>loại bỏ</strong> điểm của những môn bạn chọn học cải thiện.
-                    </p>
-                    <div className="p-4 bg-slate-50 rounded-xl font-mono text-[13px] text-slate-700 space-y-2 border border-slate-100">
-                       <div className="flex justify-between items-center opacity-60">
-                         <span>Điểm tích lũy hiện tại ({currentCredits} TC)</span>
-                         <span className="font-bold">{(currentGPA * currentCredits).toFixed(2)}</span>
-                       </div>
-                       <div className="flex justify-between items-center text-rose-500">
-                         <span>- Điểm các môn cải thiện ({retakes.reduce((acc, r) => acc + (r.credits || 0), 0)} TC)</span>
-                         <span className="font-bold">-{retakes.reduce((acc, r) => acc + (r.oldGrade * r.credits), 0).toFixed(2)}</span>
-                       </div>
-                       <div className="pt-2 border-t border-slate-200 flex justify-between items-center text-blue-600 font-black">
-                         <span>= ĐIỂM HIỆU DỤNG (X)</span>
-                         <span>{(currentGPA * currentCredits - retakes.reduce((acc, r) => acc + (r.oldGrade * r.credits), 0)).toFixed(2)}</span>
-                       </div>
-                    </div>
+                  <div className="font-mono text-sm text-slate-600 space-y-1.5 border-l-2 border-slate-100 pl-4 py-1">
+                    <div className="flex items-baseline justify-between gap-2"><span className="truncate">Điểm TL hiện tại:</span><span className="font-medium shrink-0 tabular-nums"><span className="inline-block w-4 mr-1"></span>{(currentGPA * currentCredits).toFixed(2)}</span></div>
+                    <div className="flex items-baseline justify-between gap-2 text-slate-400"><span className="truncate">Điểm cải thiện:</span><span className="shrink-0 tabular-nums"><span className="inline-block w-4 text-center mr-1 opacity-70">-</span>{(retakes.reduce((acc, r) => acc + (r.oldGrade * r.credits), 0)).toFixed(2)}</span></div>
+                    <div className="flex items-baseline justify-between gap-2 text-slate-900 font-bold pt-1.5 border-t border-dashed border-slate-200 mt-1"><span className="truncate">Điểm hiện có (X):</span><span className="shrink-0 tabular-nums"><span className="inline-block w-4 text-center mr-1 text-slate-400">=</span>{(currentGPA * currentCredits - retakes.reduce((acc, r) => acc + (r.oldGrade * r.credits), 0)).toFixed(2)}</span></div>
                   </div>
                 </div>
 
                 {/* STEP 2 */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-black text-sm">02</div>
-                    <div className="text-sm font-black text-slate-800 uppercase tracking-wider">Tổng tín chỉ dự kiến tương lai</div>
+                <div className="space-y-3">
+                  <div className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                    <span className="text-blue-600">02.</span> Tín chỉ tương lai
                   </div>
-                  <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm space-y-4">
-                    <p className="text-sm text-slate-600 leading-relaxed font-medium">
-                      Bao gồm tín chỉ hiện tại, tín chỉ mới sẽ đăng ký và các môn học lại (nếu có môn F).
-                    </p>
-                    <div className="p-4 bg-slate-50 rounded-xl font-mono text-[13px] text-slate-700 space-y-2 border border-slate-100">
-                       <div className="flex justify-between items-center">
-                         <span>TC đã tích lũy</span>
-                         <span className="font-bold">{currentCredits}</span>
-                       </div>
-                       <div className="flex justify-between items-center text-indigo-500">
-                         <span>+ TC đăng ký mới</span>
-                         <span className="font-bold">{remainingCredits}</span>
-                       </div>
-                       <div className="flex justify-between items-center text-emerald-500">
-                         <span>+ TC bù môn F (nếu có)</span>
-                         <span className="font-bold">{result.totalFutureCredits - currentCredits - remainingCredits}</span>
-                       </div>
-                       <div className="pt-2 border-t border-slate-200 flex justify-between items-center text-indigo-600 font-black">
-                         <span>= TỔNG TÍN CHỈ TƯƠNG LAI (Y)</span>
-                         <span>{result.totalFutureCredits}</span>
-                       </div>
-                    </div>
+                  <div className="font-mono text-sm text-slate-600 space-y-1.5 border-l-2 border-slate-100 pl-4 py-1">
+                    <div className="flex items-baseline justify-between gap-2"><span className="truncate">TC hiện có:</span><span className="font-medium shrink-0 tabular-nums"><span className="inline-block w-4 mr-1"></span>{currentCredits}</span></div>
+                    <div className="flex items-baseline justify-between gap-2"><span className="truncate">TC mới:</span><span className="font-medium shrink-0 tabular-nums"><span className="inline-block w-4 text-center mr-1 opacity-70">+</span>{remainingCredits}</span></div>
+                    <div className="flex items-baseline justify-between gap-2"><span className="truncate">TC bù rớt:</span><span className="font-medium shrink-0 tabular-nums"><span className="inline-block w-4 text-center mr-1 opacity-70">+</span>{result.totalFutureCredits - currentCredits - remainingCredits}</span></div>
+                    <div className="flex items-baseline justify-between gap-2 text-slate-900 font-bold pt-1.5 border-t border-dashed border-slate-200 mt-1"><span className="truncate">TC tương lai (Y):</span><span className="shrink-0 tabular-nums"><span className="inline-block w-4 text-center mr-1 text-slate-400">=</span>{result.totalFutureCredits}</span></div>
                   </div>
                 </div>
 
                 {/* STEP 3 */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-black text-sm">03</div>
-                    <div className="text-sm font-black text-slate-800 uppercase tracking-wider">Điểm mục tiêu cần đạt</div>
+                <div className="space-y-3">
+                  <div className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                    <span className="text-blue-600">03.</span> Nỗ lực cần thiết
                   </div>
-                  <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm space-y-4">
-                    <div className="p-4 bg-emerald-50 rounded-xl font-mono text-[13px] text-emerald-800 space-y-3 border border-emerald-100">
-                       <div className="flex justify-between items-center">
-                         <span>Tổng điểm cần đạt để được {targetGPA.toFixed(2)}</span>
-                         <span className="font-bold">{(targetGPA * result.totalFutureCredits).toFixed(2)}</span>
-                       </div>
-                       <div className="flex justify-between items-center text-slate-500">
-                         <span>- Điểm hiệu dụng hiện tại (X)</span>
-                         <span className="font-bold">-{(currentGPA * currentCredits - retakes.reduce((acc, r) => acc + (r.oldGrade * r.credits), 0)).toFixed(2)}</span>
-                       </div>
-                       <div className="pt-2 border-t border-emerald-200 flex justify-between items-center text-emerald-700 font-black text-base">
-                         <span>= ĐIỂM CẦN NỖ LỰC ĐẠT THÊM (Z)</span>
-                         <span>{result.requiredPoints.toFixed(2)}</span>
-                       </div>
-                    </div>
+                  <div className="font-mono text-sm text-slate-600 space-y-1.5 border-l-2 border-slate-100 pl-4 py-1">
+                    <div className="flex items-baseline justify-between gap-2"><span className="truncate">Mục tiêu × Y:</span><span className="font-medium shrink-0 tabular-nums"><span className="inline-block w-4 mr-1"></span>{(targetGPA * result.totalFutureCredits).toFixed(2)}</span></div>
+                    <div className="flex items-baseline justify-between gap-2 text-slate-400"><span className="truncate">Điểm hiện có (X):</span><span className="shrink-0 tabular-nums"><span className="inline-block w-4 text-center mr-1 opacity-70">-</span>{(currentGPA * currentCredits - retakes.reduce((acc, r) => acc + (r.oldGrade * r.credits), 0)).toFixed(2)}</span></div>
+                    <div className="flex items-baseline justify-between gap-2 text-slate-900 font-bold pt-1.5 border-t border-dashed border-slate-200 mt-1"><span className="truncate">Nỗ lực cần (Z):</span><span className="shrink-0 tabular-nums"><span className="inline-block w-4 text-center mr-1 text-slate-400">=</span>{result.requiredPoints.toFixed(2)}</span></div>
                   </div>
                 </div>
 
                 {/* STEP 4 */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center font-black text-sm">04</div>
-                    <div className="text-sm font-black text-slate-800 uppercase tracking-wider">Kết quả GPA cần đạt trung bình</div>
+                <div className="space-y-3">
+                  <div className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                    <span className="text-blue-600">04.</span> Kết quả trung bình
                   </div>
-                  <div className="bg-gradient-to-r from-orange-500 to-amber-500 p-6 rounded-2xl text-white shadow-lg space-y-4">
-                    <div className="flex justify-between items-end border-b border-white/20 pb-4">
-                      <div className="space-y-1">
-                        <div className="text-[10px] font-black uppercase opacity-80 tracking-widest">GPA YÊU CẦU = Z / TC NỖ LỰC</div>
-                        <div className="text-4xl font-black">{result.requiredGPA.toFixed(2)}</div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-[10px] font-black uppercase opacity-80 tracking-widest">Số TC nỗ lực</div>
-                        <div className="text-2xl font-black">{result.totalEffortCredits} TC</div>
-                      </div>
-                    </div>
-                    <p className="text-xs font-bold leading-relaxed opacity-90">
-                      * Số TC nỗ lực bao gồm TC đăng ký mới cộng với tổng TC các môn cải thiện (không tính các môn cải thiện có mục tiêu cố định).
-                    </p>
+                  <div className="font-mono text-sm text-slate-600 space-y-1.5 border-l-2 border-slate-100 pl-4 py-1">
+                    <div className="flex items-baseline justify-between gap-2"><span className="truncate">Nỗ lực cần (Z):</span><span className="font-medium shrink-0 tabular-nums"><span className="inline-block w-4 mr-1"></span>{result.requiredPoints.toFixed(2)}</span></div>
+                    <div className="flex items-baseline justify-between gap-2"><span className="truncate">TC nỗ lực:</span><span className="font-medium shrink-0 tabular-nums"><span className="inline-block w-4 text-center mr-1 opacity-70">/</span>{result.totalEffortCredits}</span></div>
+                    <div className="flex items-baseline justify-between gap-2 text-blue-600 font-black pt-1.5 border-t border-dashed border-slate-200 mt-1 text-base"><span className="truncate">GPA CẦN ĐẠT:</span><span className="shrink-0 tabular-nums"><span className="inline-block w-4 text-center mr-1 opacity-70">=</span>{result.requiredGPA.toFixed(2)}</span></div>
                   </div>
                 </div>
               </div>
@@ -553,7 +533,9 @@ export function RoadmapTab({ initialData }: RoadmapTabProps) {
                         </div>
                         <div className="flex items-center gap-2">
                           <div className={`h-1.5 w-1.5 rounded-full ${i === 0 ? 'bg-emerald-500 animate-pulse' : 'bg-slate-300'}`} />
-                          <span className="text-[10px] font-black text-slate-700">{(targetGPA * (currentCredits + remainingCredits)).toFixed(2)}đ</span>
+                          <span className="text-[10px] font-black text-slate-700">
+                            {((targetGPA * result.totalFutureCredits) - result.requiredPoints + (c.g1.gpa * c.c1 + c.g2.gpa * c.c2)).toFixed(2)} <span className="text-slate-400">/ {(targetGPA * result.totalFutureCredits).toFixed(2)}đ</span>
+                          </span>
                         </div>
                       </div>
                       <div className="flex items-center gap-3">
@@ -576,7 +558,7 @@ export function RoadmapTab({ initialData }: RoadmapTabProps) {
                             <div className={`absolute top-0 left-0 w-2 h-full bg-blue-500`} />
                             <div className="ps-1.5">
                               <span className="text-2xl font-black text-slate-800">{c.c1 > 0 ? c.g1.grade : c.g2.grade}</span>
-                               <span className="ms-2 text-[9px] font-bold text-slate-500 uppercase tracking-widest">Toàn bộ tín chỉ còn lại</span>
+                              <span className="ms-2 text-[9px] font-bold text-slate-500 uppercase tracking-widest">Toàn bộ tín chỉ còn lại</span>
                             </div>
                             <span className="text-md font-black text-blue-600">{c.c1 + c.c2} TC</span>
                           </div>
@@ -616,13 +598,6 @@ export function RoadmapTab({ initialData }: RoadmapTabProps) {
             )}
           </CardContent>
         </Card>
-
-        <div className="p-6 bg-slate-50 border border-slate-100 rounded-[2rem] flex gap-5 items-center">
-          <Dna className="h-6 w-6 text-blue-600 opacity-20" />
-          <p className="text-[11px] text-slate-600 font-medium leading-relaxed uppercase tracking-tight">
-            Hệ thống ưu tiên các môn học có tín chỉ cao để tối ưu hóa lộ trình học tập của bạn.
-          </p>
-        </div>
       </div>
     </div>
   );
