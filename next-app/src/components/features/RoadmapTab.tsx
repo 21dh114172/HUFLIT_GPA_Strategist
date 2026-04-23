@@ -158,7 +158,7 @@ export function RoadmapTab({ initialData }: RoadmapTabProps) {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-      <div className="lg:col-span-4 space-y-6">
+      <div className="lg:col-span-4 sticky top-20 space-y-6 h-fit z-20 self-start">
         <Card className="border-slate-200 bg-white shadow-xl shadow-blue-500/5 rounded-3xl overflow-hidden border">
           <CardHeader className="bg-slate-50/50 border-b border-slate-100 py-4 px-6">
             <div className="flex items-center gap-3">
