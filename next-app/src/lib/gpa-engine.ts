@@ -223,7 +223,9 @@ export function calculateTargetResult(
   const requiredPoints = targetTotalPoints - effectiveCurrentPoints;
   // Exclude locked retake credits from the "effort pool" since their contribution is already accounted
   const totalEffortCredits = newCredits + (retakeTotalCredits - lockedRetakeCredits);
-  const requiredGPA = totalEffortCredits > 0 ? requiredPoints / totalEffortCredits : 0;
+  const requiredGPA = totalEffortCredits > 0 
+    ? requiredPoints / totalEffortCredits 
+    : (requiredPoints > 0.001 ? Infinity : 0);
 
   return {
     requiredGPA: roundGPA(requiredGPA),
@@ -501,36 +503,62 @@ export function generateRetakeSuggestions(deficitPoints: number, targetGPA: numb
     }
   }
   
-  candidates.sort((a, b) => b.gain - a.gain);
+  // Sort candidates by efficiency (gain per credit) then by gain
+  candidates.sort((a, b) => (b.gain / b.credits) - (a.gain / a.credits) || b.gain - a.gain);
   
-  const suggestions: RetakeSuggestion[] = [];
-  
-  // Single course enough?
-  for (const c of candidates) {
-    if (c.gain >= deficitPoints) {
-      suggestions.push({
-        courses: [c],
-        totalGain: c.gain,
-        totalCredits: c.credits
-      });
+  const allSuggestions: RetakeSuggestion[] = [];
+  const seenKeys = new Set<string>();
+
+  function addSuggestion(courses: any[]) {
+    const sortedNames = courses.map(c => c.name).sort();
+    const key = sortedNames.join('|');
+    if (seenKeys.has(key)) return;
+    
+    const totalGain = courses.reduce((acc, c) => acc + c.gain, 0);
+    const totalCredits = courses.reduce((acc, c) => acc + c.credits, 0);
+    
+    if (totalGain >= deficitPoints) {
+      allSuggestions.push({ courses, totalGain, totalCredits });
+      seenKeys.add(key);
     }
   }
-  
-  // Or pairs
-  if (suggestions.length < 5) {
-     for (let i = 0; i < Math.min(candidates.length, 10); i++) {
-       for (let j = i + 1; j < Math.min(candidates.length, 10); j++) {
-         const gain = candidates[i].gain + candidates[j].gain;
-         if (gain >= deficitPoints) {
-           suggestions.push({
-             courses: [candidates[i], candidates[j]],
-             totalGain: gain,
-             totalCredits: candidates[i].credits + candidates[j].credits
-           });
-         }
-       }
-     }
+
+  // Try 1 course
+  for (const c of candidates) {
+    addSuggestion([c]);
   }
 
-  return suggestions.slice(0, 5);
+  // Try pairs
+  for (let i = 0; i < Math.min(candidates.length, 15); i++) {
+    for (let j = i + 1; j < Math.min(candidates.length, 15); j++) {
+      addSuggestion([candidates[i], candidates[j]]);
+    }
+  }
+
+  // Try triples (only if we don't have enough suggestions yet)
+  if (allSuggestions.length < 10) {
+    for (let i = 0; i < Math.min(candidates.length, 10); i++) {
+      for (let j = i + 1; j < Math.min(candidates.length, 10); j++) {
+        for (let k = j + 1; k < Math.min(candidates.length, 10); k++) {
+          addSuggestion([candidates[i], candidates[j], candidates[k]]);
+        }
+      }
+    }
+  }
+
+  // Rank suggestions:
+  // 1. Closest to deficit (but still >= deficit)
+  // 2. Minimum credits used
+  return allSuggestions
+    .sort((a, b) => {
+      const diffA = a.totalGain - deficitPoints;
+      const diffB = b.totalGain - deficitPoints;
+      
+      // If one is significantly closer to deficit, prefer it
+      if (Math.abs(diffA - diffB) > 0.5) return diffA - diffB;
+      
+      // Otherwise prefer fewer credits
+      return a.totalCredits - b.totalCredits;
+    })
+    .slice(0, 5);
 }

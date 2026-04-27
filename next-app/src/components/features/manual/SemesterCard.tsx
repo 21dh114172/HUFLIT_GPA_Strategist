@@ -51,7 +51,7 @@ const SemesterCard = memo(({
             
             <div className="flex items-center gap-3 flex-1 min-w-0">
               <div className="flex items-center gap-2 shrink-0">
-                <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest whitespace-nowrap">Học kỳ {String(sIdx + 1).padStart(2, '0')}</span>
+                <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-widest whitespace-nowrap">Học kỳ {String(sIdx + 1).padStart(2, '0')}</span>
                 <div className="h-3 w-px bg-slate-200 hidden sm:block" />
               </div>
               
@@ -86,10 +86,10 @@ const SemesterCard = memo(({
             <Table>
               <TableHeader className="bg-slate-50/50 border-b border-slate-200">
                 <TableRow className="hover:bg-transparent border-none">
-                  <TableHead className="w-[45%] text-[10px] font-black uppercase text-slate-500 tracking-wider ps-5 py-3">Môn học</TableHead>
-                  <TableHead className="w-[15%] text-[10px] font-black uppercase text-slate-500 tracking-wider text-center py-3">Tín chỉ</TableHead>
-                  <TableHead className="w-[20%] text-[10px] font-black uppercase text-slate-500 tracking-wider text-center py-3">Điểm</TableHead>
-                  <TableHead className="w-[10%] text-[10px] font-black uppercase text-slate-500 tracking-wider text-center py-3">Học Lại</TableHead>
+                  <TableHead className="w-[45%] text-[10px] font-semibold uppercase text-slate-500 tracking-widest ps-5 py-3">Môn học</TableHead>
+                  <TableHead className="w-[15%] text-[10px] font-semibold uppercase text-slate-500 tracking-widest text-center py-3">Tín chỉ</TableHead>
+                  <TableHead className="w-[20%] text-[10px] font-semibold uppercase text-slate-500 tracking-widest text-center py-3">Điểm</TableHead>
+                  <TableHead className="w-[10%] text-[10px] font-semibold uppercase text-slate-500 tracking-widest text-center py-3">Học Lại</TableHead>
                   <TableHead className="w-[10%] text-right pe-5 py-3"></TableHead>
                 </TableRow>
               </TableHeader>
@@ -123,23 +123,23 @@ const SemesterCard = memo(({
             <div className="px-1 pt-2">
               <div className="bg-slate-50/80 border border-slate-200 rounded-2xl p-3 grid grid-cols-2 lg:grid-cols-5 gap-3">
                 <div className="flex flex-col items-center justify-center py-1">
-                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Tín chỉ đạt</span>
-                  <span className="text-sm font-black text-emerald-600">{semStats.passedCredits}</span>
+                  <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-0.5">Tín chỉ đạt</span>
+                  <span className="text-sm font-bold text-emerald-600">{semStats.passedCredits}</span>
                 </div>
                 <div className="flex flex-col items-center justify-center py-1 border-l border-slate-200/60">
-                  <span className={`text-[9px] font-black uppercase tracking-widest mb-0.5 ${semStats.failedCredits > 0 ? "text-rose-400" : "text-slate-400"}`}>Tín chỉ rớt</span>
-                  <span className={`text-sm font-black ${semStats.failedCredits > 0 ? "text-rose-500" : "text-slate-500"}`}>{semStats.failedCredits}</span>
+                  <span className={`text-[10px] font-semibold uppercase tracking-widest mb-0.5 ${semStats.failedCredits > 0 ? "text-rose-400" : "text-slate-400"}`}>Tín chỉ rớt</span>
+                  <span className={`text-sm font-bold ${semStats.failedCredits > 0 ? "text-rose-500" : "text-slate-500"}`}>{semStats.failedCredits}</span>
                 </div>
                 <div className="flex flex-col items-center justify-center py-1 border-l border-slate-200/60">
-                  <span className={`text-[9px] font-black uppercase tracking-widest mb-0.5 ${semStats.isWarning ? "text-rose-400" : "text-blue-400"}`}>GPA Học kỳ</span>
-                  <span className={`text-sm font-black ${semStats.isWarning ? "text-rose-500" : "text-blue-600"}`}>{semStats.gpa.toFixed(2)}</span>
+                  <span className={`text-[10px] font-semibold uppercase tracking-widest mb-0.5 ${semStats.isWarning ? "text-rose-400" : "text-blue-400"}`}>GPA Học kỳ</span>
+                  <span className={`text-sm font-bold ${semStats.isWarning ? "text-rose-500" : "text-blue-600"}`}>{semStats.gpa.toFixed(2)}</span>
                 </div>
                 <div className="flex flex-col items-center justify-center py-1 border-l border-slate-200/60">
-                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">TC Tích lũy</span>
-                  <span className="text-sm font-black text-slate-700">{semStats.cumulativeCredits}</span>
+                  <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-0.5">TC Tích lũy</span>
+                  <span className="text-sm font-bold text-slate-700">{semStats.cumulativeCredits}</span>
                 </div>
                 <div className="flex flex-col items-center justify-center py-1 bg-blue-600 rounded-xl shadow-md shadow-blue-500/20 col-span-2 lg:col-span-1">
-                  <span className="text-[9px] font-black text-blue-100/80 uppercase tracking-widest">GPA Tích lũy</span>
+                  <span className="text-[10px] font-semibold text-blue-100/80 uppercase tracking-widest">GPA Tích lũy</span>
                   <span className="text-sm font-black text-white">{semStats.cumulativeGPA.toFixed(2)}</span>
                 </div>
               </div>

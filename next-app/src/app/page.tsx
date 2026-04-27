@@ -52,10 +52,12 @@ export default function Home() {
 
   return (
     <main className="relative min-h-screen bg-slate-50/50 text-slate-900 pb-20">
-      {/* Background Blobs for Glassmorphism */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-blue-200/40 blur-[120px] pointer-events-none -z-10 animate-pulse"></div>
-      <div className="absolute bottom-[10%] right-[-5%] w-[35%] h-[35%] rounded-full bg-cyan-100/40 blur-[100px] pointer-events-none -z-10"></div>
-      <div className="absolute top-[20%] right-[10%] w-[25%] h-[25%] rounded-full bg-sky-100/30 blur-[80px] pointer-events-none -z-10"></div>
+      {/* Background Blobs for Glassmorphism - Wrapped to contain overflow without breaking sticky */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-blue-200/40 blur-[120px] animate-pulse"></div>
+        <div className="absolute bottom-[10%] right-[-5%] w-[35%] h-[35%] rounded-full bg-cyan-100/40 blur-[100px]"></div>
+        <div className="absolute top-[20%] right-[10%] w-[25%] h-[25%] rounded-full bg-sky-100/30 blur-[80px]"></div>
+      </div>
 
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full relative z-10">
         
@@ -68,9 +70,9 @@ export default function Home() {
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeTab}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
                 transition={{ duration: 0.2, ease: "easeInOut" }}
                 style={{ overflow: "visible" }}
               >

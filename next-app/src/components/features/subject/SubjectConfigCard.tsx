@@ -1,0 +1,140 @@
+"use client";
+
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Calculator } from "lucide-react";
+
+interface SubjectConfigCardProps {
+  ratio: number;
+  setRatio: (ratio: number) => void;
+  processScore: number;
+  handleScoreChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  accumulatedScore: number;
+  minFinalToPass: number;
+}
+
+const RATIO_OPTIONS = [
+  { value: 0.3, label: "30/70" },
+  { value: 0.4, label: "40/60" },
+  { value: 0.5, label: "50/50" }
+];
+
+export function SubjectConfigCard({
+  ratio,
+  setRatio,
+  processScore,
+  handleScoreChange,
+  accumulatedScore,
+  minFinalToPass
+}: SubjectConfigCardProps) {
+    const isImpossible = minFinalToPass > 10;
+    const isPassed = minFinalToPass <= 0;
+    const isHighEffort = minFinalToPass > 7.5 && !isImpossible;
+    const scoreToPassDisplay = isImpossible ? "Không thể" : isPassed ? "Đã đạt" : minFinalToPass.toFixed(1);
+
+    return (
+      <Card className="w-full border-white/20 bg-white/40 backdrop-blur-xl shadow-xl shadow-blue-500/5 transition-all duration-300 hover:shadow-blue-500/10 rounded-3xl overflow-hidden">
+        <CardHeader className="pb-4 border-b border-white/10">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center">
+              <Calculator className="h-5 w-5 text-blue-600" />
+            </div>
+            <div>
+              <CardTitle className="text-base font-bold text-slate-800 tracking-tight">Cấu hình môn học</CardTitle>
+              <CardDescription className="text-[10px] text-slate-500 font-medium uppercase tracking-wider">Thiết lập tham số tính toán</CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-6 pt-6">
+          {/* Phần cấu hình tham số */}
+          <div className="space-y-6">
+            <div className="space-y-4">
+              <Label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest ps-1 flex items-center gap-2">
+                Tỷ lệ (Quá trình / Cuối kỳ)
+              </Label>
+              <div className="flex p-1.5 bg-slate-100/50 backdrop-blur-md border border-slate-200/50 rounded-2xl">
+              {RATIO_OPTIONS.map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => setRatio(option.value)}
+                  className={`flex-1 py-1.5 text-sm font-black rounded-xl transition-all duration-200 ${
+                    ratio === option.value
+                      ? "bg-white text-blue-700 shadow-md scale-[1.02]"
+                      : "text-slate-500 hover:text-blue-600 hover:bg-white/50"
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </div>
+  
+          <div className="space-y-3">
+            <div className="flex justify-between items-end ps-1">
+              <Label htmlFor="process-score" className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">
+                Điểm quá trình (Hệ 10)
+              </Label>
+              <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
+                {processScore >= 5 ? "Đạt" : "Cần cố gắng"}
+              </span>
+            </div>
+            <div className="p-3 bg-white/50 backdrop-blur-md border border-white/40 rounded-3xl space-y-3 shadow-inner">
+              <input
+                type="range"
+                min="0"
+                max="10"
+                step="0.1"
+                value={processScore}
+                onChange={handleScoreChange}
+                className="w-full h-2.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600 transition-all hover:accent-blue-500"
+              />
+              <div className="relative group">
+                <Input
+                  id="process-score"
+                  type="number"
+                  min="0"
+                  max="10"
+                  step="0.1"
+                  value={processScore || ""}
+                  onChange={handleScoreChange}
+                  className="text-center font-black text-blue-700 text-2xl h-14 bg-white border-2 border-blue-50 shadow-sm rounded-2xl focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all cursor-text group-hover:border-blue-200"
+                />
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-300 pointer-events-none group-focus-within:text-blue-200">
+                  ĐIỂM
+                </div>
+              </div>
+            </div>
+          </div>
+          </div>
+  
+          {/* Phần hiển thị kết quả */}
+          {/* Phần hiển thị kết quả - Hoàn tác về giao diện đơn giản */}
+          <div className="grid grid-cols-1 gap-3 pt-1">
+            <div className="bg-blue-50 border-2 border-blue-100 p-3.5 rounded-2xl flex items-center justify-between shadow-sm">
+              <div>
+                <p className="text-[11px] font-semibold text-blue-600 uppercase tracking-widest">Điểm đã có</p>
+                <p className="text-[9px] font-medium text-blue-500/70 uppercase tracking-tighter">(Quá trình × Tỷ lệ)</p>
+              </div>
+              <span className="text-2xl font-bold text-blue-700">{accumulatedScore.toFixed(2)}</span>
+            </div>
+
+            <div className={`border-2 p-3.5 rounded-2xl flex items-center justify-between shadow-sm transition-all duration-300 ${
+              isImpossible ? "bg-red-50 border-red-100" : "bg-emerald-50 border-emerald-100"
+            }`}>
+              <div>
+                <p className={`text-[11px] font-semibold uppercase tracking-widest ${
+                  isImpossible ? "text-red-600" : "text-emerald-600"
+                }`}>Điểm cần qua môn</p>
+                <p className="text-[9px] font-medium text-slate-500/70 uppercase tracking-tighter">(Thi cuối kỳ tối thiểu)</p>
+              </div>
+              <span className={`text-2xl font-bold ${
+                isImpossible ? "text-red-700" : "text-emerald-700"
+              }`}>{scoreToPassDisplay}</span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+}

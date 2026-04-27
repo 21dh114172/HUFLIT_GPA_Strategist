@@ -64,7 +64,7 @@ const ManualTab = memo(({ onSwitchToRoadmap }: ManualTabProps) => {
       {/* MAIN CONTENT */}
       <div className="lg:col-span-8 space-y-6">
         <div className="flex items-center justify-between px-2 mb-2">
-          <h2 className="text-sm font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
+          <h2 className="text-[12px] font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
             <span className="h-2 w-2 rounded-full bg-blue-600"></span>
             Chi tiết các học kỳ
           </h2>

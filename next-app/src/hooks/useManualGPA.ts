@@ -4,6 +4,9 @@ import { useState, useEffect, useMemo, useCallback, useDeferredValue } from "rea
 import { Semester, Course, calculateManualGPA, GPAResult, parsePortalText, GRADE_SCALE } from "@/lib/gpa-engine";
 import { toast } from "sonner";
 
+const STORAGE_KEY = "huflit-manual-gpa-state";
+const OLD_STORAGE_KEY = "manualGPAData";
+
 export const useManualGPA = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [initialGPA, setInitialGPA] = useState<number>(0);
@@ -12,7 +15,7 @@ export const useManualGPA = () => {
 
   // Load from localStorage
   useEffect(() => {
-    const saved = localStorage.getItem("manualGPAData");
+    const saved = localStorage.getItem(STORAGE_KEY) || localStorage.getItem(OLD_STORAGE_KEY);
     if (saved) {
       try {
         const data = JSON.parse(saved);
@@ -31,7 +34,7 @@ export const useManualGPA = () => {
   // Save to localStorage
   useEffect(() => {
     if (isLoaded) {
-      localStorage.setItem("manualGPAData", JSON.stringify({ initialGPA, initialCredits, semesters }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ initialGPA, initialCredits, semesters }));
     }
   }, [initialGPA, initialCredits, semesters, isLoaded]);
 

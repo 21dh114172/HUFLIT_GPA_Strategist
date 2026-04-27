@@ -54,13 +54,13 @@ const SCHEDULE = [
 
 export function ScaleTab() {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 pb-20">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start pb-20">
       
       {/* Cột trái: Thang điểm */}
-      <div className="lg:col-span-12 xl:col-span-5 space-y-6">
+      <div className="lg:col-span-4 sticky top-20 h-fit z-20 self-start space-y-6">
         <Card className="border-slate-200 shadow-sm">
           <CardHeader className="pb-4">
-            <CardTitle className="text-xl text-slate-800">Thang điểm HUFLIT</CardTitle>
+            <CardTitle className="text-base text-slate-800 font-bold tracking-tight">Thang điểm HUFLIT</CardTitle>
             <CardDescription>
               Quy chuẩn quy đổi từ điểm hệ số 10 sang chữ hệ số 4.
             </CardDescription>
@@ -70,9 +70,9 @@ export function ScaleTab() {
               <Table>
                 <TableHeader className="bg-slate-50">
                   <TableRow>
-                    <TableHead className="font-semibold text-slate-700">Điểm Chữ</TableHead>
-                    <TableHead className="font-semibold text-slate-700">Hệ 10 (Min - Max)</TableHead>
-                    <TableHead className="font-semibold text-slate-700 text-right">GPA</TableHead>
+                    <TableHead className="text-[10px] font-semibold uppercase text-slate-500 tracking-widest">Điểm Chữ</TableHead>
+                    <TableHead className="text-[10px] font-semibold uppercase text-slate-500 tracking-widest">Hệ 10</TableHead>
+                    <TableHead className="text-[10px] font-semibold uppercase text-slate-500 tracking-widest text-right">GPA</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -97,7 +97,7 @@ export function ScaleTab() {
 
         <Card className="border-slate-200 shadow-sm bg-blue-50/50">
           <CardHeader className="pb-4">
-            <CardTitle className="text-lg text-slate-800">Xếp loại Học lực</CardTitle>
+            <CardTitle className="text-base text-slate-800 font-bold tracking-tight">Xếp loại Học lực</CardTitle>
             <CardDescription>Tốt nghiệp dựa trên tổng điểm GPA.</CardDescription>
           </CardHeader>
           <CardContent className="grid grid-cols-2 gap-3">
@@ -112,7 +112,7 @@ export function ScaleTab() {
       </div>
 
       {/* Cột phải: Thời gian biểu */}
-      <div className="lg:col-span-12 xl:col-span-7">
+      <div className="lg:col-span-8 space-y-4">
         <Card className="border-slate-200 shadow-sm h-full overflow-hidden">
           <CardHeader className="pb-4 border-b border-slate-100 bg-white sticky top-0 z-10">
             <div className="flex items-center gap-2">
@@ -120,7 +120,7 @@ export function ScaleTab() {
                 <Coffee className="h-5 w-5 text-slate-600" />
               </div>
               <div>
-                <CardTitle className="text-xl text-slate-800">Thời gian biểu</CardTitle>
+                <CardTitle className="text-base text-slate-800 font-bold tracking-tight">Thời gian biểu</CardTitle>
                 <CardDescription>Chi tiết lịch học theo từng tiết</CardDescription>
               </div>
             </div>
@@ -130,10 +130,10 @@ export function ScaleTab() {
               <Table>
                 <TableHeader className="bg-slate-50">
                   <TableRow>
-                    <TableHead className="w-[80px] text-center font-bold text-slate-500 uppercase text-xs tracking-widest">Buổi</TableHead>
-                    <TableHead className="w-[60px] text-center font-bold text-slate-500 uppercase text-xs tracking-widest ps-4">Tiết</TableHead>
-                    <TableHead className="font-bold text-slate-500 uppercase text-xs tracking-widest">Bắt đầu</TableHead>
-                    <TableHead className="font-bold text-slate-500 uppercase text-xs tracking-widest">Kết thúc</TableHead>
+                    <TableHead className="w-[80px] text-center text-[10px] font-semibold uppercase text-slate-500 tracking-widest">Buổi</TableHead>
+                    <TableHead className="w-[60px] text-center text-[10px] font-semibold uppercase text-slate-500 tracking-widest ps-4">Tiết</TableHead>
+                    <TableHead className="text-[10px] font-semibold uppercase text-slate-500 tracking-widest">Bắt đầu</TableHead>
+                    <TableHead className="text-[10px] font-semibold uppercase text-slate-500 tracking-widest">Kết thúc</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

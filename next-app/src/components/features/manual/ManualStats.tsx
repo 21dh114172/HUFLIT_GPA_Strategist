@@ -43,7 +43,7 @@ const ManualStats = memo(({ result, semesters, onSwitchToRoadmap }: ManualStatsP
   };
 
   return (
-    <Card className="ring-0 border border-slate-300 bg-white shadow-xl shadow-blue-500/5 sticky top-24">
+    <Card className="ring-0 border border-slate-300 bg-white shadow-xl shadow-blue-500/5">
       <CardContent className="p-6 space-y-6">
         {/* GPA Display */}
         <div className="text-center py-1 relative">
