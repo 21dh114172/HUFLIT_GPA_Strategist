@@ -36,24 +36,24 @@ const PortalImportDialog = ({ onImport }: PortalImportDialogProps) => {
         }>
           <CloudUpload className="h-4 w-4" /> Nhập dữ liệu từ Portal
         </DialogTrigger>
-        <DialogContent className="max-w-4xl bg-white border-slate-200 shadow-2xl p-0 overflow-hidden rounded-3xl">
-          <DialogHeader className="p-10 pb-0">
-            <div className="flex items-center gap-5 mb-2">
-              <div className="h-14 w-14 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
-                <CloudUpload className="h-7 w-7" />
+        <DialogContent className="max-w-3xl bg-white border-slate-200 shadow-2xl p-0 overflow-hidden rounded-3xl">
+          <DialogHeader className="p-6 pb-2 border-b border-slate-50">
+            <div className="flex items-center gap-4">
+              <div className="h-10 w-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-500/15">
+                <CloudUpload className="h-5 w-5" />
               </div>
               <div>
-                <DialogTitle className="text-3xl font-black text-slate-800 tracking-tight">Nhập dữ liệu Portal</DialogTitle>
-                <DialogDescription className="text-slate-500 font-medium text-base">
+                <DialogTitle className="text-xl font-bold text-slate-800 tracking-tight">Nhập dữ liệu Portal</DialogTitle>
+                <DialogDescription className="text-slate-500 font-medium text-sm">
                   Tự động hóa việc nhập điểm chỉ với vài giây.
                 </DialogDescription>
               </div>
             </div>
           </DialogHeader>
 
-          <div className="px-10 py-8 space-y-8">
+          <div className="px-6 py-5 space-y-5">
             {/* Step-by-Step Instructions */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               {[
                 { step: 1, text: "Truy cập Portal HUFLIT", icon: "🌐", url: "https://portal.huflit.edu.vn/Home/Marks" },
                 { step: 2, text: "Ctrl+A rồi Ctrl+C bảng điểm", icon: "📋" },
@@ -68,13 +68,13 @@ const PortalImportDialog = ({ onImport }: PortalImportDialogProps) => {
                     href={s.url}
                     target={isLink ? "_blank" : undefined}
                     rel={isLink ? "noopener noreferrer" : undefined}
-                    className={`bg-slate-50 border border-slate-200 p-4 rounded-2xl flex flex-col gap-2 relative overflow-hidden group hover:border-blue-300 transition-all ${isLink ? 'cursor-pointer hover:bg-blue-50/50 hover:shadow-md active:scale-95' : ''}`}
+                    className={`bg-slate-50 border border-slate-200 p-3 rounded-xl flex flex-col gap-1.5 relative overflow-hidden group hover:border-blue-300 transition-all ${isLink ? 'cursor-pointer hover:bg-blue-50/50 hover:shadow-sm active:scale-95' : ''}`}
                   >
-                    <div className="text-xs font-black text-blue-600/30 absolute top-2 right-3 italic text-3xl group-hover:text-blue-600/10 transition-colors">0{s.step}</div>
-                    <span className="text-2xl">{s.icon}</span>
-                    <span className="text-xs font-bold text-slate-700 leading-tight pr-4">{s.text}</span>
+                    <div className="text-[10px] font-bold text-blue-600/40 absolute top-2 right-3 uppercase tracking-widest">Bước 0{s.step}</div>
+                    <span className="text-xl">{s.icon}</span>
+                    <span className="text-[11px] font-bold text-slate-700 leading-tight pr-4">{s.text}</span>
                     {isLink && (
-                      <div className="text-[9px] font-bold text-blue-600 mt-auto bg-blue-50 px-2 py-0.5 rounded-md inline-block w-fit">NHẤP ĐỂ MỞ ↗</div>
+                      <div className="text-[9px] font-bold text-blue-600 mt-1.5 bg-blue-50 px-2 py-0.5 rounded-md inline-block w-fit">MỞ TRANG ↗</div>
                     )}
                   </Component>
                 );
@@ -82,36 +82,40 @@ const PortalImportDialog = ({ onImport }: PortalImportDialogProps) => {
             </div>
 
             {/* Enhanced Textarea Area */}
-            <div className="relative group">
-              <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl blur opacity-10 group-focus-within:opacity-20 transition duration-500"></div>
-              <div className="relative">
-                <textarea
-                  className="w-full h-[400px] p-5 font-mono text-xs bg-slate-50/50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none resize-none transition-all placeholder:text-slate-400"
-                  placeholder="Nhấp vào đây và nhấn Ctrl + V để dán bảng điểm..."
-                  value={importText}
-                  onChange={(e) => setImportText(e.target.value)}
-                />
-                <div className="absolute bottom-4 right-4 flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur border border-slate-200 rounded-lg shadow-sm">
-                  <div className={`h-2.5 w-2.5 rounded-full ${importText.length > 50 ? 'bg-emerald-500' : 'bg-slate-300'}`}></div>
-                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                    {importText.length > 0 ? "Sẵn sàng phân tích" : "Chờ dữ liệu"}
-                  </span>
-                </div>
+            <div className="relative">
+              <textarea
+                className="w-full h-[200px] p-4 font-mono text-[11px] bg-slate-50/50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 outline-none resize-none transition-all placeholder:text-slate-400"
+                placeholder="Nhấp vào đây và nhấn Ctrl + V để dán bảng điểm..."
+                value={importText}
+                onChange={(e) => setImportText(e.target.value)}
+              />
+              <div className="absolute bottom-3 right-3 flex items-center gap-2 px-3 py-1.5 bg-white/90 backdrop-blur border border-slate-200 rounded-lg shadow-sm">
+                <div className={`h-2 w-2 rounded-full ${importText.length > 50 ? 'bg-emerald-500' : 'bg-slate-300'}`}></div>
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                  {importText.length > 0 ? "Sẵn sàng" : "Chờ dữ liệu"}
+                </span>
               </div>
             </div>
           </div>
 
-          <DialogFooter className="p-8 bg-white border-t border-slate-100 flex justify-center">
+          <DialogFooter className="m-0 p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-3 rounded-b-3xl">
+            <Button 
+              variant="ghost" 
+              onClick={() => setIsOpen(false)}
+              className="h-10 px-6 rounded-xl font-bold text-sm text-slate-500 hover:bg-slate-100 transition-all"
+            >
+              Hủy
+            </Button>
             <Button 
               onClick={handleImport} 
               disabled={!importText.trim()}
               className={`
-                h-14 min-w-[280px] px-8 rounded-xl
-                font-bold text-base tracking-tight
+                h-10 px-8 rounded-xl
+                font-bold text-sm tracking-tight
                 transition-all duration-200
                 ${!importText.trim() 
-                  ? 'bg-slate-100 text-slate-400 cursor-not-allowed' 
-                  : 'bg-blue-600 hover:bg-blue-700 text-white shadow-xl shadow-blue-500/15 active:scale-95'
+                  ? 'bg-slate-200 text-slate-400 cursor-not-allowed' 
+                  : 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20 active:scale-95'
                 }
               `}
             >

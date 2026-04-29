@@ -173,14 +173,14 @@ export function ScaleTab() {
       {/* Cột phải: Thời gian biểu */}
       <div className="lg:col-span-8 space-y-2">
         <Card className="border-slate-200 shadow-sm overflow-hidden bg-white">
-          <CardHeader className="py-2.5 px-4 border-b border-slate-100 bg-slate-50/30">
+          <CardHeader className="py-1.5 px-4 border-b border-slate-100 bg-slate-50/30">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="bg-blue-500/10 p-1.5 rounded-lg">
-                  <Coffee className="h-4 w-4 text-blue-600" strokeWidth={2} />
+              <div className="flex items-center gap-2">
+                <div className="bg-blue-500/10 p-1 rounded-lg">
+                  <Coffee className="h-3.5 w-3.5 text-blue-600" strokeWidth={2} />
                 </div>
                 <div>
-                  <CardTitle className="text-sm text-slate-800 font-bold tracking-tight">Thời gian biểu Tiết học</CardTitle>
+                  <CardTitle className="text-[12px] text-slate-800 font-bold uppercase tracking-wider">Thời gian biểu Tiết học</CardTitle>
                 </div>
               </div>
             </div>
@@ -190,10 +190,10 @@ export function ScaleTab() {
               <Table>
                 <TableHeader className="bg-slate-50/80">
                   <TableRow className="hover:bg-transparent border-b-slate-100">
-                    <TableHead className="w-[100px] text-center text-[11px] font-bold uppercase text-slate-400 tracking-wider border-r border-slate-100/50">Buổi</TableHead>
-                    <TableHead className="w-[80px] text-center text-[11px] font-bold uppercase text-slate-400 tracking-wider">Tiết</TableHead>
-                    <TableHead className="text-[11px] font-bold uppercase text-slate-400 tracking-wider text-center">Thời gian chi tiết</TableHead>
-                    <TableHead className="w-[100px] text-[11px] font-bold uppercase text-slate-400 tracking-wider text-center"></TableHead>
+                    <TableHead className="h-7 w-[100px] text-center text-[10px] font-bold uppercase text-slate-400 tracking-wider border-r border-slate-100/50">Buổi</TableHead>
+                    <TableHead className="h-7 w-[80px] text-center text-[10px] font-bold uppercase text-slate-400 tracking-wider">Tiết</TableHead>
+                    <TableHead className="h-7 text-[10px] font-bold uppercase text-slate-400 tracking-wider text-center">Thời gian chi tiết</TableHead>
+                    <TableHead className="h-7 w-[100px] text-[10px] font-bold uppercase text-slate-400 tracking-wider text-center"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -203,41 +203,41 @@ export function ScaleTab() {
                         <TableRow key={idx} className={`group border-b-slate-50 ${item.break ? "bg-amber-50/20" : "hover:bg-slate-50/50 transition-colors"}`}>
                           {idx === 0 && (
                             <TableCell rowSpan={session.items.length} className="border-r border-slate-100/50 bg-slate-50/10">
-                              <div className="flex flex-col items-center justify-center gap-1.5 py-1">
-                                <div className="p-1.5 rounded-full bg-white shadow-sm border border-slate-100">
-                                  {React.cloneElement(session.icon as React.ReactElement<{ className?: string }>, { className: "h-3.5 w-3.5" })}
+                              <div className="flex flex-col items-center justify-center gap-1 py-0.5">
+                                <div className="p-1 rounded-full bg-white shadow-sm border border-slate-100">
+                                  {React.cloneElement(session.icon as React.ReactElement<{ className?: string }>, { className: "h-3 w-3" })}
                                 </div>
-                                <span className="font-bold text-[10px] uppercase text-slate-600 tracking-widest vertical-text">{session.session}</span>
+                                <span className="font-bold text-[9px] uppercase text-slate-500 tracking-widest vertical-text">{session.session}</span>
                               </div>
                             </TableCell>
                           )}
                           
                           {item.break ? (
-                            <TableCell colSpan={3} className="py-2">
-                               <div className="flex items-center justify-center gap-3 px-6">
-                                 <div className="h-[1px] flex-1 bg-amber-200/40"></div>
-                                 <div className="flex items-center gap-2 text-[10px] font-bold text-amber-600 uppercase tracking-widest whitespace-nowrap">
-                                   <Coffee className="h-3.5 w-3.5" strokeWidth={2.5} /> {item.break} <span className="text-amber-400 font-mono">({item.time})</span>
+                            <TableCell colSpan={3} className="py-1">
+                               <div className="flex items-center justify-center gap-2 px-4">
+                                 <div className="h-[1px] flex-1 bg-amber-200/30"></div>
+                                 <div className="flex items-center gap-1.5 text-[9px] font-bold text-amber-600 uppercase tracking-widest whitespace-nowrap">
+                                   <Coffee className="h-3 w-3" strokeWidth={2.5} /> {item.break} <span className="text-amber-400 font-mono text-[10px]">({item.time})</span>
                                  </div>
-                                 <div className="h-[1px] flex-1 bg-amber-200/40"></div>
+                                 <div className="h-[1px] flex-1 bg-amber-200/30"></div>
                                </div>
                             </TableCell>
                           ) : (
                             <>
-                              <TableCell className="text-center py-2">
-                                <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-blue-50 text-blue-600 font-bold text-xs border border-blue-100 shadow-sm group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
+                              <TableCell className="text-center py-1">
+                                <span className="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-blue-50 text-blue-600 font-bold text-[11px] border border-blue-100 shadow-sm group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
                                   {item.period}
                                 </span>
                               </TableCell>
-                              <TableCell className="py-2">
-                                <div className="flex items-center justify-center gap-3">
-                                  <span className="font-mono text-xs text-slate-700 font-bold tabular-nums bg-slate-50 px-2 py-1 rounded border border-slate-100">{item.start}</span>
-                                  <span className="text-slate-300 text-[10px] font-bold">→</span>
-                                  <span className="font-mono text-xs text-slate-700 font-bold tabular-nums bg-slate-50 px-2 py-1 rounded border border-slate-100">{item.end}</span>
+                              <TableCell className="py-1">
+                                <div className="flex items-center justify-center gap-2">
+                                  <span className="font-mono text-[11px] text-slate-700 font-bold tabular-nums bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">{item.start}</span>
+                                  <span className="text-slate-300 text-[9px] font-bold">→</span>
+                                  <span className="font-mono text-[11px] text-slate-700 font-bold tabular-nums bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">{item.end}</span>
                                 </div>
                               </TableCell>
-                              <TableCell className="py-2 text-center">
-                                <div className="inline-block w-2 h-2 rounded-full bg-slate-200 group-hover:bg-emerald-400 group-hover:scale-125 transition-all duration-300 shadow-sm"></div>
+                              <TableCell className="py-1 text-center">
+                                <div className="inline-block w-1.5 h-1.5 rounded-full bg-slate-200 group-hover:bg-emerald-400 group-hover:scale-125 transition-all duration-300 shadow-sm"></div>
                               </TableCell>
                             </>
                           )}
