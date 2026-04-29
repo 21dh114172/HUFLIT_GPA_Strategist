@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 import { RetakeList } from "./RetakeList";
 import type { RoadmapState, RoadmapActions, RoadmapComputed } from "@/hooks/useRoadmapState";
 
@@ -22,10 +23,10 @@ export function GoalSetupCard({ state, actions, computed }: GoalSetupCardProps) 
 
   return (
     <Card className="border-slate-200 bg-white shadow-xl shadow-blue-500/5 rounded-3xl overflow-hidden border">
-      <CardHeader className="bg-slate-50/50 border-b border-slate-100 py-4 px-6">
+      <CardHeader className="bg-slate-50/50 border-b border-slate-100 py-2.5 px-5">
         <div className="flex items-center gap-3">
-          <Target className="h-5 w-5 text-blue-600" />
-          <CardTitle className="text-lg font-black text-slate-800 tracking-tight">Thiết lập mục tiêu</CardTitle>
+          <Target className="h-4 w-4 text-blue-600" strokeWidth={2} />
+          <CardTitle className="text-sm font-bold text-slate-900 tracking-tight">Thiết lập mục tiêu</CardTitle>
         </div>
       </CardHeader>
 
@@ -79,23 +80,29 @@ function StartingPointStep({ currentGPA, currentCredits, onGPAChange, onCreditsC
   }, [currentCredits]);
 
   return (
-    <div className="p-6 space-y-4">
+    <div className="p-3 space-y-2">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-[12px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md">01</span>
-          <Label className="text-[12px] font-black text-slate-600 uppercase tracking-widest">Điểm xuất phát</Label>
+          <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded-md">01</span>
+          <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Điểm xuất phát</Label>
         </div>
         <Button
           variant="ghost"
           size="sm"
-          onClick={onSync}
-          className="h-7 text-[12px] font-black text-blue-600 uppercase hover:bg-blue-50 rounded-lg px-2"
+          onClick={() => {
+            onSync();
+            toast.success("Đã đồng bộ dữ liệu thành công", {
+              description: "Thông tin GPA và tín chỉ đã được cập nhật từ Tab nhập điểm.",
+              duration: 2000,
+            });
+          }}
+          className="h-7 text-[10px] font-bold text-blue-600 uppercase tracking-wide hover:bg-blue-50 rounded-lg px-2"
         >
-          <RefreshCcw className="h-3 w-3 mr-1.5" /> Đồng bộ
+          <RefreshCcw className="h-3.5 w-3.5 mr-1" strokeWidth={2.5} /> Đồng bộ
         </Button>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1">
           <Input
             type="number"
@@ -110,9 +117,9 @@ function StartingPointStep({ currentGPA, currentCredits, onGPAChange, onCreditsC
               if (!isNaN(val)) onGPAChange(Math.min(4.0, Math.max(0, val)));
             }}
             placeholder="GPA"
-            className="h-10 font-bold text-blue-700 bg-white border-slate-200 rounded-xl focus:border-blue-500 transition-all text-center"
+            className="h-9 text-sm font-bold text-blue-600 bg-white border-slate-200 rounded-xl focus:border-blue-500 transition-all text-center"
           />
-          <div className="text-[11px] font-bold text-slate-600 text-center uppercase tracking-tighter">GPA hiện tại</div>
+          <div className="text-[10px] font-medium text-slate-400 text-center uppercase tracking-tight">GPA hiện tại</div>
         </div>
         <div className="space-y-1">
           <Input
@@ -127,9 +134,9 @@ function StartingPointStep({ currentGPA, currentCredits, onGPAChange, onCreditsC
               if (!isNaN(val)) onCreditsChange(Math.min(300, Math.max(0, val)));
             }}
             placeholder="TC"
-            className="h-10 font-bold text-blue-700 bg-white border-slate-200 rounded-xl focus:border-blue-500 transition-all text-center"
+            className="h-9 text-sm font-bold text-blue-600 bg-white border-slate-200 rounded-xl focus:border-blue-500 transition-all text-center"
           />
-          <div className="text-[11px] font-bold text-slate-600 text-center uppercase tracking-tighter">TC tích lũy</div>
+          <div className="text-[10px] font-medium text-slate-400 text-center uppercase tracking-tight">TC tích lũy</div>
         </div>
       </div>
     </div>
@@ -156,10 +163,10 @@ function TargetGPAStep({ targetGPA, onSelect }: TargetGPAStepProps) {
   };
 
   return (
-    <div className="p-6 bg-slate-50/50 border-y border-slate-100 space-y-4">
+    <div className="p-3 bg-slate-50/50 border-y border-slate-100 space-y-2.5">
       <div className="flex items-center gap-2">
-        <span className="text-[12px] font-black text-white bg-blue-600 px-2 py-0.5 rounded-md">02</span>
-        <Label className="text-[12px] font-black text-blue-600 uppercase tracking-widest">Mục tiêu mong muốn</Label>
+        <span className="text-[10px] font-bold text-white bg-blue-600 px-1.5 py-0.5 rounded-md">02</span>
+        <Label className="text-[10px] font-bold text-blue-600 uppercase tracking-wider">Mục tiêu mong muốn</Label>
       </div>
 
       <div className="flex gap-2">
@@ -167,7 +174,7 @@ function TargetGPAStep({ targetGPA, onSelect }: TargetGPAStepProps) {
           <Button
             key={val}
             variant={targetGPA === val ? "default" : "outline"}
-            className={`flex-1 h-9 text-[12px] font-black transition-all rounded-lg border-slate-200 ${targetGPA === val ? "bg-blue-600 text-white" : "text-slate-500 bg-white"}`}
+            className={`flex-1 h-8 text-[10px] font-bold transition-all rounded-lg border-slate-200 ${targetGPA === val ? "bg-blue-600 text-white shadow-sm" : "text-slate-500 bg-white"}`}
             onClick={() => {
               setValStr(val.toString());
               onSelect(val);
@@ -186,7 +193,7 @@ function TargetGPAStep({ targetGPA, onSelect }: TargetGPAStepProps) {
         value={valStr}
         onChange={e => handleInputChange(e.target.value)}
         placeholder="GPA mục tiêu"
-        className="text-center text-2xl font-black text-blue-800 bg-white border-2 border-blue-100 focus:border-blue-500 rounded-2xl h-14"
+        className="text-center text-base font-bold text-blue-700 bg-white border-2 border-blue-100 focus:border-blue-500 rounded-2xl h-10"
       />
     </div>
   );
@@ -224,13 +231,13 @@ function EffortPlanStep({
   }, [remainingCredits]);
 
   return (
-    <div className="p-6 space-y-5">
+    <div className="p-3 space-y-2.5">
       <div className="flex items-center gap-2">
-        <span className="text-[12px] font-black text-slate-600 bg-slate-100 px-2 py-0.5 rounded-md">03</span>
-        <Label className="text-[12px] font-black text-slate-600 uppercase tracking-widest">Kế hoạch nỗ lực</Label>
+        <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded-md">03</span>
+        <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Kế hoạch nỗ lực</Label>
       </div>
 
-      <div className="relative grid grid-cols-2 gap-4">
+      <div className="relative grid grid-cols-2 gap-3">
         <div className="space-y-1 relative">
           <Input
             type="number"
@@ -245,13 +252,13 @@ function EffortPlanStep({
               if (!isNaN(val)) onTotalChange(Math.min(300, Math.max(0, val)));
             }}
             placeholder="TC tốt nghiệp"
-            className="h-10 font-bold text-blue-700 bg-white border-slate-200 rounded-xl focus:border-blue-500 transition-all text-center"
+            className="h-9 text-sm font-bold text-blue-600 bg-white border-slate-200 rounded-xl focus:border-blue-500 transition-all text-center"
           />
-          <div className="text-[11px] font-bold text-slate-600 text-center uppercase tracking-tighter">Tổng TC ra trường</div>
+          <div className="text-[10px] font-medium text-slate-400 text-center uppercase tracking-tight">Tổng TC ra trường</div>
         </div>
 
-        <div className="absolute left-1/2 top-5 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center z-10 pointer-events-none">
-          <div className="bg-white text-slate-400 border border-slate-100 text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-widest shadow-sm">Hoặc</div>
+        <div className="absolute left-1/2 top-4.5 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center z-10 pointer-events-none">
+          <div className="bg-white text-slate-400 border border-slate-100 text-[8px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider shadow-sm">Hoặc</div>
         </div>
 
         <div className="space-y-1">
@@ -267,9 +274,9 @@ function EffortPlanStep({
               if (!isNaN(val)) onRemainingChange(Math.min(200, Math.max(0, val)));
             }}
             placeholder="TC học tiếp"
-            className="h-10 font-bold text-blue-700 bg-white border-slate-200 rounded-xl focus:border-blue-500 transition-all text-center"
+            className="h-9 text-sm font-bold text-blue-600 bg-white border-slate-200 rounded-xl focus:border-blue-500 transition-all text-center"
           />
-          <div className="text-[10px] font-bold text-slate-600 text-center uppercase tracking-tighter">TC dự kiến học</div>
+          <div className="text-[10px] font-medium text-slate-400 text-center uppercase tracking-tight">TC dự kiến học</div>
         </div>
       </div>
 

@@ -20,7 +20,7 @@ export function RoadmapTab({ initialData }: RoadmapTabProps) {
         <GoalSetupCard state={state} actions={actions} computed={computed} />
       </div>
 
-      <div className="lg:col-span-8 space-y-4">
+      <div className="lg:col-span-8 space-y-3">
         <ResultHeroCard
           result={result}
           status={status}

@@ -12,9 +12,16 @@ export function getResultStatus(
   currentGPA: number,
   targetGPA: number
 ): ResultStatus {
-  if (totalEffortCredits === 0 && currentGPA < targetGPA) return "no-credits";
-  if (requiredGPA > 4.0) return "impossible";
+  // 1. Target already met (including improvements from locked retakes)
   if (requiredGPA <= 0) return "achieved";
+  
+  // 2. Impossible to reach even with 4.0 in all future credits
+  if (requiredGPA > 4.0) return "impossible";
+  
+  // 3. No credits left to work with, but target not yet met
+  if (totalEffortCredits === 0 && requiredGPA > 0) return "no-credits";
+
+  // 4. Feasibility levels
   if (requiredGPA > 3.7) return "very-hard";
   if (requiredGPA > 3.2) return "hard";
   return "achievable";
@@ -54,13 +61,13 @@ export function getStatusLabel(status: ResultStatus, maxPossibleGPA: number): st
     case "impossible":  return `Không khả thi • GPA tối đa có thể đạt: ${maxPossibleGPA.toFixed(2)}`;
     case "very-hard":   return "Cần nỗ lực cực kỳ lớn";
     case "hard":        return "Đòi hỏi tập trung cao";
-    case "achievable":
-    case "achieved":    return "Khá khả thi, hãy duy trì";
+    case "achieved":    return "Đã đạt mục tiêu đề ra";
+    case "achievable":  return "Khá khả thi, hãy duy trì";
   }
 }
 
 export function getDisplayGPA(status: ResultStatus, requiredGPA: number): string {
-  if (status === "no-credits") return "HỌC LẠI";
+  if (status === "no-credits") return "CẦN THÊM";
   if (status === "achieved") return "ĐẠT";
   return requiredGPA.toFixed(2);
 }

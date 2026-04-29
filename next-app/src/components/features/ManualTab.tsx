@@ -39,9 +39,9 @@ const ManualTab = memo(({ onSwitchToRoadmap }: ManualTabProps) => {
   if (!isLoaded) return null;
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start pb-20">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 items-start pb-10">
       {/* SIDEBAR */}
-      <div className="lg:col-span-4 sticky top-20 space-y-4 order-first h-fit z-20 self-start">
+      <div className="lg:col-span-4 sticky top-16 space-y-2 order-first h-fit z-20 self-start">
         <InitialStatsCard
           initialGPA={initialGPA}
           initialCredits={initialCredits}

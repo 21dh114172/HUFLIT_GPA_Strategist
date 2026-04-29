@@ -25,24 +25,24 @@ const InitialStatsCard = memo(({
   children
 }: InitialStatsCardProps) => {
   return (
-    <Card className="ring-0 border border-slate-300 bg-white shadow-xl shadow-blue-500/5 overflow-hidden">
-      <CardHeader className="pb-1 border-b border-slate-200 px-5">
-        <div className="flex items-center justify-between py-2.5">
-          <div className="flex items-center gap-3">
+    <Card className="ring-0 border border-slate-300 bg-white shadow-xl shadow-blue-500/5">
+      <CardHeader className="py-2.5 px-4 border-b border-slate-200 bg-slate-50/50">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
             <div className="bg-blue-600 p-1.5 rounded-lg shadow-lg shadow-blue-500/20">
-              <Calculator className="h-5 w-5 text-white" />
+              <Calculator className="h-4 w-4 text-white" />
             </div>
-            <CardTitle className="text-base text-slate-800 font-bold tracking-tight">Tổng kết</CardTitle>
+            <CardTitle className="text-sm text-slate-800 font-bold tracking-tight">Tổng kết</CardTitle>
           </div>
-          <Button variant="ghost" size="icon" onClick={onReset} className="h-8 w-8 text-slate-500 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all">
-            <RotateCcw className="h-4 w-4" />
+          <Button variant="ghost" size="icon" onClick={onReset} className="h-7 w-7 text-slate-500 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all">
+            <RotateCcw className="h-3.5 w-3.5" />
           </Button>
         </div>
       </CardHeader>
-      <CardContent className="pt-4 px-5 pb-5 space-y-4">
-        <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2 shadow-sm">
-          <div className="grid grid-cols-2 gap-2.5">
-            <div className="space-y-1">
+      <CardContent className="pt-3 px-4 pb-4 space-y-3">
+        <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200 space-y-2 shadow-sm">
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
               <Label className="text-[11px] font-semibold text-slate-500 uppercase tracking-widest ps-1">GPA Hiện tại</Label>
               <Input
                 type="number"
@@ -53,7 +53,7 @@ const InitialStatsCard = memo(({
                 placeholder="0.00"
               />
             </div>
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <Label className="text-[11px] font-semibold text-slate-500 uppercase tracking-widest ps-1">Tích lũy</Label>
               <Input
                 type="number"
@@ -65,7 +65,9 @@ const InitialStatsCard = memo(({
             </div>
           </div>
         </div>
-        {children}
+        <div className="pt-1.5">
+          {children}
+        </div>
       </CardContent>
     </Card>
   );

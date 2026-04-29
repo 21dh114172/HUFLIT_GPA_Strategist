@@ -32,13 +32,13 @@ const ManualChart = memo(({ semesterStats }: ManualChartProps) => {
 
   return (
     <Card className="ring-0 border border-slate-300 bg-white shadow-xl shadow-blue-500/5 overflow-hidden">
-      <CardHeader className="pb-2 pt-5 px-6 border-b border-slate-100">
+      <CardHeader className="py-2.5 px-4 border-b border-slate-100">
         <div className="flex items-center gap-2">
           <ChartIcon className="h-4 w-4 text-blue-400" />
           <CardTitle className="text-[11px] font-black text-blue-600 uppercase tracking-widest">Biến động GPA</CardTitle>
         </div>
       </CardHeader>
-      <CardContent className="h-[200px] pt-4 pb-6 px-2">
+      <CardContent className="h-[145px] pt-3 pb-4 px-2">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
             <defs>

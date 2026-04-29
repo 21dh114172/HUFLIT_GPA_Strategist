@@ -155,3 +155,10 @@
     transform: translateX(100%);
   }
 }
+
+@layer utilities {
+  .vertical-text {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+  }
+}

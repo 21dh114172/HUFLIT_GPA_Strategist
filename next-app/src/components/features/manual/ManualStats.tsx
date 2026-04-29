@@ -44,12 +44,12 @@ const ManualStats = memo(({ result, semesters, onSwitchToRoadmap }: ManualStatsP
 
   return (
     <Card className="ring-0 border border-slate-300 bg-white shadow-xl shadow-blue-500/5">
-      <CardContent className="p-6 space-y-6">
+      <CardContent className="p-4 space-y-3.5">
         {/* GPA Display */}
         <div className="text-center py-1 relative">
           <div className="absolute inset-0 bg-blue-500/5 blur-2xl rounded-full -z-10"></div>
           <div className="text-[11px] font-bold text-blue-600/80 uppercase tracking-[0.2em] mb-1">GPA TÍCH LŨY MỚI</div>
-          <div className={`text-5xl font-black leading-none tracking-tighter drop-shadow-sm ${
+          <div className={`text-3xl font-black leading-none tracking-tighter drop-shadow-sm ${
             result.gpa >= 3.6 ? "text-emerald-500" :
             result.gpa >= 3.2 ? "text-blue-600" :
             result.gpa >= 2.5 ? "text-amber-500" : "text-rose-500"
@@ -59,14 +59,14 @@ const ManualStats = memo(({ result, semesters, onSwitchToRoadmap }: ManualStatsP
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 pt-3 pb-1 border-t border-slate-200">
-          <div className="flex flex-col items-center justify-center space-y-0.5 py-1.5 border-r border-slate-200">
-            <div className="text-[11px] font-bold text-slate-600 uppercase tracking-widest">Tổng Tín chỉ</div>
-            <div className="text-3xl font-bold text-slate-800">{result.totalCredits}</div>
+        <div className="grid grid-cols-2 pt-2.5 pb-0 border-t border-slate-200">
+          <div className="flex flex-col items-center justify-center space-y-0.5 py-1 border-r border-slate-200">
+            <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">Tín chỉ</div>
+            <div className="text-xl font-bold text-slate-800">{result.totalCredits}</div>
           </div>
-          <div className="flex flex-col items-center justify-center space-y-1 py-1.5">
-            <div className="text-[11px] font-bold text-slate-600 uppercase tracking-widest">Xếp loại</div>
-            <div className={`text-xl font-bold whitespace-nowrap ${
+          <div className="flex flex-col items-center justify-center space-y-1 py-1">
+            <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">Xếp loại</div>
+            <div className={`text-lg font-bold whitespace-nowrap ${
               result.rank === "Xuất sắc" ? "text-emerald-500" :
               result.rank === "Giỏi" ? "text-blue-600" :
               result.rank === "Khá" ? "text-amber-500" : "text-slate-700"
@@ -78,7 +78,7 @@ const ManualStats = memo(({ result, semesters, onSwitchToRoadmap }: ManualStatsP
 
         <Button
           onClick={handleSwitchToRoadmap}
-          className="w-full h-11 rounded-xl font-bold text-sm shadow-lg shadow-blue-500/10 bg-blue-600 hover:bg-blue-700 transition-all active:scale-95"
+          className="w-full h-9 rounded-xl font-bold text-xs shadow-lg shadow-blue-500/10 bg-blue-600 hover:bg-blue-700 transition-all active:scale-95"
         >
           Tìm Lộ trình Học Tập
         </Button>

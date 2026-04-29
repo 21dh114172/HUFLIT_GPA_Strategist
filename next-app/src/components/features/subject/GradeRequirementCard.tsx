@@ -56,29 +56,29 @@ export function GradeRequirementCard({ grade, gpa, requiredFinal }: GradeRequire
   }, [isAlreadyAchieved, isImpossible, percentage, requiredFinal]);
 
   return (
-    <div className={`p-3 rounded-2xl border flex flex-col gap-2.5 hover:scale-[1.01] hover:shadow-md transition-all duration-300 ${styles.cardClass}`}>
+    <div className={`p-2.5 rounded-2xl border flex flex-col gap-2 hover:scale-[1.01] hover:shadow-md transition-all duration-300 ${styles.cardClass}`}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <span className={`flex items-center justify-center h-10 w-10 shrink-0 rounded-full font-black text-sm bg-white shadow-sm border-2 ${styles.gradeRingClass}`}>
+          <span className={`flex items-center justify-center h-8 w-8 shrink-0 rounded-full font-semibold text-[11px] bg-white shadow-sm border-2 ${styles.gradeRingClass}`}>
             {grade}
           </span>
           <div className="flex flex-col justify-center">
-            <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest leading-none mb-1">Loại</span>
-            <span className="text-xs font-bold text-slate-700 leading-none">GPA {gpa.toFixed(1)}</span>
+            <span className="text-[10px] font-medium text-slate-500 uppercase tracking-widest leading-none mb-1">Loại</span>
+            <span className="text-[11px] font-medium text-slate-700 leading-none">GPA {gpa.toFixed(1)}</span>
           </div>
         </div>
 
         <div className="flex flex-col items-end gap-0.5">
-          <span className={`font-bold text-xl leading-none ${styles.scoreFontClass}`}>
+          <span className={`font-semibold text-base leading-none ${styles.scoreFontClass}`}>
             {styles.scoreDisplay}
           </span>
-          <span className={`text-[10px] font-semibold uppercase tracking-widest ${styles.labelClass}`}>
+          <span className={`text-[10px] font-medium uppercase tracking-widest ${styles.labelClass}`}>
             {styles.labelDisplay}
           </span>
         </div>
       </div>
 
-      <div className="w-full h-2 bg-slate-200/80 rounded-full overflow-hidden">
+      <div className="w-full h-1.5 bg-slate-200/80 rounded-full overflow-hidden">
         <div
           className={`h-full rounded-full transition-all duration-500 ${styles.barColor}`}
           style={{ width: isAlreadyAchieved || isImpossible ? "100%" : `${percentage}%` }}

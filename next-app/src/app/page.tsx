@@ -51,7 +51,7 @@ export default function Home() {
   };
 
   return (
-    <main className="relative min-h-screen bg-slate-50/50 text-slate-900 pb-20">
+    <main className="relative min-h-screen bg-slate-50/50 text-slate-900 pb-4">
       {/* Background Blobs for Glassmorphism - Wrapped to contain overflow without breaking sticky */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-blue-200/40 blur-[120px] animate-pulse"></div>
@@ -65,8 +65,8 @@ export default function Home() {
         <AppHeader activeTab={activeTab} />
 
         {/* Main Content Area */}
-        <div className="max-w-[1074px] mx-auto px-4 mt-6">
-          <div className="">
+        <div className="max-w-[1074px] mx-auto px-4 sm:px-6 mt-4 w-full">
+          <div className="flex flex-col w-full">
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeTab}
@@ -75,24 +75,25 @@ export default function Home() {
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.2, ease: "easeInOut" }}
                 style={{ overflow: "visible" }}
+                className="w-full flex flex-col items-stretch pb-6"
               >
-                <TabsContent value="roadmap" className="focus-visible:outline-none focus-visible:ring-0 m-0">
+                <TabsContent value="roadmap" className="focus-visible:outline-none focus-visible:ring-0 m-0 w-full">
                   <RoadmapTab initialData={roadmapInitialData} />
                 </TabsContent>
 
-                <TabsContent value="manual" className="focus-visible:outline-none focus-visible:ring-0 m-0">
+                <TabsContent value="manual" className="focus-visible:outline-none focus-visible:ring-0 m-0 w-full">
                   <ManualTab onSwitchToRoadmap={handleSwitchToRoadmap} />
                 </TabsContent>
 
-                <TabsContent value="subject" className="focus-visible:outline-none focus-visible:ring-0 m-0">
+                <TabsContent value="subject" className="focus-visible:outline-none focus-visible:ring-0 m-0 w-full">
                   <SubjectTab />
                 </TabsContent>
 
-                <TabsContent value="scale" className="focus-visible:outline-none focus-visible:ring-0 m-0">
+                <TabsContent value="scale" className="focus-visible:outline-none focus-visible:ring-0 m-0 w-full">
                   <ScaleTab />
                 </TabsContent>
 
-                <TabsContent value="news" className="focus-visible:outline-none focus-visible:ring-0 m-0">
+                <TabsContent value="news" className="focus-visible:outline-none focus-visible:ring-0 m-0 w-full">
                   <div className="text-center py-20 text-slate-500 bg-white rounded-3xl border border-slate-200">
                     <Newspaper className="h-12 w-12 mx-auto mb-4 opacity-20" />
                     <h3 className="font-medium text-lg">Bản tin Sinh viên</h3>

@@ -236,31 +236,76 @@ export function useRoadmapState(initialData?: InitialRoadmapData | null) {
     } catch { return []; }
   }, [manualVersion]);
 
-    const syncFromManual = () => {
+  const syncFromManual = () => {
     const saved = localStorage.getItem(MANUAL_STORAGE_KEY);
-    if (!saved) return;
+    
+    // Clear everything if no saved data exists
+    if (!saved) {
+      setCurrentGPA(0);
+      setCurrentCredits(0);
+      setTargetGPA(0);
+      setRemainingCredits(0);
+      setRetakes([]);
+      setManualVersion(v => v + 1);
+      return;
+    }
+
     try {
       const { semesters, initialGPA, initialCredits } = JSON.parse(saved);
+      
+      // Determine if there's actual data to sync
+      const hasSemesters = semesters && semesters.length > 0;
+      const hasInitialValues = initialGPA > 0 || initialCredits > 0;
+
+      if (!hasSemesters && !hasInitialValues) {
+        setCurrentGPA(0);
+        setCurrentCredits(0);
+        setTargetGPA(0);
+        setRemainingCredits(0);
+        setRetakes([]);
+        setManualVersion(v => v + 1);
+        return;
+      }
+
       const calcResult = calculateManualGPA(semesters, initialGPA, initialCredits);
       setCurrentGPA(calcResult.gpa);
       setCurrentCredits(calcResult.totalCredits);
       setManualVersion(v => v + 1);
+
+      // Sync retakes (courses added in manual tab but without grades)
       const manualRetakes: RetakeItem[] = [];
-      semesters.forEach((sem: { courses: { isRetake: boolean; grade: string; oldGrade: string; credits: number; name: string }[] }) => {
-        sem.courses.forEach(c => {
-          if (c.isRetake && (!c.grade || c.grade === "")) {
-            const gInfo = GRADE_SCALE.find(g => g.grade === c.oldGrade);
-            manualRetakes.push({
-              id: Math.random().toString(),
-              oldGrade: gInfo?.gpa || 1.0,
-              credits: c.credits,
-              name: c.name,
-            });
-          }
+      if (hasSemesters) {
+        semesters.forEach((sem: any) => {
+          sem.courses.forEach((c: any) => {
+            if (c.isRetake && (!c.grade || c.grade === "")) {
+              const gInfo = findGradeInfo(c.oldGrade || "D");
+              manualRetakes.push({
+                id: Math.random().toString(),
+                oldGrade: gInfo?.gpa || 1.0,
+                credits: c.credits,
+                name: c.name,
+              });
+            }
+          });
         });
-      });
-      if (manualRetakes.length > 0) setRetakes(manualRetakes);
-    } catch { }
+      }
+      
+      // Always sync retakes to ensure consistency
+      setRetakes(manualRetakes);
+
+      // Auto-suggest next target GPA milestone based on new cumulative GPA
+      const milestones = [2.0, 2.5, 3.2, 3.6];
+      const nextTarget = milestones.find(m => m > calcResult.gpa) || 0;
+      setTargetGPA(nextTarget);
+
+    } catch (err) {
+      // In case of parsing error, clear the state for safety
+      setCurrentGPA(0);
+      setCurrentCredits(0);
+      setTargetGPA(0);
+      setRemainingCredits(0);
+      setRetakes([]);
+    }
   };
 
   const addRetake = () =>

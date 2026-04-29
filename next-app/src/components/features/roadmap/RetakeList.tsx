@@ -32,24 +32,24 @@ export function RetakeList({
   onToggleFromManual,
 }: RetakeListProps) {
   return (
-    <div className="pt-4 border-t border-slate-100 space-y-6">
+    <div className="pt-2 border-t border-slate-100 space-y-3">
       {/* Suggestions Section */}
       {manualImprovableCourses.length > 0 && (
-        <div className="bg-blue-50/30 p-4 rounded-2xl border border-blue-100/50 space-y-3">
+        <div className="bg-blue-50/30 p-3 rounded-2xl border border-blue-100/50 space-y-2">
           <div className="flex items-center gap-2">
-            <Lightbulb className="h-3.5 w-3.5 text-blue-600" />
-            <Label className="text-[11px] font-black text-blue-600 uppercase tracking-widest">
+            <Lightbulb className="h-3.5 w-3.5 text-blue-600" strokeWidth={2} />
+            <Label className="text-[10px] font-bold text-blue-600 uppercase tracking-wider">
               Gợi ý từ bảng điểm ({manualImprovableCourses.length})
             </Label>
           </div>
-          <div className="flex flex-col gap-1.5 max-h-[160px] overflow-y-auto pr-1 custom-scrollbar">
+          <div className="flex flex-col gap-1.5 max-h-[100px] overflow-y-auto pr-1 custom-scrollbar">
             {manualImprovableCourses.map((c, i) => {
               const isAdded = retakes.some(r => r.name === c.name);
               return (
                 <button
                   key={i}
                   onClick={() => onToggleFromManual(c)}
-                  className={`flex items-center justify-between px-3 py-2 rounded-xl border text-[11px] font-bold transition-all w-full group/btn ${
+                  className={`flex items-center justify-between px-3 py-2 rounded-xl border text-[10px] font-bold transition-all w-full group/btn ${
                     isAdded
                       ? "bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-200 -translate-y-0.5"
                       : "bg-white border-slate-100 text-slate-600 hover:border-blue-200 hover:bg-blue-50/50 hover:shadow-sm"
@@ -63,7 +63,7 @@ export function RetakeList({
                   </div>
                   <div className="flex items-center gap-1.5 shrink-0">
                     <span className="text-[10px] text-slate-400 font-medium">{c.credits}TC</span>
-                    <span className={`px-1.5 py-0.5 rounded-lg text-[11px] font-black shrink-0 ${
+                    <span className={`px-1.5 py-0.5 rounded-lg text-[10px] font-bold shrink-0 ${
                       isAdded 
                         ? "bg-white/20 text-white" 
                         : (c.grade === "F" ? "bg-rose-50 text-rose-500" : "bg-amber-50 text-amber-500")
@@ -79,18 +79,18 @@ export function RetakeList({
       )}
 
       {/* Manual Retake List */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between mb-1">
-          <Label className="text-[12px] font-black text-slate-600 uppercase tracking-widest">
+      <div className="space-y-2">
+        <div className="flex items-center justify-between mb-0.5">
+          <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
             Môn đã chọn ({retakes.length})
           </Label>
           <Button
             variant="outline"
             size="sm"
             onClick={onAdd}
-            className="h-7 text-[12px] font-black text-blue-700 uppercase border-blue-100 hover:bg-blue-50 rounded-lg px-2"
+            className="h-7 text-[10px] font-bold text-blue-600 uppercase tracking-wide border-blue-100 hover:bg-blue-50 rounded-lg px-2"
           >
-            <PlusCircle className="h-3 w-3 mr-1" /> Thêm môn
+            <PlusCircle className="h-3.5 w-3.5 mr-1" strokeWidth={2.5} /> Thêm môn
           </Button>
         </div>
 
@@ -98,7 +98,7 @@ export function RetakeList({
           {retakes.length > 0 ? (
             <>
               <RetakeTableHeader />
-              <div className="max-h-[280px] overflow-y-auto pr-1 custom-scrollbar space-y-1.5">
+              <div className="max-h-[160px] overflow-y-auto pr-1 custom-scrollbar space-y-1.5">
                 {retakes.map(r => (
                   <RetakeRow key={r.id} retake={r} onRemove={onRemove} onUpdate={onUpdate} />
                 ))}
@@ -106,7 +106,7 @@ export function RetakeList({
               <RetakeTotalRow retakes={retakes} />
             </>
           ) : (
-            <div className="p-4 text-center border border-dashed border-slate-100 rounded-xl bg-slate-50/30">
+            <div className="p-2 text-center border border-dashed border-slate-100 rounded-xl bg-slate-50/30">
               <p className="text-[11px] text-slate-500 font-bold uppercase tracking-tighter italic opacity-70">
                 Chưa có môn cải thiện
               </p>
@@ -121,9 +121,9 @@ export function RetakeList({
 function RetakeTableHeader() {
   return (
     <div className="grid grid-cols-12 gap-2 px-1 mb-1">
-      <div className="col-span-4 text-[11px] font-black text-slate-500 uppercase text-center">Điểm cũ</div>
-      <div className="col-span-3 text-[11px] font-black text-slate-500 uppercase text-center">Tín chỉ</div>
-      <div className="col-span-4 text-[11px] font-black text-slate-500 uppercase text-center">Dự kiến</div>
+      <div className="col-span-4 text-[10px] font-bold text-slate-400 uppercase tracking-tight text-center">Điểm cũ</div>
+      <div className="col-span-3 text-[10px] font-bold text-slate-400 uppercase tracking-tight text-center">Tín chỉ</div>
+      <div className="col-span-4 text-[10px] font-bold text-slate-400 uppercase tracking-tight text-center">Dự kiến</div>
       <div className="col-span-1" />
     </div>
   );
@@ -148,12 +148,12 @@ function RetakeRow({ retake: r, onRemove, onUpdate }: RetakeRowProps) {
             if (gInfo) onUpdate(r.id, "oldGrade", gInfo.gpa);
           }}
         >
-          <SelectTrigger className="h-7 w-20 text-[11px] font-bold bg-white border-slate-100 text-rose-500 rounded-lg focus:ring-0 mx-auto">
+          <SelectTrigger className="h-7 w-20 text-[10px] font-bold bg-white border-slate-100 text-rose-500 rounded-lg focus:ring-0 mx-auto">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
             {["F", "D", "D+", "C", "C+"].map(grade => (
-              <SelectItem key={grade} value={grade} className="text-[11px] font-bold">{grade}</SelectItem>
+              <SelectItem key={grade} value={grade} className="text-[10px] font-bold">{grade}</SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -164,7 +164,7 @@ function RetakeRow({ retake: r, onRemove, onUpdate }: RetakeRowProps) {
           type="number"
           value={r.credits}
           onChange={e => onUpdate(r.id, "credits", parseInt(e.target.value) || 0)}
-          className="h-7 text-center text-[11px] font-bold bg-white border-slate-100 rounded-lg px-1 focus:ring-0"
+          className="h-7 text-center text-[10px] font-bold bg-white border-slate-100 rounded-lg px-1 focus:ring-0"
         />
       </div>
 
@@ -177,13 +177,13 @@ function RetakeRow({ retake: r, onRemove, onUpdate }: RetakeRowProps) {
             onUpdate(r.id, "targetGrade", targetGrade);
           }}
         >
-          <SelectTrigger className={`h-7 text-[11px] font-bold border rounded-lg focus:ring-0 justify-center ${r.targetGrade !== undefined ? "bg-blue-600 border-blue-600 text-white" : "bg-white border-slate-100 text-slate-500"}`}>
+          <SelectTrigger className={`h-7 text-[10px] font-bold border rounded-lg focus:ring-0 justify-center ${r.targetGrade !== undefined ? "bg-blue-600 border-blue-600 text-white" : "bg-white border-slate-100 text-slate-500"}`}>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="auto" className="text-[11px] font-bold italic">Auto</SelectItem>
+            <SelectItem value="auto" className="text-[10px] font-bold italic">Auto</SelectItem>
             {GRADE_SCALE.filter(g => g.gpa > 0).map(g => (
-              <SelectItem key={g.grade} value={String(g.gpa)} className="text-[11px] font-bold">{g.grade}</SelectItem>
+              <SelectItem key={g.grade} value={String(g.gpa)} className="text-[10px] font-bold">{g.grade}</SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -196,7 +196,7 @@ function RetakeRow({ retake: r, onRemove, onUpdate }: RetakeRowProps) {
           onClick={() => onRemove(r.id)}
           className="h-6 w-6 text-slate-400 hover:text-rose-500 rounded-md opacity-0 group-hover:opacity-100 transition-opacity"
         >
-          <X className="h-3 w-3" />
+          <X className="h-3 w-3" strokeWidth={2.5} />
         </Button>
       </div>
     </div>
@@ -207,8 +207,8 @@ function RetakeTotalRow({ retakes }: { retakes: RetakeItem[] }) {
   const total = retakes.reduce((acc, r) => acc + (r.credits || 0), 0);
   return (
     <div className="flex justify-between items-center px-3 py-1.5 bg-blue-50/50 rounded-lg border border-dashed border-blue-100 mt-2">
-      <span className="text-[11px] font-bold text-blue-500 uppercase tracking-widest">Tổng tín chỉ cải thiện</span>
-      <span className="text-[11px] font-black text-blue-600">{total} TC</span>
+      <span className="text-[10px] font-bold text-blue-500 uppercase tracking-wider">Tổng tín chỉ cải thiện</span>
+      <span className="text-[10px] font-bold text-blue-600">{total} TC</span>
     </div>
   );
 }

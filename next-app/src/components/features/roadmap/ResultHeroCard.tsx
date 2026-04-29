@@ -25,7 +25,7 @@ export function ResultHeroCard({ result, status, maxPossibleGPA, targetGPA, curr
   const isNegative = isStatusNegative(status);
 
   return (
-    <div className={`p-5 sm:p-6 border shadow-sm overflow-hidden bg-white transition-all duration-700 rounded-[2rem] flex flex-col items-center text-center space-y-5 ${borderColor}`}>
+    <div className={`p-4 sm:p-5 border shadow-sm overflow-hidden bg-white transition-all duration-700 rounded-[2rem] flex flex-col items-center text-center space-y-4 ${borderColor}`}>
       <GPADisplay status={status} requiredGPA={result.requiredGPA} textColor={textColor} />
       <StatusBadge status={status} maxPossibleGPA={maxPossibleGPA} textColor={textColor} isNegative={isNegative} />
       <StatsRow result={result} status={status} maxPossibleGPA={maxPossibleGPA} targetGPA={targetGPA} currentCredits={currentCredits} />
@@ -41,7 +41,7 @@ interface GPADisplayProps {
 
 function GPADisplay({ status, requiredGPA, textColor }: GPADisplayProps) {
   return (
-    <div className="space-y-2">
+    <div className="space-y-1">
       <div className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">
         {getDisplayLabel(status)}
       </div>
@@ -82,8 +82,8 @@ function StatsRow({ result, status, maxPossibleGPA, targetGPA, currentCredits }:
   const isImpossible = status === "impossible";
 
   return (
-    <div className="w-full space-y-4">
-      <div className="grid grid-cols-3 gap-2 sm:gap-4 w-full pt-5 border-t border-slate-100">
+    <div className="w-full space-y-3">
+      <div className="grid grid-cols-3 gap-2 sm:gap-4 w-full pt-4 border-t border-slate-100">
         <StatItem
           label="TC HIỆN TẠI"
           value={currentCredits}
@@ -117,7 +117,7 @@ interface StatItemProps {
 
 function StatItem({ label, value, subtitle }: StatItemProps) {
   return (
-    <div className="space-y-1">
+    <div className="space-y-0.5">
       <div className="text-[11px] text-slate-400 font-black uppercase tracking-widest">{label}</div>
       <div className="text-2xl font-black text-slate-800">{value}</div>
       <div className="text-[11px] text-slate-500 font-medium leading-tight">{subtitle}</div>
