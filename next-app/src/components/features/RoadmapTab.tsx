@@ -8,9 +8,10 @@ import { ScenarioCard } from "./roadmap/ScenarioCard";
 
 interface RoadmapTabProps {
   initialData?: InitialRoadmapData | null;
+  onSwitchTab?: (tab: string) => void;
 }
 
-export function RoadmapTab({ initialData }: RoadmapTabProps) {
+export function RoadmapTab({ initialData, onSwitchTab }: RoadmapTabProps) {
   const { state, actions, computed } = useRoadmapState(initialData);
   const { result, status, maxPossibleGPA, combinations, scenarioText, retakeSuggestions } = computed;
 
@@ -46,6 +47,7 @@ export function RoadmapTab({ initialData }: RoadmapTabProps) {
           targetGPA={state.targetGPA}
           totalPointsGap={computed.totalPointsGap}
           onAddRetakeSuggestion={actions.addRetakesFromSuggestion}
+          onSwitchTab={onSwitchTab}
         />
       </div>
     </div>

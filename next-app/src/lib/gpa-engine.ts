@@ -364,6 +364,12 @@ export function generateGradeCombinations(credits: number, targetPoints: number)
         // 1. If it's the same grade pair, take the one that works
         // 2. Both c1 and c2 should ideally be >= 2 (standard credits at HUFLIT)
         // 3. Avoid huge gaps between g1 and g2 (difficult to manage effort)
+        
+        // Filter out 1-credit outcomes as HUFLIT courses are min 2 credits
+        if (combination.c1 === 1 || combination.c2 === 1) {
+          continue;
+        }
+
         const gap = Math.abs(combination.g1.gpa - combination.g2.gpa);
         if (gap <= 2.0) { // Max gap A+ (4.0) vs C (2.0)
           allPossible.push(combination);

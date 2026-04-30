@@ -78,7 +78,7 @@ export default function Home() {
                 className="w-full flex flex-col items-stretch pb-6"
               >
                 <TabsContent value="roadmap" className="focus-visible:outline-none focus-visible:ring-0 m-0 w-full">
-                  <RoadmapTab initialData={roadmapInitialData} />
+                  <RoadmapTab initialData={roadmapInitialData} onSwitchTab={handleTabChange} />
                 </TabsContent>
 
                 <TabsContent value="manual" className="focus-visible:outline-none focus-visible:ring-0 m-0 w-full">

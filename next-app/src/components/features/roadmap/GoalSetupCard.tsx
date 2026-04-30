@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Target, RefreshCcw, BookOpen, Zap } from "lucide-react";
+import { Target, RefreshCcw, BookOpen, GraduationCap, HelpCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { RetakeList } from "./RetakeList";
 import type { RoadmapState, RoadmapActions, RoadmapComputed } from "@/hooks/useRoadmapState";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface GoalSetupCardProps {
   state: RoadmapState;
@@ -23,14 +24,14 @@ export function GoalSetupCard({ state, actions, computed }: GoalSetupCardProps) 
 
   return (
     <Card className="border-slate-200 bg-white shadow-xl shadow-blue-500/5 rounded-3xl overflow-hidden border">
-      <CardHeader className="bg-slate-50/50 border-b border-slate-100 py-2.5 px-5">
+      <CardHeader className="bg-slate-50/50 border-b border-slate-100 py-2 px-5">
         <div className="flex items-center gap-3">
           <Target className="h-4 w-4 text-blue-600" strokeWidth={2} />
           <CardTitle className="text-sm font-bold text-slate-900 tracking-tight">Thiết lập mục tiêu</CardTitle>
         </div>
       </CardHeader>
 
-      <CardContent className="p-0">
+      <CardContent className="p-2 space-y-2 relative">
         <StartingPointStep
           currentGPA={currentGPA}
           currentCredits={currentCredits}
@@ -38,16 +39,21 @@ export function GoalSetupCard({ state, actions, computed }: GoalSetupCardProps) 
           onCreditsChange={actions.setCurrentCredits}
           onSync={actions.syncFromManual}
         />
+        
         <TargetGPAStep
           targetGPA={targetGPA}
           onSelect={actions.setTargetGPA}
         />
+
         <EffortPlanStep
           currentCredits={currentCredits}
           remainingCredits={remainingCredits}
-          retakes={retakes}
           onTotalChange={actions.setTotalGraduationCredits}
           onRemainingChange={actions.setRemainingCredits}
+        />
+
+        <ImprovementStep
+          retakes={retakes}
           onAddRetake={actions.addRetake}
           onRemoveRetake={actions.removeRetake}
           onUpdateRetake={actions.updateRetake}
@@ -80,11 +86,16 @@ function StartingPointStep({ currentGPA, currentCredits, onGPAChange, onCreditsC
   }, [currentCredits]);
 
   return (
-    <div className="p-3 space-y-2">
+    <div className="p-2.5 bg-white border border-slate-100 rounded-[1.5rem] shadow-sm space-y-2 relative z-10">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded-md">01</span>
-          <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Điểm xuất phát</Label>
+        <div className="flex items-center gap-2 overflow-hidden shrink">
+          <span className="text-[10px] font-black text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded-lg border border-blue-100/50 shrink-0">01</span>
+          <div className="flex items-center gap-1 min-w-0">
+            <Label className="text-[10px] font-black text-slate-500 uppercase tracking-wider whitespace-nowrap truncate">
+              Dữ liệu tích lũy
+            </Label>
+            <HelpCircle className="h-3 w-3 text-slate-300 shrink-0 cursor-help" title="Điểm và tín chỉ bạn đang có tính đến hiện tại" />
+          </div>
         </div>
         <Button
           variant="ghost"
@@ -92,18 +103,18 @@ function StartingPointStep({ currentGPA, currentCredits, onGPAChange, onCreditsC
           onClick={() => {
             onSync();
             toast.success("Đã đồng bộ dữ liệu thành công", {
-              description: "Thông tin GPA và tín chỉ đã được cập nhật từ Tab nhập điểm.",
+              description: "Thông tin GPA và tín chỉ đã được cập nhật từ tab Nhập điểm.",
               duration: 2000,
             });
           }}
-          className="h-7 text-[10px] font-bold text-blue-600 uppercase tracking-wide hover:bg-blue-50 rounded-lg px-2"
+          className="h-7 text-[8px] font-black text-blue-600 uppercase tracking-wider hover:bg-blue-50 rounded-xl px-2 gap-1 border border-blue-100/50 shrink-0"
         >
-          <RefreshCcw className="h-3.5 w-3.5 mr-1" strokeWidth={2.5} /> Đồng bộ
+          <RefreshCcw className="h-2.5 w-2.5" strokeWidth={3} />
         </Button>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
-        <div className="space-y-1">
+      <div className="grid grid-cols-2 gap-3 mt-[13px]">
+        <div className="relative group">
           <Input
             type="number"
             step="0.01"
@@ -116,12 +127,13 @@ function StartingPointStep({ currentGPA, currentCredits, onGPAChange, onCreditsC
               const val = s === "" ? 0 : parseFloat(s);
               if (!isNaN(val)) onGPAChange(Math.min(4.0, Math.max(0, val)));
             }}
-            placeholder="GPA"
-            className="h-9 text-sm font-bold text-blue-600 bg-white border-slate-200 rounded-xl focus:border-blue-500 transition-all text-center"
+            placeholder="0.00"
+            className="text-center text-lg font-black text-blue-700 bg-white border-2 border-blue-100 focus:ring-blue-500/20 rounded-2xl h-11 shadow-sm transition-all group-hover:border-blue-200"
           />
-          <div className="text-[10px] font-medium text-slate-400 text-center uppercase tracking-tight">GPA hiện tại</div>
+          <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-white px-2 py-0.5 rounded-full border border-blue-100 text-[8px] font-black text-blue-600 uppercase tracking-wider whitespace-nowrap pointer-events-none">Điểm GPA hiện tại</div>
         </div>
-        <div className="space-y-1">
+
+        <div className="relative group">
           <Input
             type="number"
             min={0}
@@ -133,10 +145,10 @@ function StartingPointStep({ currentGPA, currentCredits, onGPAChange, onCreditsC
               const val = s === "" ? 0 : parseInt(s);
               if (!isNaN(val)) onCreditsChange(Math.min(300, Math.max(0, val)));
             }}
-            placeholder="TC"
-            className="h-9 text-sm font-bold text-blue-600 bg-white border-slate-200 rounded-xl focus:border-blue-500 transition-all text-center"
+            placeholder="0"
+            className="text-center text-lg font-black text-blue-700 bg-white border-2 border-blue-100 focus:ring-blue-500/20 rounded-2xl h-11 shadow-sm transition-all group-hover:border-blue-200"
           />
-          <div className="text-[10px] font-medium text-slate-400 text-center uppercase tracking-tight">TC tích lũy</div>
+          <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-white px-2 py-0.5 rounded-full border border-blue-100 text-[8px] font-black text-blue-600 uppercase tracking-wider whitespace-nowrap pointer-events-none">Số tín chỉ tích lũy</div>
         </div>
       </div>
     </div>
@@ -163,10 +175,13 @@ function TargetGPAStep({ targetGPA, onSelect }: TargetGPAStepProps) {
   };
 
   return (
-    <div className="p-3 bg-slate-50/50 border-y border-slate-100 space-y-2.5">
+    <div className="p-2.5 bg-blue-50/30 border border-blue-100/50 rounded-[1.5rem] shadow-sm space-y-2 relative z-10">
       <div className="flex items-center gap-2">
-        <span className="text-[10px] font-bold text-white bg-blue-600 px-1.5 py-0.5 rounded-md">02</span>
-        <Label className="text-[10px] font-bold text-blue-600 uppercase tracking-wider">Mục tiêu mong muốn</Label>
+        <span className="text-[10px] font-black text-white bg-blue-600 px-1.5 py-0.5 rounded-lg shadow-sm shadow-blue-200">02</span>
+        <Label className="text-[10px] font-black text-blue-600 uppercase tracking-[0.15em] flex items-center gap-1.5">
+          Mục tiêu mong muốn
+          <HelpCircle className="h-3 w-3 text-blue-300" title="Mức điểm GPA bạn muốn đạt được khi ra trường" />
+        </Label>
       </div>
 
       <div className="flex gap-2">
@@ -174,7 +189,7 @@ function TargetGPAStep({ targetGPA, onSelect }: TargetGPAStepProps) {
           <Button
             key={val}
             variant={targetGPA === val ? "default" : "outline"}
-            className={`flex-1 h-8 text-[10px] font-bold transition-all rounded-lg border-slate-200 ${targetGPA === val ? "bg-blue-600 text-white shadow-sm" : "text-slate-500 bg-white"}`}
+            className={`flex-1 h-9 text-[11px] font-black transition-all rounded-xl border-slate-200 ${targetGPA === val ? "bg-blue-600 text-white shadow-lg shadow-blue-200" : "text-slate-500 bg-white hover:bg-blue-50/50"}`}
             onClick={() => {
               setValStr(val.toString());
               onSelect(val);
@@ -185,16 +200,19 @@ function TargetGPAStep({ targetGPA, onSelect }: TargetGPAStepProps) {
         ))}
       </div>
 
-      <Input
-        type="number"
-        step="0.05"
-        min={0}
-        max={4.0}
-        value={valStr}
-        onChange={e => handleInputChange(e.target.value)}
-        placeholder="GPA mục tiêu"
-        className="text-center text-base font-bold text-blue-700 bg-white border-2 border-blue-100 focus:border-blue-500 rounded-2xl h-10"
-      />
+      <div className="relative group mt-[13px]">
+        <Input
+          type="number"
+          step="0.05"
+          min={0}
+          max={4.0}
+          value={valStr}
+          onChange={e => handleInputChange(e.target.value)}
+          placeholder="GPA mục tiêu"
+          className="text-center text-lg font-black text-blue-700 bg-white border-2 border-blue-100 focus:ring-blue-500/20 rounded-2xl h-11 shadow-sm transition-all group-hover:border-blue-200"
+        />
+        <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-white px-2 py-0.5 rounded-full border border-blue-100 text-[8px] font-black text-blue-600 uppercase tracking-wider whitespace-nowrap pointer-events-none">GPA mục tiêu</div>
+      </div>
     </div>
   );
 }
@@ -202,21 +220,13 @@ function TargetGPAStep({ targetGPA, onSelect }: TargetGPAStepProps) {
 interface EffortPlanStepProps {
   currentCredits: number;
   remainingCredits: number;
-  retakes: RoadmapState["retakes"];
   onTotalChange(total: number): void;
   onRemainingChange(v: number): void;
-  onAddRetake(): void;
-  onRemoveRetake(id: string): void;
-  onUpdateRetake(id: string, field: string, value: unknown): void;
-  manualImprovableCourses: { name: string; credits: number; grade: string; gpa: number }[];
-  onToggleFromManual(course: { name: string; credits: number; grade: string }): void;
 }
 
 function EffortPlanStep({
   currentCredits, remainingCredits,
-  retakes, onTotalChange, onRemainingChange,
-  onAddRetake, onRemoveRetake, onUpdateRetake,
-  manualImprovableCourses, onToggleFromManual,
+  onTotalChange, onRemainingChange,
 }: EffortPlanStepProps) {
   const totalVal = currentCredits + remainingCredits;
   const [totalStr, setTotalStr] = useState(totalVal === 0 ? "" : totalVal.toString());
@@ -231,63 +241,103 @@ function EffortPlanStep({
   }, [remainingCredits]);
 
   return (
-    <div className="p-3 space-y-2.5">
+    <div className="p-2.5 bg-white border border-slate-100 rounded-[1.5rem] shadow-sm space-y-2 relative z-10">
       <div className="flex items-center gap-2">
-        <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded-md">03</span>
-        <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Kế hoạch nỗ lực</Label>
+        <span className="text-[10px] font-black text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded-lg border border-slate-200">03</span>
+        <Label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] flex items-center gap-1.5">
+          Kế hoạch nỗ lực
+          <HelpCircle className="h-3 w-3 text-slate-300" title="Chọn cách nhập số tín chỉ còn lại để tính toán" />
+        </Label>
       </div>
 
-      <div className="relative grid grid-cols-2 gap-3">
-        <div className="space-y-1 relative">
-          <Input
-            type="number"
-            min={0}
-            max={300}
-            value={totalStr}
-            onChange={e => {
-              const s = e.target.value;
-              setTotalStr(s);
-              if (s === "") return onRemainingChange(0);
-              const val = parseInt(s);
-              if (!isNaN(val)) onTotalChange(Math.min(300, Math.max(0, val)));
-            }}
-            placeholder="TC tốt nghiệp"
-            className="h-9 text-sm font-bold text-blue-600 bg-white border-slate-200 rounded-xl focus:border-blue-500 transition-all text-center"
-          />
-          <div className="text-[10px] font-medium text-slate-400 text-center uppercase tracking-tight">Tổng TC ra trường</div>
-        </div>
+      <Tabs defaultValue="remaining" className="w-full gap-0">
+        <TabsList className="grid w-full grid-cols-2 h-7 bg-slate-50 rounded-xl p-0.5">
+          <TabsTrigger value="remaining" className="text-[9px] font-black uppercase tracking-tighter rounded-lg data-active:bg-white data-active:text-blue-600 data-active:shadow-sm transition-all">
+            <BookOpen className="h-3 w-3 mr-1.5" /> Còn lại
+          </TabsTrigger>
+          <TabsTrigger value="total" className="text-[9px] font-black uppercase tracking-tighter rounded-lg data-active:bg-white data-active:text-blue-600 data-active:shadow-sm transition-all">
+            <GraduationCap className="h-3 w-3 mr-1.5" /> Tổng cộng
+          </TabsTrigger>
+        </TabsList>
 
-        <div className="absolute left-1/2 top-4.5 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center z-10 pointer-events-none">
-          <div className="bg-white text-slate-400 border border-slate-100 text-[8px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider shadow-sm">Hoặc</div>
-        </div>
+        <TabsContent value="total" className="mt-[13px]">
+          <div className="relative group">
+            <Input
+              type="number"
+              min={0}
+              max={300}
+              value={totalStr}
+              onChange={e => {
+                const s = e.target.value;
+                setTotalStr(s);
+                if (s === "") return onRemainingChange(0);
+                const val = parseInt(s);
+                if (!isNaN(val)) onTotalChange(Math.min(300, Math.max(0, val)));
+              }}
+              placeholder="Ví dụ: 140"
+              className="text-center text-lg font-black text-blue-700 bg-white border-2 border-blue-100 focus:ring-blue-500/20 rounded-2xl h-11 shadow-sm transition-all group-hover:border-blue-200"
+            />
+            <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-white px-2 py-0.5 rounded-full border border-blue-100 text-[8px] font-black text-blue-600 uppercase tracking-wider whitespace-nowrap pointer-events-none">Tổng tín chỉ toàn khóa học</div>
+          </div>
+        </TabsContent>
 
-        <div className="space-y-1">
-          <Input
-            type="number"
-            min={0}
-            max={200}
-            value={remStr}
-            onChange={e => {
-              const s = e.target.value;
-              setRemStr(s);
-              const val = s === "" ? 0 : parseInt(s);
-              if (!isNaN(val)) onRemainingChange(Math.min(200, Math.max(0, val)));
-            }}
-            placeholder="TC học tiếp"
-            className="h-9 text-sm font-bold text-blue-600 bg-white border-slate-200 rounded-xl focus:border-blue-500 transition-all text-center"
-          />
-          <div className="text-[10px] font-medium text-slate-400 text-center uppercase tracking-tight">TC dự kiến học</div>
-        </div>
+        <TabsContent value="remaining" className="mt-[13px]">
+          <div className="relative group">
+            <Input
+              type="number"
+              min={0}
+              max={200}
+              value={remStr}
+              onChange={e => {
+                const s = e.target.value;
+                setRemStr(s);
+                const val = s === "" ? 0 : parseInt(s);
+                if (!isNaN(val)) onRemainingChange(Math.min(200, Math.max(0, val)));
+              }}
+              placeholder="Ví dụ: 30"
+              className="text-center text-lg font-black text-blue-700 bg-white border-2 border-blue-100 focus:ring-blue-500/20 rounded-2xl h-11 shadow-sm transition-all group-hover:border-blue-200"
+            />
+            <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-white px-2 py-0.5 rounded-full border border-blue-100 text-[8px] font-black text-blue-600 uppercase tracking-wider whitespace-nowrap pointer-events-none">Số tín chỉ dự kiến học tiếp</div>
+          </div>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}
+
+interface ImprovementStepProps {
+  retakes: RoadmapState["retakes"];
+  onAddRetake(): void;
+  onRemoveRetake(id: string): void;
+  onUpdateRetake(id: string, field: string, value: unknown): void;
+  manualImprovableCourses: { name: string; credits: number; grade: string; gpa: number }[];
+  onToggleFromManual(course: { name: string; credits: number; grade: string }): void;
+}
+
+function ImprovementStep({
+  retakes, onAddRetake, onRemoveRetake, onUpdateRetake,
+  manualImprovableCourses, onToggleFromManual,
+}: ImprovementStepProps) {
+  return (
+    <div className="p-2.5 bg-white border border-slate-100 rounded-[1.5rem] shadow-sm space-y-2 relative z-10">
+      <div className="flex items-center gap-2">
+        <span className="text-[10px] font-black text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded-lg border border-blue-100/50 shadow-sm">04</span>
+        <Label className="text-[10px] font-black text-blue-600 uppercase tracking-[0.15em] flex items-center gap-1.5">
+          Học cải thiện
+          <HelpCircle className="h-3 w-3 text-blue-300" title="Chọn các môn bạn muốn học cải thiện để nâng cao điểm GPA" />
+        </Label>
       </div>
 
-      <RetakeList
-        retakes={retakes}
-        onAdd={onAddRetake}
-        onRemove={onRemoveRetake}
-        onUpdate={onUpdateRetake}
-        manualImprovableCourses={manualImprovableCourses}
-        onToggleFromManual={onToggleFromManual}
-      />
+      <div className="pt-1">
+        <RetakeList
+          retakes={retakes}
+          onAdd={onAddRetake}
+          onRemove={onRemoveRetake}
+          onUpdate={onUpdateRetake}
+          manualImprovableCourses={manualImprovableCourses}
+          onToggleFromManual={onToggleFromManual}
+        />
+      </div>
     </div>
   );
 }

@@ -17,10 +17,11 @@ interface ScenarioCardProps {
   targetGPA: number;
   totalPointsGap: number;
   onAddRetakeSuggestion(suggestion: RetakeSuggestion): void;
+  onSwitchTab?: (tab: string) => void;
 }
 
 export function ScenarioCard({
-  scenarioText, combinations, result, retakeSuggestions, hasManualData, missingScenarios, targetGPA, totalPointsGap, onAddRetakeSuggestion,
+  scenarioText, combinations, result, retakeSuggestions, hasManualData, missingScenarios, targetGPA, totalPointsGap, onAddRetakeSuggestion, onSwitchTab,
 }: ScenarioCardProps) {
   return (
     <Card className="border-slate-200 shadow-sm overflow-hidden bg-white rounded-2xl">
@@ -36,6 +37,7 @@ export function ScenarioCard({
             missingScenarios={missingScenarios}
             totalPointsGap={totalPointsGap}
             onAdd={onAddRetakeSuggestion} 
+            onSwitchTab={onSwitchTab}
           />
         )}
       </CardContent>
@@ -94,22 +96,22 @@ function CombinationCard({ combo: c, index: i, result, targetGPA }: CombinationC
   const isBest = i === 0;
 
   return (
-    <div className="group/combo p-1.5 sm:p-2 bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300">
-      <div className="flex items-center justify-between mb-1.5">
+    <div className="group/combo p-2 bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-md hover:border-blue-200 transition-all duration-300">
+      <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
-          <Badge variant="outline" className="bg-slate-50 border-slate-100 text-slate-500 text-[10px] font-bold py-0.5 px-2 rounded-lg uppercase tracking-tight">
-            PA {i + 1}: {c.g1.grade} &amp; {c.g2.grade}
+          <Badge variant="outline" className="bg-slate-50 border-slate-100 text-slate-500 text-[9px] font-black py-0.5 px-2 rounded-lg uppercase tracking-widest">
+            PHƯƠNG ÁN {i + 1}
           </Badge>
           {isBest && (
-            <Badge className="bg-emerald-100 text-emerald-700 text-[10px] font-bold uppercase border-none h-4.5 px-2">
-              Khuyên dùng
+            <Badge className="bg-emerald-100 text-emerald-700 text-[9px] font-black uppercase border-none h-4.5 px-2 tracking-widest">
+              KHUYÊN DÙNG
             </Badge>
           )}
         </div>
         <div className="flex items-center gap-2">
           <div className={`h-1 w-1 rounded-full ${isBest ? "bg-emerald-500 animate-pulse" : "bg-slate-300"}`} />
-          <span className="text-[10px] font-bold text-slate-600">
-            {earnedPoints.toFixed(2)} <span className="text-slate-400">/ {totalPoints.toFixed(2)}đ</span>
+          <span className="text-[10px] font-black text-slate-600 tabular-nums">
+            {earnedPoints.toFixed(2)} <span className="text-slate-400 font-bold">/ {totalPoints.toFixed(2)}đ</span>
           </span>
         </div>
       </div>
@@ -191,10 +193,10 @@ function GradeBlock({ grade, credits }: { grade: string; credits: number }) {
 
   return (
     <div className={`flex-1 flex items-center justify-between px-2.5 h-8 ${theme.bg} border ${theme.border} rounded-xl transition-all duration-200 hover:shadow-sm`}>
-      <span className={`text-base font-bold tracking-tight ${theme.gradeText}`}>{grade}</span>
-      <div className={`flex items-center gap-1 px-1.5 py-0.5 ${theme.badge} rounded-lg`}>
-        <span className={`text-[10px] font-bold ${theme.badgeText} tabular-nums`}>{credits}</span>
-        <span className={`text-[10px] font-bold ${theme.badgeText} opacity-80 uppercase tracking-tight`}>TC</span>
+      <span className={`text-[15px] font-black tracking-tighter ${theme.gradeText}`}>{grade}</span>
+      <div className={`flex items-center gap-1 px-1.5 py-0.5 ${theme.badge} rounded-lg shadow-sm`}>
+        <span className={`text-[10px] font-black ${theme.badgeText} tabular-nums`}>{credits}</span>
+        <span className={`text-[9px] font-black ${theme.badgeText} opacity-80 uppercase tracking-widest`}>TC</span>
       </div>
     </div>
   );
@@ -207,12 +209,12 @@ function SingleGradeBlock({ grade, credits }: { grade: string; credits: number }
   return (
     <div className={`w-full flex items-center justify-between px-3 h-8 ${theme.bg} border ${theme.border} rounded-xl transition-all duration-200 hover:shadow-sm`}>
       <div className="flex items-center gap-2">
-        <span className={`text-lg font-bold tracking-tight ${theme.gradeText}`}>{grade}</span>
-        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Toàn bộ tín chỉ còn lại</span>
+        <span className={`text-[17px] font-black tracking-tighter ${theme.gradeText}`}>{grade}</span>
+        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Toàn bộ tín chỉ còn lại</span>
       </div>
-      <div className={`flex items-center gap-1 px-2 py-1 ${theme.badge} rounded-lg`}>
-        <span className={`text-[10px] font-bold ${theme.badgeText} tabular-nums`}>{credits}</span>
-        <span className={`text-[10px] font-bold ${theme.badgeText} opacity-80 uppercase tracking-tight`}>TC</span>
+      <div className={`flex items-center gap-1 px-2 py-1 ${theme.badge} rounded-lg shadow-sm`}>
+        <span className={`text-[10px] font-black ${theme.badgeText} tabular-nums`}>{credits}</span>
+        <span className={`text-[9px] font-black ${theme.badgeText} opacity-80 uppercase tracking-widest`}>TC</span>
       </div>
     </div>
   );
@@ -225,9 +227,10 @@ interface RescueSuggestionsProps {
   missingScenarios: { label: string; credits: number; gainPerCredit: number }[];
   totalPointsGap: number;
   onAdd(suggestion: RetakeSuggestion): void;
+  onSwitchTab?: (tab: string) => void;
 }
 
-function RescueSuggestions({ suggestions, hasManualData, missingScenarios, totalPointsGap, onAdd }: RescueSuggestionsProps) {
+function RescueSuggestions({ suggestions, hasManualData, missingScenarios, totalPointsGap, onAdd, onSwitchTab }: RescueSuggestionsProps) {
   const primaryMissing = missingScenarios.length > 0 ? missingScenarios[0].credits : 0;
 
   return (
@@ -256,18 +259,18 @@ function RescueSuggestions({ suggestions, hasManualData, missingScenarios, total
             </div>
             
             <div className="grid grid-cols-2 gap-1.5">
-              <div className="bg-white border border-slate-100 px-2.5 py-1 rounded-xl flex items-center justify-between shadow-sm group/gap">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">Tín chỉ thiếu (~A)</span>
+              <div className="bg-white border border-slate-100 px-2.5 py-1.5 rounded-xl flex items-center justify-between shadow-sm group/gap">
+                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Tín chỉ thiếu (~A)</span>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-sm font-bold text-rose-500 tracking-tight group-hover/gap:scale-110 transition-transform">{primaryMissing}</span>
-                  <span className="text-[10px] font-bold text-rose-300 uppercase">TC</span>
+                  <span className="text-base font-black text-rose-500 tracking-tighter group-hover/gap:scale-110 transition-transform tabular-nums">{primaryMissing}</span>
+                  <span className="text-[9px] font-black text-rose-300 uppercase tracking-widest">TC</span>
                 </div>
               </div>
-              <div className="bg-white border border-slate-100 px-2.5 py-1 rounded-xl flex items-center justify-between shadow-sm group/gap">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">Điểm tổng thiếu</span>
+              <div className="bg-white border border-slate-100 px-2.5 py-1.5 rounded-xl flex items-center justify-between shadow-sm group/gap">
+                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Điểm tổng thiếu</span>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-sm font-bold text-rose-500 tracking-tight group-hover/gap:scale-110 transition-transform">{totalPointsGap.toFixed(2)}</span>
-                  <span className="text-[10px] font-bold text-rose-300 uppercase">Điểm</span>
+                  <span className="text-base font-black text-rose-500 tracking-tighter group-hover/gap:scale-110 transition-transform tabular-nums">{totalPointsGap.toFixed(2)}</span>
+                  <span className="text-[9px] font-black text-rose-300 uppercase tracking-widest">ĐIỂM</span>
                 </div>
               </div>
             </div>
@@ -291,11 +294,14 @@ function RescueSuggestions({ suggestions, hasManualData, missingScenarios, total
                 ))
               ) : (
                 <div className="p-6 text-center bg-white/50 rounded-xl border border-dashed border-slate-200">
-                   <p className="text-[10px] font-bold text-slate-400 uppercase italic">
+                   <button 
+                     onClick={() => onSwitchTab?.('manual')}
+                     className="group/manual text-[10px] font-black text-slate-400 uppercase tracking-widest italic hover:text-blue-600 transition-colors"
+                   >
                      {hasManualData 
                        ? "Không tìm thấy môn học cũ phù hợp để cải thiện." 
-                       : "Vui lòng nhập dữ liệu ở tab Manual để nhận gợi ý."}
-                   </p>
+                       : <>Vui lòng nhập dữ liệu ở <span className="text-blue-500 underline underline-offset-4 group-hover/manual:text-blue-700">tab Nhập điểm</span> để nhận gợi ý.</>}
+                   </button>
                 </div>
               )}
             </div>
@@ -311,8 +317,8 @@ function RescueSuggestions({ suggestions, hasManualData, missingScenarios, total
       ) : (
         !hasManualData && (
           <div className="p-3 bg-slate-50/50 rounded-xl border border-dashed border-slate-200 text-center">
-            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">
-              Nhập dữ liệu Manual để nhận gợi ý học cải thiện tối ưu
+            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+              NHẬP DỮ LIỆU BẢNG ĐIỂM ĐỂ NHẬN GỢI Ý CẢI THIỆN TỐI ƯU
             </p>
           </div>
         )
@@ -333,20 +339,20 @@ function RescueSuggestionRow({ suggestion: s, onAdd, index }: RescueSuggestionRo
       <div className="p-2">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
-             <div className="flex items-center justify-center h-4.5 w-4.5 rounded-full bg-indigo-50 text-indigo-600 text-[10px] font-bold border border-indigo-100">
+             <div className="flex items-center justify-center h-4.5 w-4.5 rounded-full bg-indigo-50 text-indigo-600 text-[9px] font-black border border-indigo-100 shadow-sm">
                {index + 1}
              </div>
-             <span className="text-[10px] font-bold text-slate-600 uppercase tracking-tight">
-               Cải thiện {s.courses.length} môn
+             <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest">
+               CẢI THIỆN {s.courses.length} MÔN
              </span>
           </div>
           <div className="flex items-center gap-1.5">
-            <Badge className="bg-emerald-50 text-emerald-600 border-emerald-100 text-[10px] font-bold h-5 px-1.5">
-              +{s.totalGain.toFixed(2)}đ
+            <Badge className="bg-emerald-50 text-emerald-600 border-emerald-100 text-[9px] font-black h-5 px-1.5 tracking-widest">
+              +{s.totalGain.toFixed(2)}Đ
             </Badge>
             <Button
               onClick={() => onAdd(s)}
-              className="h-6 px-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[9px] uppercase tracking-wide rounded-lg transition-all border-none shadow-sm active:scale-95"
+              className="h-6 px-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-[9px] uppercase tracking-widest rounded-lg transition-all border-none shadow-sm active:scale-95"
             >
               Áp dụng
             </Button>

@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/select";
 import { GRADE_SCALE } from "@/lib/gpa-engine";
 import type { RetakeItem } from "@/hooks/useRoadmapState";
+import { GradeSuggestionDialog } from "./GradeSuggestionDialog";
 
 interface RetakeListProps {
   retakes: RetakeItem[];
@@ -32,15 +33,19 @@ export function RetakeList({
   onToggleFromManual,
 }: RetakeListProps) {
   return (
-    <div className="pt-2 border-t border-slate-100 space-y-3">
+    <div className="pt-1 border-t border-slate-100 space-y-2">
       {/* Suggestions Section */}
       {manualImprovableCourses.length > 0 && (
-        <div className="bg-blue-50/30 p-3 rounded-2xl border border-blue-100/50 space-y-2">
-          <div className="flex items-center gap-2">
-            <Lightbulb className="h-3.5 w-3.5 text-blue-600" strokeWidth={2} />
-            <Label className="text-[10px] font-bold text-blue-600 uppercase tracking-wider">
+        <div className="bg-blue-50/30 p-2.5 rounded-2xl border border-blue-100/50 space-y-2">
+          <div className="flex items-center justify-between gap-2">
+            <Label className="text-[9px] font-bold text-blue-600 uppercase tracking-tight">
               Gợi ý từ bảng điểm ({manualImprovableCourses.length})
             </Label>
+            <GradeSuggestionDialog 
+              courses={manualImprovableCourses} 
+              retakes={retakes} 
+              onToggle={onToggleFromManual} 
+            />
           </div>
           <div className="flex flex-col gap-1.5 max-h-[100px] overflow-y-auto pr-1 custom-scrollbar">
             {manualImprovableCourses.map((c, i) => {
@@ -80,17 +85,17 @@ export function RetakeList({
 
       {/* Manual Retake List */}
       <div className="space-y-2">
-        <div className="flex items-center justify-between mb-0.5">
-          <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+        <div className="flex items-center justify-between">
+          <Label className="text-[9px] font-bold text-slate-500 uppercase tracking-tight">
             Môn đã chọn ({retakes.length})
           </Label>
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
             onClick={onAdd}
-            className="h-7 text-[10px] font-bold text-blue-600 uppercase tracking-wide border-blue-100 hover:bg-blue-50 rounded-lg px-2"
+            className="h-7 text-[9px] font-black text-blue-600 uppercase tracking-tight hover:bg-blue-50 rounded-xl px-1.5 gap-1 border border-blue-100/50"
           >
-            <PlusCircle className="h-3.5 w-3.5 mr-1" strokeWidth={2.5} /> Thêm môn
+            <PlusCircle className="h-3 w-3" strokeWidth={3} /> Thêm môn
           </Button>
         </div>
 
@@ -120,10 +125,10 @@ export function RetakeList({
 
 function RetakeTableHeader() {
   return (
-    <div className="grid grid-cols-12 gap-2 px-1 mb-1">
-      <div className="col-span-4 text-[10px] font-bold text-slate-400 uppercase tracking-tight text-center">Điểm cũ</div>
-      <div className="col-span-3 text-[10px] font-bold text-slate-400 uppercase tracking-tight text-center">Tín chỉ</div>
-      <div className="col-span-4 text-[10px] font-bold text-slate-400 uppercase tracking-tight text-center">Dự kiến</div>
+    <div className="grid grid-cols-12 gap-1 px-1 mb-1">
+      <div className="col-span-3 text-[9px] font-black text-slate-400 uppercase tracking-widest text-center">Điểm cũ</div>
+      <div className="col-span-3 text-[9px] font-black text-slate-400 uppercase tracking-widest text-center">Tín chỉ</div>
+      <div className="col-span-5 text-[9px] font-black text-slate-400 uppercase tracking-widest text-center">Dự kiến</div>
       <div className="col-span-1" />
     </div>
   );
@@ -139,8 +144,8 @@ function RetakeRow({ retake: r, onRemove, onUpdate }: RetakeRowProps) {
   const oldGradeLabel = GRADE_SCALE.find(g => g.gpa === r.oldGrade)?.grade ?? "D";
 
   return (
-    <div className="grid grid-cols-12 gap-1.5 items-center bg-slate-50/50 p-1.5 rounded-xl border border-slate-100/50 group transition-all hover:bg-white hover:border-blue-100">
-      <div className="col-span-4">
+    <div className="grid grid-cols-12 gap-1 items-center bg-white p-1 rounded-2xl border border-slate-100/70 group transition-all hover:border-blue-200 hover:shadow-sm relative">
+      <div className="col-span-3">
         <Select
           value={oldGradeLabel}
           onValueChange={val => {
@@ -148,7 +153,7 @@ function RetakeRow({ retake: r, onRemove, onUpdate }: RetakeRowProps) {
             if (gInfo) onUpdate(r.id, "oldGrade", gInfo.gpa);
           }}
         >
-          <SelectTrigger className="h-7 w-20 text-[10px] font-bold bg-white border-slate-100 text-rose-500 rounded-lg focus:ring-0 mx-auto">
+          <SelectTrigger className="h-7 w-full text-[10px] font-bold bg-white border-slate-100 text-rose-500 rounded-lg focus:ring-0">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -164,11 +169,11 @@ function RetakeRow({ retake: r, onRemove, onUpdate }: RetakeRowProps) {
           type="number"
           value={r.credits}
           onChange={e => onUpdate(r.id, "credits", parseInt(e.target.value) || 0)}
-          className="h-7 text-center text-[10px] font-bold bg-white border-slate-100 rounded-lg px-1 focus:ring-0"
+          className="h-7 w-full text-center text-[10px] font-bold bg-white border-slate-100 rounded-lg px-1 focus:ring-0"
         />
       </div>
 
-      <div className="col-span-4">
+      <div className="col-span-5">
         <Select
           value={r.targetGrade !== undefined ? String(r.targetGrade) : "auto"}
           onValueChange={val => {
@@ -177,11 +182,11 @@ function RetakeRow({ retake: r, onRemove, onUpdate }: RetakeRowProps) {
             onUpdate(r.id, "targetGrade", targetGrade);
           }}
         >
-          <SelectTrigger className={`h-7 text-[10px] font-bold border rounded-lg focus:ring-0 justify-center ${r.targetGrade !== undefined ? "bg-blue-600 border-blue-600 text-white" : "bg-white border-slate-100 text-slate-500"}`}>
+          <SelectTrigger className={`h-7 w-full text-[10px] font-bold border rounded-lg focus:ring-0 justify-center ${r.targetGrade !== undefined ? "bg-blue-600 border-blue-600 text-white" : "bg-white border-slate-100 text-slate-500"}`}>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="auto" className="text-[10px] font-bold italic">Auto</SelectItem>
+            <SelectItem value="auto" className="text-[10px] font-bold italic">Tự động</SelectItem>
             {GRADE_SCALE.filter(g => g.gpa > 0).map(g => (
               <SelectItem key={g.grade} value={String(g.gpa)} className="text-[10px] font-bold">{g.grade}</SelectItem>
             ))}
@@ -189,12 +194,12 @@ function RetakeRow({ retake: r, onRemove, onUpdate }: RetakeRowProps) {
         </Select>
       </div>
 
-      <div className="col-span-1 flex justify-end">
+      <div className="col-span-1 flex justify-center">
         <Button
           variant="ghost"
           size="icon"
           onClick={() => onRemove(r.id)}
-          className="h-6 w-6 text-slate-400 hover:text-rose-500 rounded-md opacity-0 group-hover:opacity-100 transition-opacity"
+          className="h-6 w-6 text-slate-400 hover:text-rose-500 rounded-md transition-all active:scale-95"
         >
           <X className="h-3 w-3" strokeWidth={2.5} />
         </Button>
@@ -206,9 +211,9 @@ function RetakeRow({ retake: r, onRemove, onUpdate }: RetakeRowProps) {
 function RetakeTotalRow({ retakes }: { retakes: RetakeItem[] }) {
   const total = retakes.reduce((acc, r) => acc + (r.credits || 0), 0);
   return (
-    <div className="flex justify-between items-center px-3 py-1.5 bg-blue-50/50 rounded-lg border border-dashed border-blue-100 mt-2">
-      <span className="text-[10px] font-bold text-blue-500 uppercase tracking-wider">Tổng tín chỉ cải thiện</span>
-      <span className="text-[10px] font-bold text-blue-600">{total} TC</span>
+    <div className="flex justify-between items-center px-4 py-2 bg-blue-50/50 rounded-2xl border border-dashed border-blue-200 mt-2">
+      <span className="text-[10px] font-black text-blue-600/70 uppercase tracking-widest">Tổng tín chỉ cải thiện</span>
+      <span className="text-[11px] font-black text-blue-600 tabular-nums">{total} TC</span>
     </div>
   );
 }

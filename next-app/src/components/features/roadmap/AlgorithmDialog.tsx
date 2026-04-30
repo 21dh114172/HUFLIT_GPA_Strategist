@@ -41,10 +41,10 @@ export function AlgorithmDialog({
           </Button>
         } />
 
-        <DialogContent className="sm:max-w-2xl w-[95vw] sm:w-[90vw] max-h-[90vh] rounded-[2.5rem] border border-slate-100 shadow-xl p-8 sm:p-12 overflow-y-auto bg-white flex flex-col gap-10">
+        <DialogContent className="sm:max-w-xl w-[92vw] max-h-[90vh] rounded-[2rem] border border-slate-100 shadow-2xl p-6 sm:p-8 overflow-y-auto bg-white flex flex-col gap-6">
           <DialogHeader />
 
-          <div className="space-y-8">
+          <div className="space-y-6">
             <AlgorithmStep
               number="01"
               title="Điểm hiện có"
@@ -79,7 +79,7 @@ export function AlgorithmDialog({
               rows={[
                 { label: "Nỗ lực cần (Z):", value: result.requiredPoints.toFixed(2), op: "" },
                 { label: "TC nỗ lực:", value: result.totalEffortCredits, op: "/" },
-                { label: "GPA CẦN ĐẠT:", value: result.requiredGPA.toFixed(2), op: "=", bold: true, highlight: true },
+                { label: "GPA CẦN ĐẠT:", value: result.requiredGPA === Infinity ? "KHÔNG THỂ" : result.requiredGPA.toFixed(2), op: "=", bold: true, highlight: true },
               ]}
             />
           </div>
@@ -91,12 +91,12 @@ export function AlgorithmDialog({
 
 function DialogHeader() {
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       <div className="flex items-center gap-2 opacity-60">
-        <Info className="h-4 w-4" />
+        <Info className="h-3.5 w-3.5" />
         <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Cơ chế tính toán</span>
       </div>
-      <DialogTitle className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900">
+      <DialogTitle className="text-xl sm:text-2xl font-black tracking-tight text-slate-900">
         Thuật toán lộ trình & Đối soát
       </DialogTitle>
       <DialogDescription className="text-sm font-medium text-slate-500 max-w-lg leading-relaxed">
@@ -123,11 +123,11 @@ interface AlgorithmStepProps {
 
 function AlgorithmStep({ number, title, rows }: AlgorithmStepProps) {
   return (
-    <div className="space-y-3">
-      <div className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+    <div className="space-y-2">
+      <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
         <span className="text-blue-600">{number}.</span> {title}
       </div>
-      <div className="font-mono text-sm text-slate-600 space-y-1.5 border-l-2 border-slate-100 pl-4 py-1">
+      <div className="font-mono text-[13px] text-slate-600 space-y-1 border-l border-slate-100 pl-4 py-0.5">
         {rows.map((row, i) => {
           const isLast = i === rows.length - 1;
           const rowClass = row.highlight
