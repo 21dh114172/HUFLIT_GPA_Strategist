@@ -29,7 +29,7 @@ export const AppHeader = memo(({ activeTab, onTabChange }: AppHeaderProps) => {
 
         {/* Nav Menu (Floating Pill Tabs) */}
         <div className="flex-1 flex items-center justify-center h-full px-2 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-          <TabsList className="flex items-center h-8 gap-0.5 sm:gap-1 border-none p-0.5 bg-slate-100/40 rounded-full">
+          <TabsList className="flex items-center h-10 gap-1 sm:gap-2 border-none p-1 bg-slate-50/50 rounded-full">
             {[
               { value: "manual", icon: Calculator, label: "Nhập điểm" },
               { value: "roadmap", icon: Target, label: "Lộ trình" },
@@ -40,10 +40,15 @@ export const AppHeader = memo(({ activeTab, onTabChange }: AppHeaderProps) => {
               <TabsTrigger 
                 key={tab.value}
                 value={tab.value} 
-                className="h-7 relative rounded-full border-none px-2.5 sm:px-3 py-0 text-[10px] sm:text-[11px] font-black text-slate-500 transition-all focus-visible:ring-0 flex items-center gap-1.5 group shadow-none data-active:bg-white data-active:text-blue-600 data-active:shadow-sm tracking-tight"
+                className="h-8 sm:h-8.5 relative rounded-full border-none px-4 sm:px-6 py-0 text-[10px] sm:text-[11px] font-bold text-slate-500 transition-all focus-visible:ring-0 flex items-center justify-center group shadow-none 
+                  data-active:bg-blue-100/70 data-active:text-blue-700 tracking-tight"
               >
-                <tab.icon className="h-3.5 w-3.5 shrink-0 text-slate-400 group-data-active:text-blue-600 transition-colors" strokeWidth={2.5} /> 
-                <span className="hidden sm:inline whitespace-nowrap">{tab.label}</span>
+                <span className="whitespace-nowrap mb-0.5">{tab.label}</span>
+                
+                {/* Underline Indicator - Refined for a sleeker look */}
+                <div className="absolute inset-x-0 bottom-[5px] flex justify-center opacity-0 group-data-active:opacity-100 transition-all duration-300">
+                  <div className="w-6 h-[2px] bg-blue-600 rounded-full opacity-80" />
+                </div>
               </TabsTrigger>
             ))}
           </TabsList>
