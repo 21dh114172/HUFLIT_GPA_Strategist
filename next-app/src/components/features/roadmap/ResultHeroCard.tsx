@@ -42,7 +42,7 @@ interface GPADisplayProps {
 function GPADisplay({ status, requiredGPA, textColor }: GPADisplayProps) {
   return (
     <div className="space-y-1">
-      <div className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">
+      <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.25em]">
         {getDisplayLabel(status)}
       </div>
       <div className={`text-5xl sm:text-6xl font-black tracking-tighter py-0.5 ${textColor}`}>
@@ -63,7 +63,7 @@ function StatusBadge({ status, maxPossibleGPA, textColor, isNegative }: StatusBa
   return (
     <div className={`flex items-center justify-center gap-2 ${textColor}`}>
       {isNegative ? <AlertCircle className="h-4 w-4" /> : <TrendingUp className="h-4 w-4" />}
-      <span className="font-bold text-[11px] uppercase tracking-widest">
+      <span className="font-black text-[10px] uppercase tracking-[0.15em]">
         {getStatusLabel(status, maxPossibleGPA)}
       </span>
     </div>
@@ -83,27 +83,27 @@ function StatsRow({ result, status, maxPossibleGPA, targetGPA, currentCredits }:
 
   return (
     <div className="w-full space-y-3">
-      <div className="grid grid-cols-3 gap-2 sm:gap-4 w-full pt-4 border-t border-slate-100">
+      <div className="grid grid-cols-3 gap-1 sm:gap-4 w-full pt-4 border-t border-slate-100">
         <StatItem
-          label="TC HIỆN TẠI"
+          label="TC Hiện tại"
           value={currentCredits}
           subtitle="Đã tích lũy"
         />
         <StatItem
-          label="TC SẼ HỌC"
+          label="TC Sẽ học"
           value={result.totalEffortCredits}
-          subtitle="Học mới & cải thiện"
+          subtitle="Mới & cải thiện"
         />
         <StatItem
-          label={isImpossible ? "GPA TỐI ĐA" : "GPA MỤC TIÊU"}
+          label={isImpossible ? "GPA Tối đa" : "GPA Mục tiêu"}
           value={isImpossible ? maxPossibleGPA.toFixed(2) : targetGPA.toFixed(2)}
           subtitle={isImpossible ? "Khả năng cao nhất" : "Mục tiêu ra trường"}
         />
       </div>
       
-      <div className="inline-flex items-center gap-2 px-3 py-1 bg-slate-50 rounded-full border border-slate-100">
-        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Tổng tín chỉ khi tốt nghiệp:</span>
-        <span className="text-[11px] font-black text-blue-600">{result.totalFutureCredits} TC</span>
+      <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-50 rounded-full border border-slate-100">
+        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Tổng tín chỉ khi tốt nghiệp:</span>
+        <span className="text-[10px] font-black text-blue-600">{result.totalFutureCredits} TC</span>
       </div>
     </div>
   );
@@ -117,10 +117,10 @@ interface StatItemProps {
 
 function StatItem({ label, value, subtitle }: StatItemProps) {
   return (
-    <div className="space-y-0.5">
-      <div className="text-[11px] text-slate-400 font-black uppercase tracking-widest">{label}</div>
-      <div className="text-2xl font-black text-slate-800">{value}</div>
-      <div className="text-[11px] text-slate-500 font-medium leading-tight">{subtitle}</div>
+    <div className="space-y-0">
+      <div className="text-[9px] text-slate-400 font-black uppercase tracking-[0.1em]">{label}</div>
+      <div className="text-2xl font-black text-slate-900 leading-none py-1">{value}</div>
+      <div className="text-[10px] text-slate-400 font-bold leading-tight">{subtitle}</div>
     </div>
   );
 }

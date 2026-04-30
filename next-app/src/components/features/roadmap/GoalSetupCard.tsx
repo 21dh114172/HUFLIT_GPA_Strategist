@@ -24,14 +24,14 @@ export function GoalSetupCard({ state, actions, computed }: GoalSetupCardProps) 
 
   return (
     <Card className="border-slate-200 bg-white shadow-xl shadow-blue-500/5 rounded-3xl overflow-hidden border">
-      <CardHeader className="bg-slate-50/50 border-b border-slate-100 py-2 px-5">
+      <CardHeader className="bg-slate-50/50 border-b border-slate-100 pt-2 !pb-1.5 px-5">
         <div className="flex items-center gap-3">
           <Target className="h-4 w-4 text-blue-600" strokeWidth={2} />
           <CardTitle className="text-sm font-bold text-slate-900 tracking-tight">Thiết lập mục tiêu</CardTitle>
         </div>
       </CardHeader>
 
-      <CardContent className="p-2 space-y-2 relative">
+      <CardContent className="px-2 pb-2 pt-0 space-y-1.5 relative">
         <StartingPointStep
           currentGPA={currentGPA}
           currentCredits={currentCredits}
@@ -89,12 +89,12 @@ function StartingPointStep({ currentGPA, currentCredits, onGPAChange, onCreditsC
     <div className="p-2.5 bg-white border border-slate-100 rounded-[1.5rem] shadow-sm space-y-2 relative z-10">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 overflow-hidden shrink">
-          <span className="text-[10px] font-black text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded-lg border border-blue-100/50 shrink-0">01</span>
+          <span className="text-[10px] font-black text-blue-600 bg-blue-50/80 px-2 py-0.5 rounded-full border border-blue-100/50 shadow-sm shrink-0">01</span>
           <div className="flex items-center gap-1 min-w-0">
-            <Label className="text-[10px] font-black text-slate-500 uppercase tracking-wider whitespace-nowrap truncate">
+            <Label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] whitespace-nowrap truncate flex items-center gap-1.5">
               Dữ liệu tích lũy
+              <HelpCircle className="h-3 w-3 text-slate-300 shrink-0 cursor-help" title="Điểm và tín chỉ bạn đang có tính đến hiện tại" />
             </Label>
-            <HelpCircle className="h-3 w-3 text-slate-300 shrink-0 cursor-help" title="Điểm và tín chỉ bạn đang có tính đến hiện tại" />
           </div>
         </div>
         <Button
@@ -113,8 +113,8 @@ function StartingPointStep({ currentGPA, currentCredits, onGPAChange, onCreditsC
         </Button>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 mt-[13px]">
-        <div className="relative group">
+      <div className="grid grid-cols-2 gap-3 bg-slate-50/50 p-2.5 rounded-2xl border border-slate-100/50">
+        <div className="space-y-1.5">
           <Input
             type="number"
             step="0.01"
@@ -128,12 +128,11 @@ function StartingPointStep({ currentGPA, currentCredits, onGPAChange, onCreditsC
               if (!isNaN(val)) onGPAChange(Math.min(4.0, Math.max(0, val)));
             }}
             placeholder="0.00"
-            className="text-center text-lg font-black text-blue-700 bg-white border-2 border-blue-100 focus:ring-blue-500/20 rounded-2xl h-11 shadow-sm transition-all group-hover:border-blue-200"
+            className="h-9 text-[13px] font-black text-blue-600 bg-white border-slate-200 rounded-xl focus:ring-blue-500/20 text-center"
           />
-          <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-white px-2 py-0.5 rounded-full border border-blue-100 text-[8px] font-black text-blue-600 uppercase tracking-wider whitespace-nowrap pointer-events-none">Điểm GPA hiện tại</div>
+          <div className="text-[9px] font-bold text-slate-400 text-center uppercase tracking-wider leading-tight">Điểm GPA hiện tại</div>
         </div>
-
-        <div className="relative group">
+        <div className="space-y-1.5">
           <Input
             type="number"
             min={0}
@@ -146,9 +145,9 @@ function StartingPointStep({ currentGPA, currentCredits, onGPAChange, onCreditsC
               if (!isNaN(val)) onCreditsChange(Math.min(300, Math.max(0, val)));
             }}
             placeholder="0"
-            className="text-center text-lg font-black text-blue-700 bg-white border-2 border-blue-100 focus:ring-blue-500/20 rounded-2xl h-11 shadow-sm transition-all group-hover:border-blue-200"
+            className="h-9 text-[13px] font-black text-blue-600 bg-white border-slate-200 rounded-xl focus:ring-blue-500/20 text-center"
           />
-          <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-white px-2 py-0.5 rounded-full border border-blue-100 text-[8px] font-black text-blue-600 uppercase tracking-wider whitespace-nowrap pointer-events-none">Số tín chỉ tích lũy</div>
+          <div className="text-[9px] font-bold text-slate-400 text-center uppercase tracking-wider leading-tight">Số tín chỉ tích lũy</div>
         </div>
       </div>
     </div>
@@ -177,41 +176,47 @@ function TargetGPAStep({ targetGPA, onSelect }: TargetGPAStepProps) {
   return (
     <div className="p-2.5 bg-blue-50/30 border border-blue-100/50 rounded-[1.5rem] shadow-sm space-y-2 relative z-10">
       <div className="flex items-center gap-2">
-        <span className="text-[10px] font-black text-white bg-blue-600 px-1.5 py-0.5 rounded-lg shadow-sm shadow-blue-200">02</span>
-        <Label className="text-[10px] font-black text-blue-600 uppercase tracking-[0.15em] flex items-center gap-1.5">
+        <span className="text-[10px] font-black text-blue-600 bg-blue-50/80 px-2 py-0.5 rounded-full border border-blue-100/50 shadow-sm">02</span>
+        <Label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] flex items-center gap-1.5">
           Mục tiêu mong muốn
-          <HelpCircle className="h-3 w-3 text-blue-300" title="Mức điểm GPA bạn muốn đạt được khi ra trường" />
+          <HelpCircle className="h-3 w-3 text-slate-300" title="Mức điểm GPA bạn muốn đạt được khi ra trường" />
         </Label>
       </div>
 
-      <div className="flex gap-2">
-        {GPA_MILESTONES.map(val => (
-          <Button
-            key={val}
-            variant={targetGPA === val ? "default" : "outline"}
-            className={`flex-1 h-9 text-[11px] font-black transition-all rounded-xl border-slate-200 ${targetGPA === val ? "bg-blue-600 text-white shadow-lg shadow-blue-200" : "text-slate-500 bg-white hover:bg-blue-50/50"}`}
-            onClick={() => {
-              setValStr(val.toString());
-              onSelect(val);
-            }}
-          >
-            {val.toFixed(1)}
-          </Button>
-        ))}
-      </div>
+      <div className="bg-white/60 p-2 pt-3.5 rounded-2xl border border-blue-100/30 space-y-3">
+        <div className="relative group">
+          <Input
+            type="number"
+            step="0.05"
+            min={0}
+            max={4.0}
+            value={valStr}
+            onChange={e => handleInputChange(e.target.value)}
+            placeholder="GPA mục tiêu"
+            className="text-center text-lg font-black text-blue-700 bg-white border-2 border-blue-100 focus:ring-blue-500/20 rounded-xl h-10 shadow-sm transition-all group-hover:border-blue-200"
+          />
+          <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-white px-2.5 py-0.5 rounded-full border border-blue-100 text-[9px] font-black text-blue-600 uppercase tracking-widest whitespace-nowrap pointer-events-none shadow-sm">GPA mục tiêu</div>
+        </div>
 
-      <div className="relative group mt-[13px]">
-        <Input
-          type="number"
-          step="0.05"
-          min={0}
-          max={4.0}
-          value={valStr}
-          onChange={e => handleInputChange(e.target.value)}
-          placeholder="GPA mục tiêu"
-          className="text-center text-lg font-black text-blue-700 bg-white border-2 border-blue-100 focus:ring-blue-500/20 rounded-2xl h-11 shadow-sm transition-all group-hover:border-blue-200"
-        />
-        <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-white px-2 py-0.5 rounded-full border border-blue-100 text-[8px] font-black text-blue-600 uppercase tracking-wider whitespace-nowrap pointer-events-none">GPA mục tiêu</div>
+        <div className="grid grid-cols-4 h-8 bg-white/50 rounded-lg p-0.5 border border-slate-200/50">
+          {GPA_MILESTONES.map(val => (
+            <button
+              key={val}
+              type="button"
+              className={`h-full text-[10px] font-black transition-all rounded-md ${
+                targetGPA === val 
+                  ? "bg-white text-blue-600 shadow-sm" 
+                  : "text-slate-400 hover:text-slate-600 hover:bg-white/30"
+              }`}
+              onClick={() => {
+                setValStr(val.toString());
+                onSelect(val);
+              }}
+            >
+              {val.toFixed(1)}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -243,64 +248,66 @@ function EffortPlanStep({
   return (
     <div className="p-2.5 bg-white border border-slate-100 rounded-[1.5rem] shadow-sm space-y-2 relative z-10">
       <div className="flex items-center gap-2">
-        <span className="text-[10px] font-black text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded-lg border border-slate-200">03</span>
+        <span className="text-[10px] font-black text-blue-600 bg-blue-50/80 px-2 py-0.5 rounded-full border border-blue-100/50 shadow-sm">03</span>
         <Label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] flex items-center gap-1.5">
           Kế hoạch nỗ lực
           <HelpCircle className="h-3 w-3 text-slate-300" title="Chọn cách nhập số tín chỉ còn lại để tính toán" />
         </Label>
       </div>
 
-      <Tabs defaultValue="remaining" className="w-full gap-0">
-        <TabsList className="grid w-full grid-cols-2 h-7 bg-slate-50 rounded-xl p-0.5">
-          <TabsTrigger value="remaining" className="text-[9px] font-black uppercase tracking-tighter rounded-lg data-active:bg-white data-active:text-blue-600 data-active:shadow-sm transition-all">
-            <BookOpen className="h-3 w-3 mr-1.5" /> Còn lại
-          </TabsTrigger>
-          <TabsTrigger value="total" className="text-[9px] font-black uppercase tracking-tighter rounded-lg data-active:bg-white data-active:text-blue-600 data-active:shadow-sm transition-all">
-            <GraduationCap className="h-3 w-3 mr-1.5" /> Tổng cộng
-          </TabsTrigger>
-        </TabsList>
+      <div className="bg-slate-50/50 p-2 pt-3.5 rounded-2xl border border-slate-100/50 space-y-3">
+        <Tabs defaultValue="remaining" className="w-full gap-3 flex flex-col">
+          <TabsContent value="total" className="mt-0">
+            <div className="relative group">
+              <Input
+                type="number"
+                min={0}
+                max={300}
+                value={totalStr}
+                onChange={e => {
+                  const s = e.target.value;
+                  setTotalStr(s);
+                  if (s === "") return onRemainingChange(0);
+                  const val = parseInt(s);
+                  if (!isNaN(val)) onTotalChange(Math.min(300, Math.max(0, val)));
+                }}
+                placeholder="Ví dụ: 140"
+                className="text-center text-lg font-black text-blue-700 bg-white border-2 border-blue-100 focus:ring-blue-500/20 rounded-xl h-10 shadow-sm transition-all group-hover:border-blue-200"
+              />
+              <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-white px-2.5 py-0.5 rounded-full border border-blue-100 text-[9px] font-black text-blue-600 uppercase tracking-widest whitespace-nowrap pointer-events-none shadow-sm">Tổng tín chỉ toàn khóa</div>
+            </div>
+          </TabsContent>
 
-        <TabsContent value="total" className="mt-[13px]">
-          <div className="relative group">
-            <Input
-              type="number"
-              min={0}
-              max={300}
-              value={totalStr}
-              onChange={e => {
-                const s = e.target.value;
-                setTotalStr(s);
-                if (s === "") return onRemainingChange(0);
-                const val = parseInt(s);
-                if (!isNaN(val)) onTotalChange(Math.min(300, Math.max(0, val)));
-              }}
-              placeholder="Ví dụ: 140"
-              className="text-center text-lg font-black text-blue-700 bg-white border-2 border-blue-100 focus:ring-blue-500/20 rounded-2xl h-11 shadow-sm transition-all group-hover:border-blue-200"
-            />
-            <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-white px-2 py-0.5 rounded-full border border-blue-100 text-[8px] font-black text-blue-600 uppercase tracking-wider whitespace-nowrap pointer-events-none">Tổng tín chỉ toàn khóa học</div>
-          </div>
-        </TabsContent>
+          <TabsContent value="remaining" className="mt-0">
+            <div className="relative group">
+              <Input
+                type="number"
+                min={0}
+                max={200}
+                value={remStr}
+                onChange={e => {
+                  const s = e.target.value;
+                  setRemStr(s);
+                  const val = s === "" ? 0 : parseInt(s);
+                  if (!isNaN(val)) onRemainingChange(Math.min(200, Math.max(0, val)));
+                }}
+                placeholder="Ví dụ: 30"
+                className="text-center text-lg font-black text-blue-700 bg-white border-2 border-blue-100 focus:ring-blue-500/20 rounded-xl h-10 shadow-sm transition-all group-hover:border-blue-200"
+              />
+              <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-white px-2.5 py-0.5 rounded-full border border-blue-100 text-[9px] font-black text-blue-600 uppercase tracking-widest whitespace-nowrap pointer-events-none shadow-sm">Số tín chỉ dự kiến học</div>
+            </div>
+          </TabsContent>
 
-        <TabsContent value="remaining" className="mt-[13px]">
-          <div className="relative group">
-            <Input
-              type="number"
-              min={0}
-              max={200}
-              value={remStr}
-              onChange={e => {
-                const s = e.target.value;
-                setRemStr(s);
-                const val = s === "" ? 0 : parseInt(s);
-                if (!isNaN(val)) onRemainingChange(Math.min(200, Math.max(0, val)));
-              }}
-              placeholder="Ví dụ: 30"
-              className="text-center text-lg font-black text-blue-700 bg-white border-2 border-blue-100 focus:ring-blue-500/20 rounded-2xl h-11 shadow-sm transition-all group-hover:border-blue-200"
-            />
-            <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-white px-2 py-0.5 rounded-full border border-blue-100 text-[8px] font-black text-blue-600 uppercase tracking-wider whitespace-nowrap pointer-events-none">Số tín chỉ dự kiến học tiếp</div>
-          </div>
-        </TabsContent>
-      </Tabs>
+          <TabsList className="grid w-full grid-cols-2 h-7 bg-white/50 rounded-lg p-0.5 border border-slate-200/50 order-last">
+            <TabsTrigger value="remaining" className="text-[9px] font-black uppercase tracking-tighter rounded-md data-active:bg-white data-active:text-blue-600 data-active:shadow-sm transition-all h-6">
+              <BookOpen className="h-3 w-3 mr-1.5" /> Còn lại
+            </TabsTrigger>
+            <TabsTrigger value="total" className="text-[9px] font-black uppercase tracking-tighter rounded-md data-active:bg-white data-active:text-blue-600 data-active:shadow-sm transition-all h-6">
+              <GraduationCap className="h-3 w-3 mr-1.5" /> Tổng cộng
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
     </div>
   );
 }
@@ -321,10 +328,10 @@ function ImprovementStep({
   return (
     <div className="p-2.5 bg-white border border-slate-100 rounded-[1.5rem] shadow-sm space-y-2 relative z-10">
       <div className="flex items-center gap-2">
-        <span className="text-[10px] font-black text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded-lg border border-blue-100/50 shadow-sm">04</span>
-        <Label className="text-[10px] font-black text-blue-600 uppercase tracking-[0.15em] flex items-center gap-1.5">
+        <span className="text-[10px] font-black text-blue-600 bg-blue-50/80 px-2 py-0.5 rounded-full border border-blue-100/50 shadow-sm">04</span>
+        <Label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] flex items-center gap-1.5">
           Học cải thiện
-          <HelpCircle className="h-3 w-3 text-blue-300" title="Chọn các môn bạn muốn học cải thiện để nâng cao điểm GPA" />
+          <HelpCircle className="h-3 w-3 text-slate-300" title="Chọn các môn bạn muốn học cải thiện để nâng cao điểm GPA" />
         </Label>
       </div>
 
