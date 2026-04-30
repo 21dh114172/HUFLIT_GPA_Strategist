@@ -24,19 +24,19 @@ export function ScenarioCard({
   scenarioText, combinations, result, retakeSuggestions, hasManualData, missingScenarios, targetGPA, totalPointsGap, onAddRetakeSuggestion, onSwitchTab,
 }: ScenarioCardProps) {
   return (
-    <Card className="border-slate-200 shadow-sm overflow-hidden bg-white rounded-2xl">
+    <Card className="border-slate-200 shadow-sm overflow-hidden bg-white rounded-2xl py-0 gap-0">
       <CardContent className="p-2.5 sm:p-3 space-y-2.5">
         <RecommendedScenario scenarioText={scenarioText} />
         {combinations.length > 1 && (
           <AlternativeCombinations combinations={combinations} result={result} targetGPA={targetGPA} />
         )}
         {result.requiredGPA > 4.0 && (
-          <RescueSuggestions 
-            suggestions={retakeSuggestions} 
-            hasManualData={hasManualData} 
+          <RescueSuggestions
+            suggestions={retakeSuggestions}
+            hasManualData={hasManualData}
             missingScenarios={missingScenarios}
             totalPointsGap={totalPointsGap}
-            onAdd={onAddRetakeSuggestion} 
+            onAdd={onAddRetakeSuggestion}
             onSwitchTab={onSwitchTab}
           />
         )}
@@ -257,7 +257,7 @@ function RescueSuggestions({ suggestions, hasManualData, missingScenarios, total
                 </Badge>
               )}
             </div>
-            
+
             <div className="grid grid-cols-2 gap-1.5">
               <div className="bg-white border border-slate-100 px-2.5 py-1.5 rounded-xl flex items-center justify-between shadow-sm group/gap">
                 <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Tín chỉ thiếu (~A)</span>
@@ -279,14 +279,14 @@ function RescueSuggestions({ suggestions, hasManualData, missingScenarios, total
               * Bạn cần bổ sung tối thiểu lượng điểm/tín chỉ trên để đạt GPA mục tiêu.
             </p>
           </div>
-          
+
           <div className="p-2.5 space-y-2 bg-slate-50/30">
             <div className="text-[10px] font-bold text-indigo-600/70 uppercase tracking-wider flex items-center gap-2">
-               <div className="h-px flex-1 bg-indigo-100" />
-               Phương án đề xuất
-               <div className="h-px flex-1 bg-indigo-100" />
+              <div className="h-px flex-1 bg-indigo-100" />
+              Phương án đề xuất
+              <div className="h-px flex-1 bg-indigo-100" />
             </div>
-            
+
             <div className="space-y-2">
               {suggestions.length > 0 ? (
                 suggestions.map((s, idx) => (
@@ -294,14 +294,14 @@ function RescueSuggestions({ suggestions, hasManualData, missingScenarios, total
                 ))
               ) : (
                 <div className="p-6 text-center bg-white/50 rounded-xl border border-dashed border-slate-200">
-                   <button 
-                     onClick={() => onSwitchTab?.('manual')}
-                     className="group/manual text-[10px] font-black text-slate-400 uppercase tracking-widest italic hover:text-blue-600 transition-colors"
-                   >
-                     {hasManualData 
-                       ? "Không tìm thấy môn học cũ phù hợp để cải thiện." 
-                       : <>Vui lòng nhập dữ liệu ở <span className="text-blue-500 underline underline-offset-4 group-hover/manual:text-blue-700">tab Nhập điểm</span> để nhận gợi ý.</>}
-                   </button>
+                  <button
+                    onClick={() => onSwitchTab?.('manual')}
+                    className="group/manual text-[10px] font-black text-slate-400 uppercase tracking-widest italic hover:text-blue-600 transition-colors"
+                  >
+                    {hasManualData
+                      ? "Không tìm thấy môn học cũ phù hợp để cải thiện."
+                      : <>Vui lòng nhập dữ liệu ở <span className="text-blue-500 underline underline-offset-4 group-hover/manual:text-blue-700">tab Nhập điểm</span> để nhận gợi ý.</>}
+                  </button>
                 </div>
               )}
             </div>
@@ -339,12 +339,12 @@ function RescueSuggestionRow({ suggestion: s, onAdd, index }: RescueSuggestionRo
       <div className="p-2">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
-             <div className="flex items-center justify-center h-4.5 w-4.5 rounded-full bg-indigo-50 text-indigo-600 text-[9px] font-black border border-indigo-100 shadow-sm">
-               {index + 1}
-             </div>
-             <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest">
-               CẢI THIỆN {s.courses.length} MÔN
-             </span>
+            <div className="flex items-center justify-center h-4.5 w-4.5 rounded-full bg-indigo-50 text-indigo-600 text-[9px] font-black border border-indigo-100 shadow-sm">
+              {index + 1}
+            </div>
+            <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest">
+              CẢI THIỆN {s.courses.length} MÔN
+            </span>
           </div>
           <div className="flex items-center gap-1.5">
             <Badge className="bg-emerald-50 text-emerald-600 border-emerald-100 text-[9px] font-black h-5 px-1.5 tracking-widest">
@@ -375,7 +375,7 @@ function RescueSuggestionRow({ suggestion: s, onAdd, index }: RescueSuggestionRo
                   <span className="text-[10px] font-bold text-emerald-600">A</span>
                 </div>
                 <div className="text-[10px] font-bold text-slate-500 bg-white px-1 py-0.5 rounded border border-slate-100">
-                  +{( (4.0 - (GRADE_SCALE.find(g => g.grade === course.grade)?.gpa || 0)) * course.credits ).toFixed(1)}
+                  +{((4.0 - (GRADE_SCALE.find(g => g.grade === course.grade)?.gpa || 0)) * course.credits).toFixed(1)}
                 </div>
               </div>
             </div>

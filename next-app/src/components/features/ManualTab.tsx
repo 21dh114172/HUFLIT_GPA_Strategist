@@ -1,6 +1,7 @@
 "use client";
 
 import { memo } from "react";
+import { motion } from "framer-motion";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useManualGPA } from "@/hooks/useManualGPA";
@@ -41,7 +42,12 @@ const ManualTab = memo(({ onSwitchToRoadmap }: ManualTabProps) => {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 items-start pb-10">
       {/* SIDEBAR */}
-      <div className="lg:col-span-4 sticky top-16 space-y-2 order-first h-fit z-20 self-start">
+      <motion.div 
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+        className="lg:col-span-4 sticky top-16 space-y-2 order-first h-fit z-20 self-start"
+      >
         <InitialStatsCard
           initialGPA={initialGPA}
           initialCredits={initialCredits}
@@ -59,10 +65,15 @@ const ManualTab = memo(({ onSwitchToRoadmap }: ManualTabProps) => {
         />
 
         <ManualChart semesterStats={result.semesterStats} />
-      </div>
+      </motion.div>
 
       {/* MAIN CONTENT */}
-      <div className="lg:col-span-8 space-y-6">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+        className="lg:col-span-8 space-y-6"
+      >
         <div className="flex items-center justify-between px-2 mb-2">
           <h2 className="text-[12px] font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
             <span className="h-2 w-2 rounded-full bg-blue-600"></span>
@@ -114,7 +125,7 @@ const ManualTab = memo(({ onSwitchToRoadmap }: ManualTabProps) => {
           <Button
             variant="outline"
             onClick={addSemester}
-            className="group border-dashed border-2 border-slate-300 hover:border-blue-400 hover:bg-blue-50 text-slate-500 hover:text-blue-600 font-bold py-8 px-12 rounded-3xl transition-all w-full flex flex-col gap-2"
+            className="group border-dashed border-2 border-slate-300 hover:border-blue-400 hover:bg-blue-50 text-slate-500 hover:text-blue-600 font-bold py-8 px-12 rounded-3xl transition-all w-full flex flex-col gap-2 cursor-pointer"
           >
             <div className="h-10 w-10 rounded-full bg-slate-100 group-hover:bg-blue-100 flex items-center justify-center transition-colors">
               <Plus className="h-6 w-6 group-hover:rotate-90 transition-transform duration-500" />
@@ -122,7 +133,7 @@ const ManualTab = memo(({ onSwitchToRoadmap }: ManualTabProps) => {
             <span>Thêm học kỳ mới</span>
           </Button>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 });

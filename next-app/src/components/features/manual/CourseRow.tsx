@@ -54,7 +54,7 @@ const CourseRow = memo(({
           onValueChange={(val) => onUpdate(sIdx, cIdx, "grade", val)}
         >
           <SelectTrigger className="bg-white border-slate-300 h-8 w-20 text-sm font-bold text-blue-600 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm mx-auto">
-            <SelectValue />
+            <SelectValue placeholder="Điểm" />
           </SelectTrigger>
           <SelectContent>
             {GRADE_SCALE.map(g => (
@@ -90,7 +90,7 @@ const CourseRow = memo(({
       <TableCell className="pe-6 text-right py-1.5">
         <button
           onClick={() => onRemove(sIdx, cIdx)}
-          className="text-slate-500 hover:text-red-500 transition-all p-1.5 rounded-lg hover:bg-red-50 opacity-100"
+          className="text-slate-500 hover:text-red-500 transition-all p-1.5 rounded-lg hover:bg-red-50 opacity-100 cursor-pointer"
         >
           <Trash2 className="h-4 w-4" />
         </button>

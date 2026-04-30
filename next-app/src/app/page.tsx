@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { AppHeader } from "@/components/layout/AppHeader";
@@ -38,6 +38,25 @@ export default function Home() {
     pendingRetakes?: { id: string; oldGrade: number; credits: number; name?: string }[];
   } | null>(null);
 
+  // Preload dynamic components in the background
+  useEffect(() => {
+    // Preload heavy components after initial render to make tab switching instant
+    const preload = async () => {
+      // Small delay to ensure initial paint is done without interruption
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Execute imports in parallel
+      Promise.all([
+        import("@/components/features/ScaleTab"),
+        import("@/components/features/SubjectTab"),
+        import("@/components/features/ManualTab"),
+        import("@/components/features/RoadmapTab")
+      ]).catch(err => console.error("Preload failed", err));
+    };
+    
+    preload();
+  }, []);
+
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
     // Smooth scroll to top when changing tabs
@@ -62,49 +81,35 @@ export default function Home() {
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full relative z-10">
         
         {/* Header - Refactored to separate component */}
-        <AppHeader activeTab={activeTab} />
+        <AppHeader activeTab={activeTab} onTabChange={handleTabChange} />
 
         {/* Main Content Area */}
-        <div className="max-w-[1074px] mx-auto px-4 sm:px-6 mt-4 w-full">
-          <div className="flex flex-col w-full">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeTab}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.2, ease: "easeInOut" }}
-                style={{ overflow: "visible" }}
-                className="w-full flex flex-col items-stretch pb-6"
-              >
-                <TabsContent value="roadmap" className="focus-visible:outline-none focus-visible:ring-0 m-0 w-full">
-                  <RoadmapTab initialData={roadmapInitialData} onSwitchTab={handleTabChange} />
-                </TabsContent>
+        <div className="max-w-[1074px] mx-auto px-4 sm:px-6 mt-4 w-full pb-6">
+          <TabsContent value="roadmap" className="focus-visible:outline-none focus-visible:ring-0 m-0 w-full">
+            <RoadmapTab initialData={roadmapInitialData} onSwitchTab={handleTabChange} />
+          </TabsContent>
 
-                <TabsContent value="manual" className="focus-visible:outline-none focus-visible:ring-0 m-0 w-full">
-                  <ManualTab onSwitchToRoadmap={handleSwitchToRoadmap} />
-                </TabsContent>
+          <TabsContent value="manual" className="focus-visible:outline-none focus-visible:ring-0 m-0 w-full">
+            <ManualTab onSwitchToRoadmap={handleSwitchToRoadmap} />
+          </TabsContent>
 
-                <TabsContent value="subject" className="focus-visible:outline-none focus-visible:ring-0 m-0 w-full">
-                  <SubjectTab />
-                </TabsContent>
+          <TabsContent value="subject" className="focus-visible:outline-none focus-visible:ring-0 m-0 w-full">
+            <SubjectTab />
+          </TabsContent>
 
-                <TabsContent value="scale" className="focus-visible:outline-none focus-visible:ring-0 m-0 w-full">
-                  <ScaleTab />
-                </TabsContent>
+          <TabsContent value="scale" className="focus-visible:outline-none focus-visible:ring-0 m-0 w-full">
+            <ScaleTab />
+          </TabsContent>
 
-                <TabsContent value="news" className="focus-visible:outline-none focus-visible:ring-0 m-0 w-full">
-                  <div className="text-center py-20 text-slate-500 bg-white rounded-3xl border border-slate-200">
-                    <Newspaper className="h-12 w-12 mx-auto mb-4 opacity-20" />
-                    <h3 className="font-medium text-lg">Bản tin Sinh viên</h3>
-                    <p className="text-sm mt-1">Phân hệ kết nối Notion API đang được thiết lập.</p>
-                  </div>
-                </TabsContent>
-              </motion.div>
-            </AnimatePresence>
-          </div>
+          <TabsContent value="news" className="focus-visible:outline-none focus-visible:ring-0 m-0 w-full">
+            <div className="text-center py-20 text-slate-500 bg-white rounded-3xl border border-slate-200">
+              <Newspaper className="h-12 w-12 mx-auto mb-4 opacity-20" />
+              <h3 className="font-medium text-lg">Bản tin Sinh viên</h3>
+              <p className="text-sm mt-1">Phân hệ kết nối Notion API đang được thiết lập.</p>
+            </div>
+          </TabsContent>
         </div>
-      </Tabs>
+        </Tabs>
     </main>
   );
 }

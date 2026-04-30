@@ -62,7 +62,7 @@ export const useManualGPA = () => {
       cumulativeGPA: number;
     }> = {};
 
-    semesters.forEach((sem, sIdx) => {
+    deferredSemesters.forEach((sem, sIdx) => {
       // Priority: Detected year from name > Fallback to group by every 3 semesters
       const year = getYear(sem.name) || `Năm ${Math.floor(sIdx / 3) + 1}`;
       const sStats = result.semesterStats[sIdx];
@@ -100,7 +100,7 @@ export const useManualGPA = () => {
       stats[year].cumulativeGPA = sStats.cumulativeGPA;
     });
     return stats;
-  }, [semesters, result.semesterStats]);
+  }, [deferredSemesters, result.semesterStats]);
 
   const updateInitialGPA = useCallback((val: number) => setInitialGPA(val), []);
   const updateInitialCredits = useCallback((val: number) => setInitialCredits(val), []);
@@ -116,7 +116,7 @@ export const useManualGPA = () => {
   const addSemester = useCallback(() => {
     setSemesters(prev => [
       ...prev,
-      { name: `Học kỳ ${prev.length + 1}`, courses: [{ name: "", credits: 3, grade: "A", isRetake: false }] }
+      { name: `Học kỳ ${prev.length + 1}`, courses: [{ name: "", credits: 3, grade: "", isRetake: false }] }
     ]);
   }, []);
 
@@ -129,7 +129,7 @@ export const useManualGPA = () => {
       const next = [...prev];
       next[semIdx] = {
         ...next[semIdx],
-        courses: [...next[semIdx].courses, { name: "", credits: 3, grade: "A", isRetake: false }]
+        courses: [...next[semIdx].courses, { name: "", credits: 3, grade: "", isRetake: false }]
       };
       return next;
     });

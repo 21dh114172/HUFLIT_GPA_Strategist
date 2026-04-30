@@ -69,7 +69,7 @@ export function getStatusLabel(status: ResultStatus, maxPossibleGPA: number): st
 export function getDisplayGPA(status: ResultStatus, requiredGPA: number): string {
   if (status === "no-credits") return "CẦN THÊM";
   if (status === "achieved") return "ĐẠT";
-  if (status === "impossible" || requiredGPA === Infinity) return "KHÔNG THỂ";
+  if (requiredGPA === Infinity) return "KHÔNG THỂ";
   return requiredGPA.toFixed(2);
 }
 

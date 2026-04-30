@@ -42,8 +42,8 @@ const SemesterCard = memo(({
 
   return (
     <div className="space-y-4">
-      <Card className="ring-0 border border-slate-200 bg-white/80 backdrop-blur-xl shadow-xl shadow-blue-500/5 hover:shadow-blue-500/10 transition-all duration-500 overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-300 gap-0">
-        <CardHeader className="bg-white border-b border-slate-100 py-1.5 px-4 flex flex-row items-center justify-between group/header transition-all hover:bg-slate-50/30">
+      <Card className="ring-0 border border-slate-200 bg-white/80 backdrop-blur-xl shadow-xl shadow-blue-500/5 hover:shadow-blue-500/10 transition-all duration-500 overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-300 gap-0 py-0">
+        <CardHeader className="bg-white border-b border-slate-100 py-3 !pb-3 px-4 flex flex-row items-center justify-between group/header transition-all hover:bg-slate-50/30">
           <div className="flex items-center gap-3 flex-1 min-w-0">
             <div className="h-8 w-8 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shadow-sm shrink-0 group-hover/header:scale-105 transition-transform duration-300">
               <BookOpen className="h-4 w-4" />
@@ -81,7 +81,7 @@ const SemesterCard = memo(({
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="p-0">
+        <CardContent className="p-0 pb-1">
           <div className="border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-sm mx-1 mt-2">
             <Table>
               <TableHeader className="bg-slate-50/50 border-b border-slate-200">

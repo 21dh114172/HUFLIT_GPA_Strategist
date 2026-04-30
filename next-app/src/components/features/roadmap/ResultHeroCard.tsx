@@ -10,6 +10,7 @@ import {
   getDisplayGPA,
   getDisplayLabel,
 } from "@/lib/roadmap-utils";
+import { AnimatedNumber } from "@/components/ui/animated-number";
 
 interface ResultHeroCardProps {
   result: RoadmapComputed["result"];
@@ -25,7 +26,7 @@ export function ResultHeroCard({ result, status, maxPossibleGPA, targetGPA, curr
   const isNegative = isStatusNegative(status);
 
   return (
-    <div className={`p-4 sm:p-5 border shadow-sm overflow-hidden bg-white transition-all duration-700 rounded-[2rem] flex flex-col items-center text-center space-y-4 ${borderColor}`}>
+    <div className={`px-4 py-2.5 sm:px-5 sm:py-2.5 border shadow-sm overflow-hidden bg-white transition-all duration-700 rounded-[2rem] flex flex-col items-center text-center space-y-4 ${borderColor}`}>
       <GPADisplay status={status} requiredGPA={result.requiredGPA} textColor={textColor} />
       <StatusBadge status={status} maxPossibleGPA={maxPossibleGPA} textColor={textColor} isNegative={isNegative} />
       <StatsRow result={result} status={status} maxPossibleGPA={maxPossibleGPA} targetGPA={targetGPA} currentCredits={currentCredits} />
@@ -40,13 +41,20 @@ interface GPADisplayProps {
 }
 
 function GPADisplay({ status, requiredGPA, textColor }: GPADisplayProps) {
+  const displayVal = getDisplayGPA(status, requiredGPA);
+  const isNumeric = !isNaN(Number(displayVal));
+
   return (
     <div className="space-y-1">
       <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.25em]">
         {getDisplayLabel(status)}
       </div>
-      <div className={`text-5xl sm:text-6xl font-black tracking-tighter py-0.5 ${textColor}`}>
-        {getDisplayGPA(status, requiredGPA)}
+      <div className={`text-4xl sm:text-5xl font-black tracking-tighter py-0.5 ${textColor}`}>
+        {isNumeric ? (
+          <AnimatedNumber value={requiredGPA} precision={2} />
+        ) : (
+          displayVal
+        )}
       </div>
     </div>
   );
@@ -96,14 +104,17 @@ function StatsRow({ result, status, maxPossibleGPA, targetGPA, currentCredits }:
         />
         <StatItem
           label={isImpossible ? "GPA Tối đa" : "GPA Mục tiêu"}
-          value={isImpossible ? maxPossibleGPA.toFixed(2) : targetGPA.toFixed(2)}
+          value={isImpossible ? maxPossibleGPA : targetGPA}
+          precision={2}
           subtitle={isImpossible ? "Khả năng cao nhất" : "Mục tiêu ra trường"}
         />
       </div>
       
       <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-50 rounded-full border border-slate-100">
         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Tổng tín chỉ khi tốt nghiệp:</span>
-        <span className="text-[10px] font-black text-blue-600">{result.totalFutureCredits} TC</span>
+        <span className="text-[10px] font-black text-blue-600">
+          <AnimatedNumber value={result.totalFutureCredits} suffix=" TC" />
+        </span>
       </div>
     </div>
   );
@@ -111,16 +122,20 @@ function StatsRow({ result, status, maxPossibleGPA, targetGPA, currentCredits }:
 
 interface StatItemProps {
   label: string;
-  value: number | string;
+  value: number;
+  precision?: number;
   subtitle: string;
 }
 
-function StatItem({ label, value, subtitle }: StatItemProps) {
+function StatItem({ label, value, precision = 0, subtitle }: StatItemProps) {
   return (
     <div className="space-y-0">
       <div className="text-[9px] text-slate-400 font-black uppercase tracking-[0.1em]">{label}</div>
-      <div className="text-2xl font-black text-slate-900 leading-none py-1">{value}</div>
+      <div className="text-2xl font-black text-slate-900 leading-none py-1">
+        <AnimatedNumber value={value} precision={precision} />
+      </div>
       <div className="text-[10px] text-slate-400 font-bold leading-tight">{subtitle}</div>
     </div>
   );
 }
+

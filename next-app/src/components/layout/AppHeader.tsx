@@ -2,18 +2,25 @@
 
 import { GraduationCap, Calculator, Target, BookOpen, Newspaper, BarChart3 } from "lucide-react";
 import { TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { memo } from "react";
+import { AuthorInfoDialog } from "./AuthorInfoDialog";
+import Image from "next/image";
 
 interface AppHeaderProps {
   activeTab: string;
+  onTabChange?: (tab: string) => void;
 }
 
-export function AppHeader({ activeTab }: AppHeaderProps) {
+export const AppHeader = memo(({ activeTab, onTabChange }: AppHeaderProps) => {
   return (
     <header className="sticky top-3 z-50 w-full px-4 mb-4">
       <div className="w-[1026px] max-w-[95%] mx-auto h-12 flex items-center justify-between px-2.5 bg-white/70 backdrop-blur-xl border border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.08)] rounded-full transition-all">
         
         {/* Logo Section */}
-        <div className="flex items-center gap-2 pl-1.5 group cursor-pointer shrink-0">
+        <div 
+          onClick={() => onTabChange?.("manual")}
+          className="flex items-center gap-2 pl-1.5 group cursor-pointer shrink-0 active:scale-95 transition-transform"
+        >
           <div className="bg-gradient-to-br from-blue-600 to-indigo-700 p-1.5 rounded-full shadow-md group-hover:scale-110 transition-transform">
             <GraduationCap className="h-3.5 w-3.5 text-white" strokeWidth={2.5} />
           </div>
@@ -44,17 +51,29 @@ export function AppHeader({ activeTab }: AppHeaderProps) {
 
         {/* Action Section */}
         <div className="flex items-center gap-1.5 pr-0.5 shrink-0">
-          <div className="hidden sm:flex w-7 h-7 rounded-full items-center justify-center cursor-pointer hover:bg-slate-100/50 transition-all text-slate-400 hover:text-blue-600">
+          <div 
+            onClick={() => onTabChange?.("news")}
+            className="hidden sm:flex w-7 h-7 rounded-full items-center justify-center cursor-pointer hover:bg-slate-100/50 transition-all text-slate-400 hover:text-blue-600 active:scale-90"
+          >
             <Newspaper className="h-3.5 w-3.5" strokeWidth={2.5} />
           </div>
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 p-[1px] shadow-sm active:scale-90 transition-transform">
-            <div className="w-full h-full rounded-full bg-white flex items-center justify-center">
-              <span className="text-[10px] font-black text-blue-600">HT</span>
-            </div>
-          </div>
+          <AuthorInfoDialog>
+            <button className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 p-[1px] shadow-sm active:scale-90 transition-transform cursor-pointer overflow-hidden border-none outline-none">
+              <div className="w-full h-full rounded-full bg-white flex items-center justify-center overflow-hidden relative">
+                <Image 
+                  src="/ava.jpg" 
+                  alt="TienxDun" 
+                  fill 
+                  className="object-cover"
+                />
+              </div>
+            </button>
+          </AuthorInfoDialog>
         </div>
 
       </div>
     </header>
   );
-}
+});
+
+AppHeader.displayName = "AppHeader";

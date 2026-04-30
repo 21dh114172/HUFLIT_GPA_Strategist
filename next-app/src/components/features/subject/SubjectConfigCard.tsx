@@ -35,8 +35,8 @@ export function SubjectConfigCard({
     const scoreToPassDisplay = isImpossible ? "Không thể" : isPassed ? "Đã đạt" : minFinalToPass.toFixed(1);
 
     return (
-      <Card className="w-full border-white/20 bg-white/40 backdrop-blur-xl shadow-xl shadow-blue-500/5 transition-all duration-300 hover:shadow-blue-500/10 rounded-3xl overflow-hidden">
-        <CardHeader className="py-2.5 border-b border-white/10 px-4">
+      <Card className="w-full border-white/20 bg-white/40 backdrop-blur-xl shadow-xl shadow-blue-500/5 transition-all duration-300 hover:shadow-blue-500/10 rounded-3xl overflow-hidden gap-0 py-0">
+        <CardHeader className="pt-5 !pb-0 border-b border-white/10 px-4">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center">
               <Calculator className="h-4 w-4 text-blue-600" />
@@ -59,7 +59,7 @@ export function SubjectConfigCard({
                 <button
                   key={option.value}
                   onClick={() => setRatio(option.value)}
-                  className={`flex-1 py-1 text-[11px] font-bold rounded-lg transition-all duration-200 ${
+                  className={`flex-1 py-1 text-[11px] font-bold rounded-lg transition-all duration-200 cursor-pointer ${
                     ratio === option.value
                       ? "bg-white text-blue-700 shadow-sm scale-[1.02]"
                       : "text-slate-500 hover:text-blue-600 hover:bg-white/50"

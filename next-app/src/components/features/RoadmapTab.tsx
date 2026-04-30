@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { useRoadmapState, type InitialRoadmapData } from "@/hooks/useRoadmapState";
 import { GoalSetupCard } from "./roadmap/GoalSetupCard";
 import { ResultHeroCard } from "./roadmap/ResultHeroCard";
@@ -17,11 +18,21 @@ export function RoadmapTab({ initialData, onSwitchTab }: RoadmapTabProps) {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-      <div className="lg:col-span-4 sticky top-20 space-y-6 h-fit z-20 self-start">
+      <motion.div 
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+        className="lg:col-span-4 sticky top-20 space-y-6 h-fit z-20 self-start"
+      >
         <GoalSetupCard state={state} actions={actions} computed={computed} />
-      </div>
+      </motion.div>
 
-      <div className="lg:col-span-8 space-y-3">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+        className="lg:col-span-8 space-y-3"
+      >
         <ResultHeroCard
           result={result}
           status={status}
@@ -49,7 +60,8 @@ export function RoadmapTab({ initialData, onSwitchTab }: RoadmapTabProps) {
           onAddRetakeSuggestion={actions.addRetakesFromSuggestion}
           onSwitchTab={onSwitchTab}
         />
-      </div>
+      </motion.div>
     </div>
   );
 }
+

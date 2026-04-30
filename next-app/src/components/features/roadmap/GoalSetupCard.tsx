@@ -21,13 +21,13 @@ const GPA_MILESTONES = [2.0, 2.5, 3.2, 3.6];
 
 export function GoalSetupCard({ state, actions, computed }: GoalSetupCardProps) {
   const { currentGPA, currentCredits, targetGPA, remainingCredits, retakes } = state;
-  
+
   // Quản lý trạng thái đóng mở độc lập cho từng bước
-  const [expandedSteps, setExpandedSteps] = useState<Record<number, boolean>>({ 
+  const [expandedSteps, setExpandedSteps] = useState<Record<number, boolean>>({
     1: true,
     2: true,
     3: true,
-    4: false 
+    4: false
   });
 
   const toggleStep = (step: number) => {
@@ -38,15 +38,15 @@ export function GoalSetupCard({ state, actions, computed }: GoalSetupCardProps) 
   };
 
   return (
-    <Card className="border-slate-200 bg-white shadow-xl shadow-blue-500/5 rounded-3xl overflow-hidden border">
-      <CardHeader className="bg-slate-50/50 border-b border-slate-100 pt-2 !pb-1.5 px-5">
+    <Card className="border-slate-200 bg-white shadow-xl shadow-blue-500/5 rounded-3xl overflow-hidden border gap-0 py-0">
+      <CardHeader className="bg-slate-50/50 border-b border-slate-100 pt-4 pb-2.5 px-5">
         <div className="flex items-center gap-3">
           <Target className="h-4 w-4 text-blue-600" strokeWidth={2} />
           <CardTitle className="text-sm font-bold text-slate-900 tracking-tight">Thiết lập mục tiêu</CardTitle>
         </div>
       </CardHeader>
 
-      <CardContent className="px-2 pb-2 pt-0 space-y-1.5 relative">
+      <CardContent className="px-2 pb-2 pt-3 space-y-1.5 relative">
         <StartingPointStep
           currentGPA={currentGPA}
           currentCredits={currentCredits}
@@ -56,7 +56,7 @@ export function GoalSetupCard({ state, actions, computed }: GoalSetupCardProps) 
           isExpanded={expandedSteps[1]}
           onToggle={() => toggleStep(1)}
         />
-        
+
         <TargetGPAStep
           targetGPA={targetGPA}
           onSelect={actions.setTargetGPA}
@@ -112,7 +112,7 @@ function StartingPointStep({ currentGPA, currentCredits, onGPAChange, onCreditsC
 
   return (
     <div className={`bg-white border border-slate-100 rounded-[1.5rem] shadow-sm relative z-10 transition-all duration-300 overflow-hidden ${isExpanded ? "p-2.5 space-y-2" : "p-2.5"}`}>
-      <div 
+      <div
         className="flex items-center justify-between cursor-pointer hover:opacity-80 transition-opacity"
         onClick={onToggle}
       >
@@ -221,7 +221,7 @@ function TargetGPAStep({ targetGPA, onSelect, isExpanded, onToggle }: TargetGPAS
 
   return (
     <div className={`bg-blue-50/30 border border-blue-100/50 rounded-[1.5rem] shadow-sm relative z-10 transition-all duration-300 overflow-hidden ${isExpanded ? "p-2.5 space-y-2" : "p-2.5"}`}>
-      <div 
+      <div
         className="flex items-center justify-between cursor-pointer hover:opacity-80 transition-opacity"
         onClick={onToggle}
       >
@@ -262,11 +262,10 @@ function TargetGPAStep({ targetGPA, onSelect, isExpanded, onToggle }: TargetGPAS
               <button
                 key={val}
                 type="button"
-                className={`h-full text-[10px] font-black transition-all rounded-md ${
-                  targetGPA === val 
-                    ? "bg-white text-blue-600 shadow-sm" 
+                className={`h-full text-[10px] font-black transition-all rounded-md ${targetGPA === val
+                    ? "bg-white text-blue-600 shadow-sm"
                     : "text-slate-400 hover:text-slate-600 hover:bg-white/30"
-                }`}
+                  }`}
                 onClick={(e) => {
                   e.stopPropagation();
                   setValStr(val.toString());
@@ -307,7 +306,7 @@ function EffortPlanStep({ currentCredits, remainingCredits, onTotalChange, onRem
 
   return (
     <div className={`bg-white border border-slate-100 rounded-[1.5rem] shadow-sm relative z-10 transition-all duration-300 overflow-hidden ${isExpanded ? "p-2.5 space-y-2" : "p-2.5"}`}>
-      <div 
+      <div
         className="flex items-center justify-between cursor-pointer hover:opacity-80 transition-opacity"
         onClick={onToggle}
       >
@@ -400,7 +399,7 @@ interface ImprovementStepProps {
 function ImprovementStep({ retakes, onAddRetake, onRemoveRetake, onUpdateRetake, manualImprovableCourses, onToggleFromManual, isExpanded, onToggle }: ImprovementStepProps) {
   return (
     <div className={`bg-white border border-slate-100 rounded-[1.5rem] shadow-sm relative z-10 transition-all duration-300 overflow-hidden ${isExpanded ? "p-2.5 space-y-2" : "p-2.5"}`}>
-      <div 
+      <div
         className="flex items-center justify-between cursor-pointer hover:opacity-80 transition-opacity"
         onClick={onToggle}
       >
