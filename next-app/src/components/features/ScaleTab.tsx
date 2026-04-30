@@ -14,10 +14,34 @@ function getGradeColorClass(grade: string) {
   return "bg-slate-100 text-slate-700";
 }
 
+const SESSION_CONFIG: Record<string, { bg: string; text: string; border: string; iconBg: string; iconColor: string }> = {
+  "Sáng": { 
+    bg: "bg-amber-50/30", 
+    text: "text-amber-700", 
+    border: "border-amber-100/50", 
+    iconBg: "bg-amber-100",
+    iconColor: "text-amber-600"
+  },
+  "Chiều": { 
+    bg: "bg-sky-50/30", 
+    text: "text-sky-700", 
+    border: "border-sky-100/50", 
+    iconBg: "bg-sky-100",
+    iconColor: "text-sky-600"
+  },
+  "Tối": { 
+    bg: "bg-indigo-50/30", 
+    text: "text-indigo-700", 
+    border: "border-indigo-100/50", 
+    iconBg: "bg-indigo-100",
+    iconColor: "text-indigo-600"
+  }
+};
+
 const SCHEDULE = [
   {
     session: "Sáng",
-    icon: <Sun className="h-4 w-4 text-amber-500" strokeWidth={2} />,
+    icon: <Sun className="h-4 w-4" strokeWidth={2} />,
     items: [
       { period: "1", start: "06:45", end: "07:35" },
       { period: "2", start: "07:35", end: "08:25" },
@@ -30,7 +54,7 @@ const SCHEDULE = [
   },
   {
     session: "Chiều",
-    icon: <Sunset className="h-4 w-4 text-orange-500" strokeWidth={2} />,
+    icon: <Sunset className="h-4 w-4" strokeWidth={2} />,
     items: [
       { period: "7", start: "12:45", end: "13:35" },
       { period: "8", start: "13:35", end: "14:25" },
@@ -43,7 +67,7 @@ const SCHEDULE = [
   },
   {
     session: "Tối",
-    icon: <Moon className="h-4 w-4 text-blue-500" strokeWidth={2} />,
+    icon: <Moon className="h-4 w-4" strokeWidth={2} />,
     items: [
       { period: "13", start: "18:15", end: "19:05" },
       { period: "14", start: "19:05", end: "19:55" },
@@ -68,8 +92,8 @@ export function ScaleTab() {
               <TableHeader className="bg-slate-50/30">
                 <TableRow className="hover:bg-transparent border-b-slate-100">
                   <TableHead className="h-8 text-[11px] font-bold uppercase text-slate-400 text-center w-16">Chữ</TableHead>
-                  <TableHead className="h-8 text-[11px] font-bold uppercase text-slate-400">Hệ 10</TableHead>
-                  <TableHead className="h-8 text-[11px] font-bold uppercase text-slate-400 text-right pr-4">GPA</TableHead>
+                  <TableHead className="h-8 text-[11px] font-bold uppercase text-slate-400 text-center">Hệ 10</TableHead>
+                  <TableHead className="h-8 text-[11px] font-bold uppercase text-slate-400 text-center w-16">GPA</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -80,10 +104,10 @@ export function ScaleTab() {
                         {scale.grade}
                       </span>
                     </TableCell>
-                    <TableCell className="py-1 text-xs text-slate-600 font-medium font-mono tabular-nums">
+                    <TableCell className="py-1 text-xs text-slate-600 font-bold font-mono tabular-nums text-center">
                       {scale.min.toFixed(1)} - {scale.max.toFixed(1)}
                     </TableCell>
-                    <TableCell className="py-1 text-xs font-bold text-slate-800 text-right pr-4 font-mono tabular-nums">
+                    <TableCell className="py-1 text-xs font-bold text-slate-800 text-center font-mono tabular-nums">
                       {scale.gpa.toFixed(1)}
                     </TableCell>
                   </TableRow>
@@ -93,7 +117,7 @@ export function ScaleTab() {
           </CardContent>
         </Card>
 
-        {/* Card 2: Xếp loại học lực (Standardized Table) */}
+        {/* Card 2: Xếp loại học lực */}
         <Card className="border-slate-200 shadow-sm overflow-hidden bg-white">
           <CardHeader className="py-2 px-4 border-b border-slate-100 bg-slate-50/50">
             <CardTitle className="text-[12px] text-slate-800 font-black uppercase tracking-widest">Xếp loại Học lực</CardTitle>
@@ -131,7 +155,7 @@ export function ScaleTab() {
           </CardContent>
         </Card>
 
-        {/* Card 3: Điểm rèn luyện (Standardized Table) */}
+        {/* Card 3: Điểm rèn luyện */}
         <Card className="border-slate-200 shadow-sm overflow-hidden bg-white">
           <CardHeader className="py-2 px-4 border-b border-slate-100 bg-slate-50/50">
             <CardTitle className="text-[12px] text-slate-800 font-black uppercase tracking-widest">Điểm rèn luyện</CardTitle>
@@ -199,50 +223,61 @@ export function ScaleTab() {
                 <TableBody>
                   {SCHEDULE.map((session) => (
                     <React.Fragment key={session.session}>
-                      {session.items.map((item, idx) => (
-                        <TableRow key={idx} className={`group border-b-slate-50 ${item.break ? "bg-amber-50/20" : "hover:bg-slate-50/50 transition-colors"}`}>
-                          {idx === 0 && (
-                            <TableCell rowSpan={session.items.length} className="border-r border-slate-100/50 bg-slate-50/10">
-                              <div className="flex flex-col items-center justify-center gap-1 py-0.5">
-                                <div className="p-1 rounded-full bg-white shadow-sm border border-slate-100">
-                                  {React.cloneElement(session.icon as React.ReactElement<{ className?: string }>, { className: "h-3 w-3" })}
-                                </div>
-                                <span className="font-bold text-[9px] uppercase text-slate-500 tracking-widest vertical-text">{session.session}</span>
-                              </div>
-                            </TableCell>
-                          )}
-                          
-                          {item.break ? (
-                            <TableCell colSpan={3} className="py-1">
-                               <div className="flex items-center justify-center gap-2 px-4">
-                                 <div className="h-[1px] flex-1 bg-amber-200/30"></div>
-                                 <div className="flex items-center gap-1.5 text-[9px] font-bold text-amber-600 uppercase tracking-widest whitespace-nowrap">
-                                   <Coffee className="h-3 w-3" strokeWidth={2.5} /> {item.break} <span className="text-amber-400 font-mono text-[10px]">({item.time})</span>
-                                 </div>
-                                 <div className="h-[1px] flex-1 bg-amber-200/30"></div>
-                               </div>
-                            </TableCell>
-                          ) : (
-                            <>
-                              <TableCell className="text-center py-1">
-                                <span className="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-blue-50 text-blue-600 font-bold text-[11px] border border-blue-100 shadow-sm group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
-                                  {item.period}
-                                </span>
-                              </TableCell>
-                              <TableCell className="py-1">
-                                <div className="flex items-center justify-center gap-2">
-                                  <span className="font-mono text-[11px] text-slate-700 font-bold tabular-nums bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">{item.start}</span>
-                                  <span className="text-slate-300 text-[9px] font-bold">→</span>
-                                  <span className="font-mono text-[11px] text-slate-700 font-bold tabular-nums bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">{item.end}</span>
+                      {session.items.map((item, idx) => {
+                        const config = SESSION_CONFIG[session.session];
+                        return (
+                          <TableRow key={idx} className={`group border-b-slate-100/50 ${item.break ? "bg-white/50" : `${config.bg} hover:bg-white/80 transition-all duration-300`}`}>
+                            {idx === 0 && (
+                              <TableCell rowSpan={session.items.length} className={`border-r ${config.border} ${config.bg} relative`}>
+                                <div className="flex flex-col items-center justify-center gap-2 py-0.5">
+                                  <div className={`p-1.5 rounded-xl ${config.iconBg} shadow-sm border ${config.border}`}>
+                                    {React.cloneElement(session.icon as React.ReactElement<{ className?: string }>, { 
+                                      className: `h-3.5 w-3.5 ${config.iconColor}` 
+                                    })}
+                                  </div>
+                                  <span className={`font-black text-[10px] uppercase tracking-[0.2em] vertical-text ${config.text}`}>
+                                    {session.session}
+                                  </span>
                                 </div>
                               </TableCell>
-                              <TableCell className="py-1 text-center">
-                                <div className="inline-block w-1.5 h-1.5 rounded-full bg-slate-200 group-hover:bg-emerald-400 group-hover:scale-125 transition-all duration-300 shadow-sm"></div>
+                            )}
+                            
+                            {item.break ? (
+                              <TableCell colSpan={3} className="py-2.5">
+                                <div className="flex items-center justify-center gap-3 px-4">
+                                  <div className={`h-[1.5px] flex-1 ${config.bg} opacity-50 rounded-full`}></div>
+                                  <div className={`flex items-center gap-2 text-[10px] font-black uppercase tracking-widest whitespace-nowrap ${config.text}`}>
+                                    <div className={`p-1 rounded-lg ${config.iconBg} shadow-inner`}>
+                                      <Coffee className="h-3 w-3" strokeWidth={3} />
+                                    </div>
+                                    {item.break} 
+                                    <span className="opacity-60 font-mono text-[11px] font-medium">({item.time})</span>
+                                  </div>
+                                  <div className={`h-[1.5px] flex-1 ${config.bg} opacity-50 rounded-full`}></div>
+                                </div>
                               </TableCell>
-                            </>
-                          )}
-                        </TableRow>
-                      ))}
+                            ) : (
+                              <>
+                                <TableCell className="text-center py-1.5">
+                                  <span className={`inline-flex items-center justify-center w-7 h-7 rounded-xl ${config.iconBg} ${config.text} font-black text-[12px] border ${config.border} shadow-sm group-hover:scale-110 transition-all duration-300`}>
+                                    {item.period}
+                                  </span>
+                                </TableCell>
+                                <TableCell className="py-1.5">
+                                  <div className="flex items-center justify-center gap-2.5">
+                                    <span className={`font-mono text-[12px] ${config.text} font-black tabular-nums bg-white px-2 py-0.5 rounded-lg border ${config.border} shadow-sm`}>{item.start}</span>
+                                    <span className={`${config.text} opacity-30 text-[10px] font-black`}>→</span>
+                                    <span className={`font-mono text-[12px] ${config.text} font-black tabular-nums bg-white px-2 py-0.5 rounded-lg border ${config.border} shadow-sm`}>{item.end}</span>
+                                  </div>
+                                </TableCell>
+                                <TableCell className="py-1.5 text-center">
+                                  <div className={`inline-block w-2 h-2 rounded-full ${config.iconBg} border ${config.border} group-hover:scale-125 transition-all duration-300 shadow-sm`}></div>
+                                </TableCell>
+                              </>
+                            )}
+                          </TableRow>
+                        );
+                      })}
                     </React.Fragment>
                   ))}
                 </TableBody>
