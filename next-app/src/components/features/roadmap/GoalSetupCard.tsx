@@ -31,10 +31,18 @@ export function GoalSetupCard({ state, actions, computed }: GoalSetupCardProps) 
   });
 
   const toggleStep = (step: number) => {
-    setExpandedSteps(prev => ({
-      ...prev,
-      [step]: !prev[step]
-    }));
+    setExpandedSteps(prev => {
+      const isOpening = !prev[step];
+      const newState = { ...prev, [step]: isOpening };
+      
+      // Nếu mở thẻ số 4 thì tự động đóng thẻ 2 và 3 để tiết kiệm không gian
+      if (step === 4 && isOpening) {
+        newState[2] = false;
+        newState[3] = false;
+      }
+      
+      return newState;
+    });
   };
 
   return (

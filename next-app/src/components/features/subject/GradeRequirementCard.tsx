@@ -63,7 +63,6 @@ export function GradeRequirementCard({ grade, gpa, requiredFinal }: GradeRequire
             {grade}
           </span>
           <div className="flex flex-col justify-center">
-            <span className="text-[10px] font-medium text-slate-500 uppercase tracking-widest leading-none mb-1">Loại</span>
             <span className="text-[11px] font-medium text-slate-700 leading-none">GPA {gpa.toFixed(1)}</span>
           </div>
         </div>

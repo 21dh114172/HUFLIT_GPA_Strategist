@@ -9,22 +9,62 @@ const beVietnamPro = Be_Vietnam_Pro({
 });
 
 export const metadata: Metadata = {
-  title: "HUFLIT GPA Strategist - Tính toán & Lập kế hoạch điểm số",
+  metadataBase: new URL("https://huflit-gpa.vercel.app"),
+  title: {
+    default: "HUFLIT GPA Strategist - Tính toán & Lập kế hoạch điểm số",
+    template: "%s | HUFLIT GPA Strategist",
+  },
   description: "Công cụ tối ưu giúp sinh viên HUFLIT tính GPA, dự đoán điểm cần đạt và gợi ý môn học lại thông minh. Hỗ trợ import bảng điểm từ Portal.",
-  keywords: ["HUFLIT", "GPA", "Calculator", "Tính điểm", "Tín chỉ", "Sinh viên", "Portal", "Kế hoạch học tập"],
+  keywords: ["HUFLIT", "GPA", "Calculator", "Tính điểm", "Tín chỉ", "Sinh viên", "Portal", "Kế hoạch học tập", "GPA Strategist"],
   authors: [{ name: "TienxDun" }],
+  creator: "TienxDun",
+  publisher: "TienxDun",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  alternates: {
+    canonical: "/",
+  },
+  manifest: "/manifest.json",
   openGraph: {
     title: "HUFLIT GPA Strategist - Tính toán & Lập kế hoạch điểm số",
     description: "Công cụ tối ưu giúp sinh viên HUFLIT tính GPA, dự đoán điểm cần đạt và gợi ý môn học lại thông minh.",
-    url: "https://tienxdun.github.io/HUFLIT_GPA_Strategist/",
+    url: "https://huflit-gpa.vercel.app",
     siteName: "HUFLIT GPA Strategist",
     locale: "vi_VN",
     type: "website",
+    images: [
+      {
+        url: "/ava.jpg",
+        width: 800,
+        height: 800,
+        alt: "HUFLIT GPA Strategist Preview",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "HUFLIT GPA Strategist - Tính toán & Lập kế hoạch điểm số",
     description: "Công cụ tối ưu giúp sinh viên HUFLIT tính GPA, dự đoán điểm cần đạt và gợi ý môn học lại thông minh.",
+    images: ["/ava.jpg"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/ava.jpg", // Tạm thời dùng ava.jpg cho apple-touch-icon
   },
 };
 
@@ -35,12 +75,37 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // JSON-LD Structured Data
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "HUFLIT GPA Strategist",
+    "description": "Công cụ tính toán GPA và lập lộ trình học tập cho sinh viên HUFLIT.",
+    "applicationCategory": "EducationalApplication",
+    "operatingSystem": "Web",
+    "author": {
+      "@type": "Person",
+      "name": "TienxDun"
+    },
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "VND"
+    }
+  };
+
   return (
     <html
       lang="vi"
       className={`${beVietnamPro.variable} font-sans h-full antialiased`}
       suppressHydrationWarning
     >
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body className="min-h-full flex flex-col font-sans">
         {children}
         <Toaster richColors closeButton position="top-right" />

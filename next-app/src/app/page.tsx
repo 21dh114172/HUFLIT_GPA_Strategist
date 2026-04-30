@@ -71,6 +71,9 @@ export default function Home() {
 
   return (
     <main className="relative min-h-screen bg-slate-50/50 text-slate-900 pb-4">
+      {/* SEO H1 - Visually Hidden */}
+      <h1 className="sr-only">HUFLIT GPA Strategist - Công cụ tính điểm GPA và lập lộ trình học tập thông minh cho sinh viên HUFLIT</h1>
+      
       {/* Background Blobs for Glassmorphism - Wrapped to contain overflow without breaking sticky */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-blue-200/40 blur-[120px] animate-pulse"></div>
