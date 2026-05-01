@@ -67,7 +67,7 @@ const CourseRow = memo(({
       <TableCell className="text-center py-1.5">
         <div className="flex flex-col items-center gap-1">
           <Switch
-            checked={course.isRetake}
+            checked={course.isRetake ?? false}
             onCheckedChange={(val) => onUpdate(sIdx, cIdx, "isRetake", val)}
             className="scale-75 data-[state=checked]:bg-blue-600"
           />
