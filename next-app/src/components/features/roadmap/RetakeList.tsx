@@ -14,7 +14,7 @@ import {
 import { GRADE_SCALE } from "@/lib/gpa-engine";
 import type { RetakeItem } from "@/hooks/useRoadmapState";
 import { GradeSuggestionDialog } from "./GradeSuggestionDialog";
-import { motion, AnimatePresence } from "framer-motion";
+
 
 interface RetakeListProps {
   retakes: RetakeItem[];
@@ -105,11 +105,9 @@ export function RetakeList({
             <>
               <RetakeTableHeader />
               <div className="max-h-[160px] overflow-y-auto pr-1 custom-scrollbar space-y-1.5">
-                <AnimatePresence initial={false}>
-                  {retakes.map(r => (
-                    <RetakeRow key={r.id} retake={r} onRemove={onRemove} onUpdate={onUpdate} />
-                  ))}
-                </AnimatePresence>
+                {retakes.map(r => (
+                  <RetakeRow key={r.id} retake={r} onRemove={onRemove} onUpdate={onUpdate} />
+                ))}
               </div>
               <RetakeTotalRow retakes={retakes} />
             </>
@@ -147,14 +145,7 @@ function RetakeRow({ retake: r, onRemove, onUpdate }: RetakeRowProps) {
   const oldGradeLabel = GRADE_SCALE.find(g => g.gpa === r.oldGrade)?.grade ?? "D";
 
   return (
-    <motion.div 
-      layout
-      initial={{ opacity: 0, x: -10, height: 0 }}
-      animate={{ opacity: 1, x: 0, height: "auto" }}
-      exit={{ opacity: 0, x: 10, height: 0 }}
-      transition={{ duration: 0.2 }}
-      className="grid grid-cols-12 gap-1 items-center bg-white p-1 rounded-2xl border border-slate-100/70 group transition-all hover:border-blue-200 hover:shadow-sm relative overflow-hidden"
-    >
+    <div className="grid grid-cols-12 gap-1 items-center bg-white p-1 rounded-2xl border border-slate-100/70 group transition-all hover:border-blue-200 hover:shadow-sm relative overflow-hidden">
       <div className="col-span-3">
         <Select
           value={oldGradeLabel}
@@ -214,7 +205,7 @@ function RetakeRow({ retake: r, onRemove, onUpdate }: RetakeRowProps) {
           <X className="h-3 w-3" strokeWidth={2.5} />
         </Button>
       </div>
-    </motion.div>
+    </div>
   );
 }
 

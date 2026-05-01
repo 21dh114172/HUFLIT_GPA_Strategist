@@ -88,6 +88,12 @@ export function calculateManualGPA(
               state.totalPoints += (newGPA - oldGPA) * courseCredits;
             }
           }
+        } else {
+          // Fallback: treat as new course if isRetake is true but oldGrade is missing
+          if (gradeInfo.gpa > 0) {
+            state.totalPoints += gradeInfo.gpa * courseCredits;
+            state.totalCredits += courseCredits;
+          }
         }
       } else {
         if (gradeInfo.gpa > 0) {

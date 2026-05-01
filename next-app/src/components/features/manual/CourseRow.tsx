@@ -51,7 +51,7 @@ const CourseRow = memo(({
       </TableCell>
       <TableCell className="text-center py-1.5">
         <Select
-          value={course.grade}
+          value={course.grade || ""}
           onValueChange={(val) => onUpdate(sIdx, cIdx, "grade", val)}
         >
           <SelectTrigger className="bg-white border-slate-300 h-8 w-20 text-sm font-bold text-blue-600 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm mx-auto cursor-pointer">
@@ -73,7 +73,7 @@ const CourseRow = memo(({
           />
           {course.isRetake && (
             <Select
-              value={course.oldGrade}
+              value={course.oldGrade || ""}
               onValueChange={(val) => onUpdate(sIdx, cIdx, "oldGrade", val)}
             >
               <SelectTrigger className="h-7 w-16 text-[10px] font-bold bg-slate-50 border-slate-200 cursor-pointer">

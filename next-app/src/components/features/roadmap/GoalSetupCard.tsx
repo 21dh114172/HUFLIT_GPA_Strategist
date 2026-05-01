@@ -106,10 +106,12 @@ function StartingPointStep({ currentGPA, currentCredits, onGPAChange, onCreditsC
         className="flex items-center justify-between cursor-pointer hover:opacity-80 transition-opacity"
         onClick={onToggle}
       >
-        <div className="flex items-center gap-2 overflow-hidden shrink">
-          <span className="text-[10px] font-black text-blue-600 bg-blue-50/80 px-2 py-0.5 rounded-full border border-blue-100/50 shadow-sm shrink-0">01</span>
+        <div className="flex items-center gap-2.5 overflow-hidden shrink">
+          <div className={`flex items-center justify-center w-6 h-6 rounded-full shadow-md shrink-0 border transition-all duration-300 ${isExpanded ? "bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-blue-500/20 border-blue-400/50" : "bg-blue-50/80 text-blue-500 border-blue-100 shadow-none"}`}>
+            <span className="text-xs font-black">1</span>
+          </div>
           <div className="flex items-center gap-2 min-w-0">
-            <Label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] whitespace-nowrap truncate cursor-pointer">
+            <Label className={`text-[11px] font-bold uppercase tracking-widest whitespace-nowrap truncate cursor-pointer transition-colors duration-300 ${isExpanded ? "text-slate-700" : "text-slate-500"}`}>
               Dữ liệu tích lũy
             </Label>
           </div>
@@ -229,9 +231,11 @@ function TargetGPAStep({ targetGPA, onSelect, isExpanded, onToggle }: TargetGPAS
         className="flex items-center justify-between cursor-pointer hover:opacity-80 transition-opacity"
         onClick={onToggle}
       >
-        <div className="flex items-center gap-2">
-          <span className="text-[10px] font-black text-blue-600 bg-blue-50/80 px-2 py-0.5 rounded-full border border-blue-100/50 shadow-sm">02</span>
-          <Label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] cursor-pointer">
+        <div className="flex items-center gap-2.5">
+          <div className={`flex items-center justify-center w-6 h-6 rounded-full shadow-md shrink-0 border transition-all duration-300 ${isExpanded ? "bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-blue-500/20 border-blue-400/50" : "bg-blue-50/80 text-blue-500 border-blue-100 shadow-none"}`}>
+            <span className="text-xs font-black">2</span>
+          </div>
+          <Label className={`text-[11px] font-bold uppercase tracking-widest cursor-pointer transition-colors duration-300 ${isExpanded ? "text-slate-700" : "text-slate-500"}`}>
             Mục tiêu mong muốn
           </Label>
         </div>
@@ -328,9 +332,11 @@ function EffortPlanStep({ currentCredits, remainingCredits, onTotalChange, onRem
         className="flex items-center justify-between cursor-pointer hover:opacity-80 transition-opacity"
         onClick={onToggle}
       >
-        <div className="flex items-center gap-2">
-          <span className="text-[10px] font-black text-blue-600 bg-blue-50/80 px-2 py-0.5 rounded-full border border-blue-100/50 shadow-sm">03</span>
-          <Label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] cursor-pointer">
+        <div className="flex items-center gap-2.5">
+          <div className={`flex items-center justify-center w-6 h-6 rounded-full shadow-md shrink-0 border transition-all duration-300 ${isExpanded ? "bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-blue-500/20 border-blue-400/50" : "bg-blue-50/80 text-blue-500 border-blue-100 shadow-none"}`}>
+            <span className="text-xs font-black">3</span>
+          </div>
+          <Label className={`text-[11px] font-bold uppercase tracking-widest cursor-pointer transition-colors duration-300 ${isExpanded ? "text-slate-700" : "text-slate-500"}`}>
             Kế hoạch nỗ lực
           </Label>
         </div>
@@ -435,9 +441,11 @@ function ImprovementStep({ retakes, onAddRetake, onRemoveRetake, onUpdateRetake,
         className="flex items-center justify-between cursor-pointer hover:opacity-80 transition-opacity"
         onClick={onToggle}
       >
-        <div className="flex items-center gap-2">
-          <span className="text-[10px] font-black text-blue-600 bg-blue-50/80 px-2 py-0.5 rounded-full border border-blue-100/50 shadow-sm">04</span>
-          <Label className="text-[10px] font-black text-blue-600 uppercase tracking-[0.15em] cursor-pointer">
+        <div className="flex items-center gap-2.5">
+          <div className={`flex items-center justify-center w-6 h-6 rounded-full shadow-md shrink-0 border transition-all duration-300 ${isExpanded ? "bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-blue-500/20 border-blue-400/50" : "bg-blue-50/80 text-blue-500 border-blue-100 shadow-none"}`}>
+            <span className="text-xs font-black">4</span>
+          </div>
+          <Label className={`text-[11px] font-bold uppercase tracking-widest cursor-pointer transition-colors duration-300 ${isExpanded ? "text-blue-700" : "text-blue-500/80"}`}>
             Học cải thiện
           </Label>
         </div>
