@@ -40,6 +40,26 @@ export function RoadmapTab({ initialData, onSwitchTab }: RoadmapTabProps) {
     });
   };
 
+  const isAnyExpanded = Object.values(expandedSteps).some(Boolean);
+
+  const toggleAllSteps = () => {
+    if (isAnyExpanded) {
+      setExpandedSteps({
+        1: false,
+        2: false,
+        3: false,
+        4: false
+      });
+    } else {
+      setExpandedSteps({
+        1: true,
+        2: true,
+        3: true,
+        4: true
+      });
+    }
+  };
+
   const handleAddRetakeSuggestion = (suggestion: any) => {
     actions.addRetakesFromSuggestion(suggestion);
     // Tự động mở thẻ 4 và đóng thẻ 2, 3 khi bấm Áp dụng
@@ -65,6 +85,7 @@ export function RoadmapTab({ initialData, onSwitchTab }: RoadmapTabProps) {
           computed={computed} 
           expandedSteps={expandedSteps}
           onToggleStep={toggleStep}
+          onToggleAll={toggleAllSteps}
         />
       </motion.div>
 

@@ -18,21 +18,33 @@ interface GoalSetupCardProps {
   computed: RoadmapComputed;
   expandedSteps: Record<number, boolean>;
   onToggleStep: (step: number) => void;
+  onToggleAll: () => void;
 }
 
 const GPA_MILESTONES = [2.0, 2.5, 3.2, 3.6];
 
-export function GoalSetupCard({ state, actions, computed, expandedSteps, onToggleStep }: GoalSetupCardProps) {
+export function GoalSetupCard({ state, actions, computed, expandedSteps, onToggleStep, onToggleAll }: GoalSetupCardProps) {
   const { currentGPA, currentCredits, targetGPA, remainingCredits, retakes } = state;
+  const isAnyExpanded = Object.values(expandedSteps).some(Boolean);
 
   return (
     <Card className="border-slate-200 bg-white shadow-xl shadow-blue-500/5 rounded-3xl overflow-hidden border gap-0 py-0">
       <CardHeader className="py-2.5 px-4 border-b border-slate-200 bg-slate-50/50">
-        <div className="flex items-center gap-2.5">
-          <div className="bg-blue-50/50 backdrop-blur-sm p-1.5 rounded-lg border border-blue-100/50 shadow-sm">
-            <Compass className="h-4 w-4 text-blue-600" />
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="bg-blue-50/50 backdrop-blur-sm p-1.5 rounded-lg border border-blue-100/50 shadow-sm">
+              <Compass className="h-4 w-4 text-blue-600" />
+            </div>
+            <CardTitle className="text-sm text-slate-800 font-bold tracking-tight">Thiết lập mục tiêu</CardTitle>
           </div>
-          <CardTitle className="text-sm text-slate-800 font-bold tracking-tight">Thiết lập mục tiêu</CardTitle>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onToggleAll}
+            className="h-6 text-[10px] font-bold text-slate-500 hover:text-slate-700 hover:bg-slate-200 px-2 rounded-lg"
+          >
+            {isAnyExpanded ? "Thu gọn tất cả" : "Mở tất cả"}
+          </Button>
         </div>
       </CardHeader>
 
