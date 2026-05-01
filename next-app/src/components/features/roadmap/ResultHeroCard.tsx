@@ -49,7 +49,7 @@ function GPADisplay({ status, requiredGPA, textColor }: GPADisplayProps) {
       <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.25em]">
         {getDisplayLabel(status)}
       </div>
-      <div className={`text-4xl sm:text-5xl font-black tracking-tighter py-0.5 ${textColor}`}>
+      <div className={`${isNumeric ? "text-3xl sm:text-4xl" : "text-xl sm:text-2xl"} font-black tracking-tighter py-0.5 ${textColor}`}>
         {isNumeric ? (
           <AnimatedNumber value={requiredGPA} precision={2} />
         ) : (

@@ -62,9 +62,8 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon.ico",
-    apple: "/ava.jpg", // Tạm thời dùng ava.jpg cho apple-touch-icon
+    icon: "/icon.svg",
+    apple: "/ava.jpg",
   },
 };
 
