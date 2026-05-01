@@ -16,35 +16,14 @@ interface GoalSetupCardProps {
   state: RoadmapState;
   actions: RoadmapActions;
   computed: RoadmapComputed;
+  expandedSteps: Record<number, boolean>;
+  onToggleStep: (step: number) => void;
 }
 
 const GPA_MILESTONES = [2.0, 2.5, 3.2, 3.6];
 
-export function GoalSetupCard({ state, actions, computed }: GoalSetupCardProps) {
+export function GoalSetupCard({ state, actions, computed, expandedSteps, onToggleStep }: GoalSetupCardProps) {
   const { currentGPA, currentCredits, targetGPA, remainingCredits, retakes } = state;
-
-  // Quản lý trạng thái đóng mở độc lập cho từng bước
-  const [expandedSteps, setExpandedSteps] = useState<Record<number, boolean>>({
-    1: true,
-    2: true,
-    3: true,
-    4: false
-  });
-
-  const toggleStep = (step: number) => {
-    setExpandedSteps(prev => {
-      const isOpening = !prev[step];
-      const newState = { ...prev, [step]: isOpening };
-      
-      // Nếu mở thẻ số 4 thì tự động đóng thẻ 2 và 3 để tiết kiệm không gian
-      if (step === 4 && isOpening) {
-        newState[2] = false;
-        newState[3] = false;
-      }
-      
-      return newState;
-    });
-  };
 
   return (
     <Card className="border-slate-200 bg-white shadow-xl shadow-blue-500/5 rounded-3xl overflow-hidden border gap-0 py-0">
@@ -65,14 +44,14 @@ export function GoalSetupCard({ state, actions, computed }: GoalSetupCardProps) 
           onCreditsChange={actions.setCurrentCredits}
           onSync={actions.syncFromManual}
           isExpanded={expandedSteps[1]}
-          onToggle={() => toggleStep(1)}
+          onToggle={() => onToggleStep(1)}
         />
 
         <TargetGPAStep
           targetGPA={targetGPA}
           onSelect={actions.setTargetGPA}
           isExpanded={expandedSteps[2]}
-          onToggle={() => toggleStep(2)}
+          onToggle={() => onToggleStep(2)}
         />
 
         <EffortPlanStep
@@ -81,7 +60,7 @@ export function GoalSetupCard({ state, actions, computed }: GoalSetupCardProps) 
           onTotalChange={actions.setTotalGraduationCredits}
           onRemainingChange={actions.setRemainingCredits}
           isExpanded={expandedSteps[3]}
-          onToggle={() => toggleStep(3)}
+          onToggle={() => onToggleStep(3)}
         />
 
         <ImprovementStep
@@ -92,7 +71,7 @@ export function GoalSetupCard({ state, actions, computed }: GoalSetupCardProps) 
           manualImprovableCourses={computed.manualImprovableCourses}
           onToggleFromManual={actions.toggleRetakeFromManual}
           isExpanded={expandedSteps[4]}
-          onToggle={() => toggleStep(4)}
+          onToggle={() => onToggleStep(4)}
         />
       </CardContent>
     </Card>

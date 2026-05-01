@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { useRoadmapState, type InitialRoadmapData } from "@/hooks/useRoadmapState";
 import { GoalSetupCard } from "./roadmap/GoalSetupCard";
@@ -16,6 +17,40 @@ export function RoadmapTab({ initialData, onSwitchTab }: RoadmapTabProps) {
   const { state, actions, computed } = useRoadmapState(initialData);
   const { result, status, maxPossibleGPA, combinations, scenarioText, retakeSuggestions } = computed;
 
+  // Quản lý trạng thái đóng mở của các bước trong GoalSetupCard
+  const [expandedSteps, setExpandedSteps] = useState<Record<number, boolean>>({
+    1: true,
+    2: true,
+    3: true,
+    4: false
+  });
+
+  const toggleStep = (step: number) => {
+    setExpandedSteps(prev => {
+      const isOpening = !prev[step];
+      const newState = { ...prev, [step]: isOpening };
+      
+      // Nếu mở thẻ số 4 thì tự động đóng thẻ 2 và 3 để tiết kiệm không gian
+      if (step === 4 && isOpening) {
+        newState[2] = false;
+        newState[3] = false;
+      }
+      
+      return newState;
+    });
+  };
+
+  const handleAddRetakeSuggestion = (suggestion: any) => {
+    actions.addRetakesFromSuggestion(suggestion);
+    // Tự động mở thẻ 4 và đóng thẻ 2, 3 khi bấm Áp dụng
+    setExpandedSteps(prev => ({
+      ...prev,
+      4: true,
+      2: false,
+      3: false
+    }));
+  };
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
       <motion.div 
@@ -24,7 +59,13 @@ export function RoadmapTab({ initialData, onSwitchTab }: RoadmapTabProps) {
         transition={{ duration: 0.5, delay: 0.1 }}
         className="lg:col-span-4 sticky top-20 space-y-6 h-fit z-20 self-start"
       >
-        <GoalSetupCard state={state} actions={actions} computed={computed} />
+        <GoalSetupCard 
+          state={state} 
+          actions={actions} 
+          computed={computed} 
+          expandedSteps={expandedSteps}
+          onToggleStep={toggleStep}
+        />
       </motion.div>
 
       <motion.div 
@@ -57,7 +98,7 @@ export function RoadmapTab({ initialData, onSwitchTab }: RoadmapTabProps) {
           missingScenarios={computed.missingScenarios}
           targetGPA={state.targetGPA}
           totalPointsGap={computed.totalPointsGap}
-          onAddRetakeSuggestion={actions.addRetakesFromSuggestion}
+          onAddRetakeSuggestion={handleAddRetakeSuggestion}
           onSwitchTab={onSwitchTab}
         />
       </motion.div>
