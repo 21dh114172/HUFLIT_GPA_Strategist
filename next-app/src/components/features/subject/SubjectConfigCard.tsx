@@ -1,10 +1,10 @@
 "use client";
 
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Calculator } from "lucide-react";
+import { Settings2 } from "lucide-react";
 
 interface SubjectConfigCardProps {
   ratio: number;
@@ -36,15 +36,12 @@ export function SubjectConfigCard({
 
     return (
       <Card className="w-full border-white/20 bg-white/40 backdrop-blur-xl shadow-xl shadow-blue-500/5 transition-all duration-300 hover:shadow-blue-500/10 rounded-3xl overflow-hidden gap-0 py-0">
-        <CardHeader className="pt-5 !pb-0 border-b border-white/10 px-4">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center">
-              <Calculator className="h-4 w-4 text-blue-600" />
+        <CardHeader className="py-2.5 px-4 border-b border-slate-200 bg-slate-50/50">
+          <div className="flex items-center gap-2.5">
+            <div className="bg-blue-50/50 backdrop-blur-sm p-1.5 rounded-lg border border-blue-100/50 shadow-sm">
+              <Settings2 className="h-4 w-4 text-blue-600" />
             </div>
-            <div>
-              <CardTitle className="text-sm font-bold text-slate-800 tracking-tight">Cấu hình môn học</CardTitle>
-              <CardDescription className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Thiết lập tham số tính toán</CardDescription>
-            </div>
+            <CardTitle className="text-sm text-slate-800 font-bold tracking-tight">Cấu hình môn học</CardTitle>
           </div>
         </CardHeader>
         <CardContent className="flex flex-col gap-3.5 pt-4 px-4 pb-4">
@@ -114,11 +111,11 @@ export function SubjectConfigCard({
             <div className="bg-blue-50/50 border border-blue-100 p-2.5 rounded-xl flex items-center justify-between shadow-sm">
               <div>
                 <p className="text-[10px] font-bold text-blue-600 uppercase tracking-widest">Điểm đã có</p>
-                <p className="text-[10px] font-bold text-blue-500/70 uppercase tracking-tighter opacity-80">(Quá trình × Tỷ lệ)</p>
+                <p className="text-[10px] font-bold text-blue-500/70 tracking-tighter opacity-80">(Quá trình × Tỷ lệ)</p>
               </div>
               <span className="text-base font-bold text-blue-700">{accumulatedScore.toFixed(2)}</span>
             </div>
-
+  
             <div className={`border p-2.5 rounded-xl flex items-center justify-between shadow-sm transition-all duration-300 ${
               isImpossible ? "bg-red-50 border-red-100" : "bg-emerald-50 border-emerald-100"
             }`}>
@@ -126,7 +123,7 @@ export function SubjectConfigCard({
                 <p className={`text-[10px] font-bold uppercase tracking-widest ${
                   isImpossible ? "text-red-600" : "text-emerald-600"
                 }`}>Điểm cần qua môn</p>
-                <p className="text-[10px] font-bold text-slate-500/70 uppercase tracking-tighter opacity-80">(Thi cuối kỳ tối thiểu)</p>
+                <p className="text-[10px] font-bold text-slate-500/70 tracking-tighter opacity-80">(Thi cuối kỳ tối thiểu)</p>
               </div>
               <span className={`text-base font-bold ${
                 isImpossible ? "text-red-700" : "text-emerald-700"

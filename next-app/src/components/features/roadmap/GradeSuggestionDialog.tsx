@@ -112,7 +112,7 @@ export function GradeSuggestionDialog({ courses, retakes, onToggle }: GradeSugge
                         <button
                           key={i}
                           onClick={() => onToggle(c)}
-                          className={`flex items-center justify-between px-4 py-3 rounded-2xl border transition-all text-left group/card ${
+                          className={`flex items-center justify-between px-4 py-3 rounded-2xl border transition-all text-left group/card cursor-pointer ${
                             isAdded
                               ? "bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-200"
                               : "bg-white border-slate-100 text-slate-700 hover:border-blue-200 hover:bg-blue-50/30"

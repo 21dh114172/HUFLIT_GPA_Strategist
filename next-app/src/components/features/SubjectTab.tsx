@@ -3,7 +3,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Target, Info } from "lucide-react";
+import { Trophy, HelpCircle } from "lucide-react";
 import { useSubjectCalculator } from "@/hooks/useSubjectCalculator";
 import { SubjectConfigCard } from "./subject/SubjectConfigCard";
 import { GradeRequirementCard } from "./subject/GradeRequirementCard";
@@ -49,7 +49,7 @@ export function SubjectTab() {
           <CardContent className="p-3.5 space-y-2">
             <h3 className="text-sm font-bold text-slate-800 uppercase tracking-tight flex items-center justify-start gap-2">
               <span className="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
-                <Info className="w-4 h-4" />
+                <HelpCircle className="w-4 h-4" />
               </span>
               Mẹo sử dụng
             </h3>
@@ -79,16 +79,20 @@ export function SubjectTab() {
         className="lg:col-span-8 space-y-4 w-full"
       >
         <Card className="w-full border-white/20 bg-white/40 backdrop-blur-xl shadow-xl shadow-blue-500/5 transition-all duration-300 hover:shadow-blue-500/10 rounded-3xl overflow-hidden gap-0 py-0">
-          <CardHeader className="pt-5 !pb-0 border-b border-white/10 px-4">
-            <div className="flex items-center gap-3">
-              <Target className="h-4 w-4 text-blue-600" />
-              <CardTitle className="text-sm font-bold text-slate-800 tracking-tight">
-                Mục tiêu Điểm thi
-              </CardTitle>
+          <CardHeader className="py-2.5 px-4 border-b border-slate-200 bg-slate-50/50">
+            <div className="flex items-center gap-2.5">
+              <div className="bg-blue-50/50 backdrop-blur-sm p-1.5 rounded-lg border border-blue-100/50 shadow-sm">
+                <Trophy className="h-4 w-4 text-blue-600" />
+              </div>
+              <div>
+                <CardTitle className="text-sm text-slate-800 font-bold tracking-tight">
+                  Mục tiêu Điểm thi
+                </CardTitle>
+                <CardDescription className="text-[10px] text-slate-500 font-medium">
+                  Điểm thi cần đạt để đạt từng mức GPA mục tiêu.
+                </CardDescription>
+              </div>
             </div>
-            <CardDescription className="text-[11px] text-slate-500 font-medium">
-              Điểm thi cần đạt để đạt từng mức GPA mục tiêu.
-            </CardDescription>
           </CardHeader>
           <CardContent className="pt-4 pb-4">
             <div className="grid grid-cols-1 gap-2">

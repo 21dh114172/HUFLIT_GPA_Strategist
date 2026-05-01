@@ -30,7 +30,7 @@ export function getResultStatus(
 export function getStatusTextColor(status: ResultStatus): string {
   const map: Record<ResultStatus, string> = {
     "no-credits": "text-rose-500",
-    "impossible": "text-rose-500",
+    "impossible": "text-orange-600",
     "very-hard": "text-amber-500",
     "hard": "text-blue-500",
     "achievable": "text-emerald-500",
@@ -42,7 +42,7 @@ export function getStatusTextColor(status: ResultStatus): string {
 export function getStatusBorderColor(status: ResultStatus): string {
   const map: Record<ResultStatus, string> = {
     "no-credits": "border-rose-100",
-    "impossible": "border-rose-100",
+    "impossible": "border-orange-100",
     "very-hard": "border-amber-100",
     "hard": "border-blue-100",
     "achievable": "border-emerald-100",
@@ -58,18 +58,19 @@ export function isStatusNegative(status: ResultStatus): boolean {
 export function getStatusLabel(status: ResultStatus, maxPossibleGPA: number): string {
   switch (status) {
     case "no-credits":  return "Cần thêm môn học lại";
-    case "impossible":  return `Không khả thi • GPA tối đa có thể đạt: ${maxPossibleGPA.toFixed(2)}`;
+    case "impossible":  return `Cần học cải thiện • GPA tối đa hiện tại: ${maxPossibleGPA.toFixed(2)}`;
     case "very-hard":   return "Cần nỗ lực cực kỳ lớn";
     case "hard":        return "Đòi hỏi tập trung cao";
     case "achieved":    return "Đã đạt mục tiêu đề ra";
     case "achievable":  return "Khá khả thi, hãy duy trì";
+    default: return "";
   }
 }
 
 export function getDisplayGPA(status: ResultStatus, requiredGPA: number): string {
   if (status === "no-credits") return "CẦN THÊM";
   if (status === "achieved") return "ĐẠT";
-  if (requiredGPA === Infinity) return "KHÔNG THỂ";
+  if (status === "impossible" || requiredGPA === Infinity || requiredGPA > 4.0) return "CẦN CẢI THIỆN";
   return requiredGPA.toFixed(2);
 }
 

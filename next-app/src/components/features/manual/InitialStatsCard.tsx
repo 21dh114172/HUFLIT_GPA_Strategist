@@ -1,7 +1,7 @@
 "use client";
 
 import { memo } from "react";
-import { Calculator, RotateCcw } from "lucide-react";
+import { LayoutDashboard, RotateCcw } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,12 +25,12 @@ const InitialStatsCard = memo(({
   children
 }: InitialStatsCardProps) => {
   return (
-    <Card className="ring-0 border border-slate-300 bg-white shadow-xl shadow-blue-500/5">
+    <Card className="ring-0 border border-slate-300 bg-white shadow-xl shadow-blue-500/5 py-0">
       <CardHeader className="py-2.5 px-4 border-b border-slate-200 bg-slate-50/50">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="bg-blue-600 p-1.5 rounded-lg shadow-lg shadow-blue-500/20">
-              <Calculator className="h-4 w-4 text-white" />
+            <div className="bg-blue-50/50 backdrop-blur-sm p-1.5 rounded-lg border border-blue-100/50 shadow-sm">
+              <LayoutDashboard className="h-4 w-4 text-blue-600" />
             </div>
             <CardTitle className="text-sm text-slate-800 font-bold tracking-tight">Tổng kết</CardTitle>
           </div>
@@ -39,7 +39,7 @@ const InitialStatsCard = memo(({
           </Button>
         </div>
       </CardHeader>
-      <CardContent className="pt-3 px-4 pb-4 space-y-3">
+      <CardContent className="pt-2 px-4 pb-3 space-y-3">
         <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200 space-y-2 shadow-sm">
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
@@ -65,7 +65,7 @@ const InitialStatsCard = memo(({
             </div>
           </div>
         </div>
-        <div className="pt-1.5">
+        <div className="pt-0.5">
           {children}
         </div>
       </CardContent>

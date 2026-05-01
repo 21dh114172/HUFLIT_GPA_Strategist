@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CloudUpload } from "lucide-react";
+import { CloudUpload, ExternalLink, Copy, ClipboardCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -53,32 +53,44 @@ const PortalImportDialog = ({ onImport }: PortalImportDialogProps) => {
 
           <div className="px-6 py-5 space-y-5">
             {/* Step-by-Step Instructions */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              {[
-                { step: 1, text: "Truy cập Portal HUFLIT", icon: "🌐", url: "https://portal.huflit.edu.vn/Home/Marks" },
-                { step: 2, text: "Ctrl+A rồi Ctrl+C bảng điểm", icon: "📋" },
-                { step: 3, text: "Dán kết quả vào ô bên dưới", icon: "🎯" }
-              ].map((s) => {
-                const isLink = !!s.url;
-                const Component = isLink ? 'a' : 'div' as any;
-                
-                return (
-                  <Component 
-                    key={s.step} 
-                    href={s.url}
-                    target={isLink ? "_blank" : undefined}
-                    rel={isLink ? "noopener noreferrer" : undefined}
-                    className={`bg-slate-50 border border-slate-200 p-3 rounded-xl flex flex-col gap-1.5 relative overflow-hidden group hover:border-blue-300 transition-all ${isLink ? 'cursor-pointer hover:bg-blue-50/50 hover:shadow-sm active:scale-95' : ''}`}
-                  >
-                    <div className="text-[10px] font-bold text-blue-600/40 absolute top-2 right-3 uppercase tracking-widest">Bước 0{s.step}</div>
-                    <span className="text-xl">{s.icon}</span>
-                    <span className="text-[11px] font-bold text-slate-700 leading-tight pr-4">{s.text}</span>
-                    {isLink && (
-                      <div className="text-[9px] font-bold text-blue-600 mt-1.5 bg-blue-50 px-2 py-0.5 rounded-md inline-block w-fit">MỞ TRANG ↗</div>
-                    )}
-                  </Component>
-                );
-              })}
+            {/* Unified Step-by-Step Flow */}
+            <div className="bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-sm">
+              <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-slate-100">
+                {[
+                  { step: 1, text: "Truy cập Portal", subText: "Mở trang điểm ở đây nè! ", icon: ExternalLink, url: "https://portal.huflit.edu.vn/Home/Marks" },
+                  { step: 2, text: "Sao chép tất cả", subText: "Ctrl+A & Ctrl+C", icon: Copy },
+                  { step: 3, text: "Dán vào ô dưới", subText: "Ctrl+V để nhập", icon: ClipboardCheck }
+                ].map((s) => {
+                  const isLink = !!s.url;
+                  const Component = isLink ? 'a' : 'div' as any;
+                  
+                  return (
+                    <Component 
+                      key={s.step} 
+                      href={s.url}
+                      target={isLink ? "_blank" : undefined}
+                      rel={isLink ? "noopener noreferrer" : undefined}
+                      className={`flex items-center gap-3 p-3.5 transition-all group ${isLink ? 'hover:bg-slate-50 cursor-pointer' : ''}`}
+                    >
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 group-hover:scale-110 transition-transform">
+                        <s.icon className="w-4 h-4" strokeWidth={2.5} />
+                      </div>
+                      <div className="flex flex-col min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[9px] font-black text-blue-400 uppercase tracking-tighter">BƯỚC 0{s.step}</span>
+                          {isLink && <ExternalLink className="w-2.5 h-2.5 text-blue-400/50 group-hover:text-blue-500 transition-colors" />}
+                        </div>
+                        <span className={`text-[11px] font-bold text-slate-800 leading-none truncate ${isLink ? 'group-hover:underline group-hover:text-blue-700' : ''}`}>
+                          {s.text}
+                        </span>
+                        <span className={`text-[10px] mt-1 leading-none ${isLink ? 'text-blue-600 font-bold underline underline-offset-2 decoration-blue-300' : 'text-slate-500 font-medium'}`}>
+                          {s.subText}
+                        </span>
+                      </div>
+                    </Component>
+                  );
+                })}
+              </div>
             </div>
 
             {/* Enhanced Textarea Area */}

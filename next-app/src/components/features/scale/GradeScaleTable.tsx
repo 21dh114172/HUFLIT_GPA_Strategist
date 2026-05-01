@@ -35,8 +35,12 @@ export const GradeScaleTable = memo(() => {
                     {scale.grade}
                   </span>
                 </TableCell>
-                <TableCell className="py-1 text-xs text-slate-600 font-bold font-mono tabular-nums text-center">
-                  {scale.min.toFixed(1)} - {scale.max.toFixed(1)}
+                <TableCell className="py-1 flex justify-center">
+                  <div className="grid grid-cols-[1fr_auto_1fr] gap-2 items-center font-mono tabular-nums text-xs min-w-[70px]">
+                    <span className="text-right text-slate-600 font-bold">{scale.min.toFixed(1)}</span>
+                    <span className="text-slate-300 font-bold">-</span>
+                    <span className="text-left text-slate-600 font-bold">{scale.max.toFixed(1)}</span>
+                  </div>
                 </TableCell>
                 <TableCell className="py-1 text-xs font-bold text-slate-800 text-center font-mono tabular-nums">
                   {scale.gpa.toFixed(1)}

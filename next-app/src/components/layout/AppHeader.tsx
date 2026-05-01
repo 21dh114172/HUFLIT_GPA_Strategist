@@ -5,6 +5,7 @@ import { TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { memo } from "react";
 import { AuthorInfoDialog } from "./AuthorInfoDialog";
 import Image from "next/image";
+import { motion } from "framer-motion";
 
 interface AppHeaderProps {
   activeTab: string;
@@ -29,28 +30,54 @@ export const AppHeader = memo(({ activeTab, onTabChange }: AppHeaderProps) => {
 
         {/* Nav Menu (Floating Pill Tabs) */}
         <div className="flex-1 flex items-center justify-center h-full px-2 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-          <TabsList className="flex items-center h-10 gap-1 sm:gap-2 border-none p-1 bg-slate-50/50 rounded-full">
+          <TabsList className="flex items-center h-9 gap-1 sm:gap-1.5 border-none p-1 bg-transparent rounded-full relative">
             {[
               { value: "manual", icon: Calculator, label: "Nhập điểm" },
               { value: "roadmap", icon: Target, label: "Lộ trình" },
               { value: "subject", icon: BookOpen, label: "Môn lẻ" },
               { value: "scale", icon: BarChart3, label: "Thang điểm" },
               { value: "news", icon: Newspaper, label: "Tin tức" },
-            ].map((tab) => (
-              <TabsTrigger 
-                key={tab.value}
-                value={tab.value} 
-                className="h-8 sm:h-8.5 relative rounded-full border-none px-4 sm:px-6 py-0 text-[10px] sm:text-[11px] font-bold text-slate-500 transition-all focus-visible:ring-0 flex items-center justify-center group shadow-none 
-                  data-active:bg-blue-100/70 data-active:text-blue-700 tracking-tight"
-              >
-                <span className="whitespace-nowrap mb-0.5">{tab.label}</span>
-                
-                {/* Underline Indicator - Refined for a sleeker look */}
-                <div className="absolute inset-x-0 bottom-[5px] flex justify-center opacity-0 group-data-active:opacity-100 transition-all duration-300">
-                  <div className="w-6 h-[2px] bg-blue-600 rounded-full opacity-80" />
-                </div>
-              </TabsTrigger>
-            ))}
+            ].map((tab) => {
+              const isActive = activeTab === tab.value;
+              
+              return (
+                <TabsTrigger 
+                  key={tab.value}
+                  value={tab.value} 
+                  className="h-7 sm:h-8 relative rounded-full border-0 px-4 sm:px-6 py-0 text-[10px] sm:text-[11px] font-bold text-slate-500 transition-colors focus-visible:ring-0 flex items-center justify-center group shadow-none 
+                    hover:text-blue-600/80 data-active:text-blue-700 tracking-tight z-10 bg-transparent"
+                >
+                  {/* Hover effect for inactive tabs */}
+                  {!isActive && (
+                    <div className="absolute inset-0 bg-slate-100/0 group-hover:bg-slate-100/50 rounded-full transition-colors -z-10" />
+                  )}
+
+                  {/* Active Background (Magic Pill) */}
+                  {isActive && (
+                    <motion.div 
+                      layoutId="active-pill"
+                      className="absolute inset-0 bg-blue-50 border-0 rounded-full -z-10 shadow-sm"
+                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                    />
+                  )}
+
+                  <span className="whitespace-nowrap relative z-20 transition-transform group-active:scale-95 tracking-tight">
+                    {tab.label}
+                  </span>
+                  
+                  {/* Active Underline Indicator (Animated) */}
+                  {isActive && (
+                    <motion.div 
+                      layoutId="active-underline"
+                      className="absolute inset-x-0 bottom-[4px] flex justify-center z-20"
+                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                    >
+                      <div className="w-6 h-[2px] bg-blue-600 rounded-full opacity-80" />
+                    </motion.div>
+                  )}
+                </TabsTrigger>
+              );
+            })}
           </TabsList>
         </div>
 

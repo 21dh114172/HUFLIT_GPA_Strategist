@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Target, RefreshCcw, BookOpen, GraduationCap, HelpCircle, ChevronDown, ChevronUp } from "lucide-react";
+import { Compass, RefreshCcw, BookOpen, GraduationCap, HelpCircle, ChevronDown, ChevronUp } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { RetakeList } from "./RetakeList";
 import type { RoadmapState, RoadmapActions, RoadmapComputed } from "@/hooks/useRoadmapState";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface GoalSetupCardProps {
   state: RoadmapState;
@@ -47,10 +48,12 @@ export function GoalSetupCard({ state, actions, computed }: GoalSetupCardProps) 
 
   return (
     <Card className="border-slate-200 bg-white shadow-xl shadow-blue-500/5 rounded-3xl overflow-hidden border gap-0 py-0">
-      <CardHeader className="bg-slate-50/50 border-b border-slate-100 pt-4 pb-2.5 px-5">
-        <div className="flex items-center gap-3">
-          <Target className="h-4 w-4 text-blue-600" strokeWidth={2} />
-          <CardTitle className="text-sm font-bold text-slate-900 tracking-tight">Thiết lập mục tiêu</CardTitle>
+      <CardHeader className="py-2.5 px-4 border-b border-slate-200 bg-slate-50/50">
+        <div className="flex items-center gap-2.5">
+          <div className="bg-blue-50/50 backdrop-blur-sm p-1.5 rounded-lg border border-blue-100/50 shadow-sm">
+            <Compass className="h-4 w-4 text-blue-600" />
+          </div>
+          <CardTitle className="text-sm text-slate-800 font-bold tracking-tight">Thiết lập mục tiêu</CardTitle>
         </div>
       </CardHeader>
 
@@ -119,7 +122,7 @@ function StartingPointStep({ currentGPA, currentCredits, onGPAChange, onCreditsC
   }, [currentCredits]);
 
   return (
-    <div className={`bg-white border border-slate-100 rounded-[1.5rem] shadow-sm relative z-10 transition-all duration-300 overflow-hidden ${isExpanded ? "p-2.5 space-y-2" : "p-2.5"}`}>
+    <div className={`bg-white border border-slate-100 rounded-[1.5rem] shadow-sm relative z-10 transition-all duration-300 overflow-hidden ${isExpanded ? "p-2.5" : "p-2.5"}`}>
       <div
         className="flex items-center justify-between cursor-pointer hover:opacity-80 transition-opacity"
         onClick={onToggle}
@@ -134,9 +137,13 @@ function StartingPointStep({ currentGPA, currentCredits, onGPAChange, onCreditsC
         </div>
         <div className="flex items-center gap-3 shrink-0">
           {!isExpanded && (
-            <span className="text-[9px] font-black text-blue-600 bg-blue-50/50 px-2 py-1 rounded-lg border border-blue-100/30 whitespace-nowrap shadow-sm">
+            <motion.span 
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="text-[9px] font-black text-blue-600 bg-blue-50/50 px-2 py-1 rounded-lg border border-blue-100/30 whitespace-nowrap shadow-sm"
+            >
               {currentGPA.toFixed(2)} GPA • {currentCredits} TC
-            </span>
+            </motion.span>
           )}
           {isExpanded ? (
             <div className="flex items-center gap-2">
@@ -163,45 +170,55 @@ function StartingPointStep({ currentGPA, currentCredits, onGPAChange, onCreditsC
         </div>
       </div>
 
-      {isExpanded && (
-        <div className="grid grid-cols-2 gap-3 bg-slate-50/50 p-2.5 rounded-2xl border border-slate-100/50">
-          <div className="space-y-1.5">
-            <Input
-              type="number"
-              step="0.01"
-              min={0}
-              max={4.0}
-              value={gpaStr}
-              onChange={e => {
-                const s = e.target.value;
-                setGpaStr(s);
-                const val = s === "" ? 0 : parseFloat(s);
-                if (!isNaN(val)) onGPAChange(Math.min(4.0, Math.max(0, val)));
-              }}
-              placeholder="0.00"
-              className="h-9 text-[13px] font-black text-blue-600 bg-white border-slate-200 rounded-xl focus:ring-blue-500/20 text-center"
-            />
-            <div className="text-[9px] font-bold text-slate-400 text-center uppercase tracking-wider leading-tight">Điểm GPA hiện tại</div>
-          </div>
-          <div className="space-y-1.5">
-            <Input
-              type="number"
-              min={0}
-              max={300}
-              value={creditsStr}
-              onChange={e => {
-                const s = e.target.value;
-                setCreditsStr(s);
-                const val = s === "" ? 0 : parseInt(s);
-                if (!isNaN(val)) onCreditsChange(Math.min(300, Math.max(0, val)));
-              }}
-              placeholder="0"
-              className="h-9 text-[13px] font-black text-blue-600 bg-white border-slate-200 rounded-xl focus:ring-blue-500/20 text-center"
-            />
-            <div className="text-[9px] font-bold text-slate-400 text-center uppercase tracking-wider leading-tight">Số tín chỉ tích lũy</div>
-          </div>
-        </div>
-      )}
+      <AnimatePresence initial={false}>
+        {isExpanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0, marginTop: 0 }}
+            animate={{ height: "auto", opacity: 1, marginTop: 8 }}
+            exit={{ height: 0, opacity: 0, marginTop: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="overflow-hidden"
+          >
+            <div className="grid grid-cols-2 gap-3 bg-slate-50/50 p-2.5 rounded-2xl border border-slate-100/50">
+              <div className="space-y-1.5">
+                <Input
+                  type="number"
+                  step="0.01"
+                  min={0}
+                  max={4.0}
+                  value={gpaStr}
+                  onChange={e => {
+                    const s = e.target.value;
+                    setGpaStr(s);
+                    const val = s === "" ? 0 : parseFloat(s);
+                    if (!isNaN(val)) onGPAChange(Math.min(4.0, Math.max(0, val)));
+                  }}
+                  placeholder="0.00"
+                  className="h-9 text-[13px] font-black text-blue-600 bg-white border-slate-200 rounded-xl focus:ring-blue-500/20 text-center"
+                />
+                <div className="text-[9px] font-bold text-slate-400 text-center uppercase tracking-wider leading-tight">Điểm GPA hiện tại</div>
+              </div>
+              <div className="space-y-1.5">
+                <Input
+                  type="number"
+                  min={0}
+                  max={300}
+                  value={creditsStr}
+                  onChange={e => {
+                    const s = e.target.value;
+                    setCreditsStr(s);
+                    const val = s === "" ? 0 : parseInt(s);
+                    if (!isNaN(val)) onCreditsChange(Math.min(300, Math.max(0, val)));
+                  }}
+                  placeholder="0"
+                  className="h-9 text-[13px] font-black text-blue-600 bg-white border-slate-200 rounded-xl focus:ring-blue-500/20 text-center"
+                />
+                <div className="text-[9px] font-bold text-slate-400 text-center uppercase tracking-wider leading-tight">Số tín chỉ tích lũy</div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -228,7 +245,7 @@ function TargetGPAStep({ targetGPA, onSelect, isExpanded, onToggle }: TargetGPAS
   };
 
   return (
-    <div className={`bg-blue-50/30 border border-blue-100/50 rounded-[1.5rem] shadow-sm relative z-10 transition-all duration-300 overflow-hidden ${isExpanded ? "p-2.5 space-y-2" : "p-2.5"}`}>
+    <div className={`bg-blue-50/30 border border-blue-100/50 rounded-[1.5rem] shadow-sm relative z-10 transition-all duration-300 overflow-hidden ${isExpanded ? "p-2.5" : "p-2.5"}`}>
       <div
         className="flex items-center justify-between cursor-pointer hover:opacity-80 transition-opacity"
         onClick={onToggle}
@@ -241,51 +258,65 @@ function TargetGPAStep({ targetGPA, onSelect, isExpanded, onToggle }: TargetGPAS
         </div>
         <div className="flex items-center gap-3 shrink-0">
           {!isExpanded && (
-            <span className="text-[9px] font-black text-blue-600 bg-white/80 px-2 py-1 rounded-lg border border-blue-100/30 whitespace-nowrap shadow-sm">
+            <motion.span 
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="text-[9px] font-black text-blue-600 bg-white/80 px-2 py-1 rounded-lg border border-blue-100/30 whitespace-nowrap shadow-sm"
+            >
               {targetGPA.toFixed(2)} GPA
-            </span>
+            </motion.span>
           )}
           {isExpanded ? <ChevronUp className="h-3 w-3 text-blue-300" /> : <ChevronDown className="h-3 w-3 text-blue-300" />}
         </div>
       </div>
 
-      {isExpanded && (
-        <div className="bg-white/60 p-2 pt-3.5 rounded-2xl border border-blue-100/30 space-y-3">
-          <div className="relative group">
-            <Input
-              type="number"
-              step="0.05"
-              min={0}
-              max={4.0}
-              value={valStr}
-              onChange={e => handleInputChange(e.target.value)}
-              placeholder="GPA mục tiêu"
-              className="text-center text-lg font-black text-blue-700 bg-white border-2 border-blue-100 focus:ring-blue-500/20 rounded-xl h-10 shadow-sm transition-all group-hover:border-blue-200"
-            />
-            <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-white px-2.5 py-0.5 rounded-full border border-blue-100 text-[9px] font-black text-blue-600 uppercase tracking-widest whitespace-nowrap pointer-events-none shadow-sm">GPA mục tiêu</div>
-          </div>
+      <AnimatePresence initial={false}>
+        {isExpanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0, marginTop: 0 }}
+            animate={{ height: "auto", opacity: 1, marginTop: 8 }}
+            exit={{ height: 0, opacity: 0, marginTop: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="overflow-hidden"
+          >
+            <div className="bg-white/60 p-2 pt-3.5 rounded-2xl border border-blue-100/30 space-y-3">
+              <div className="relative group">
+                <Input
+                  type="number"
+                  step="0.05"
+                  min={0}
+                  max={4.0}
+                  value={valStr}
+                  onChange={e => handleInputChange(e.target.value)}
+                  placeholder="GPA mục tiêu"
+                  className="text-center text-lg font-black text-blue-700 bg-white border-2 border-blue-100 focus:ring-blue-500/20 rounded-xl h-10 shadow-sm transition-all group-hover:border-blue-200"
+                />
+                <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-white px-2.5 py-0.5 rounded-full border border-blue-100 text-[9px] font-black text-blue-600 uppercase tracking-widest whitespace-nowrap pointer-events-none shadow-sm">GPA mục tiêu</div>
+              </div>
 
-          <div className="grid grid-cols-4 h-8 bg-white/50 rounded-lg p-0.5 border border-slate-200/50">
-            {GPA_MILESTONES.map(val => (
-              <button
-                key={val}
-                type="button"
-                className={`h-full text-[10px] font-black transition-all rounded-md ${targetGPA === val
-                    ? "bg-white text-blue-600 shadow-sm"
-                    : "text-slate-400 hover:text-slate-600 hover:bg-white/30"
-                  }`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setValStr(val.toString());
-                  onSelect(val);
-                }}
-              >
-                {val.toFixed(1)}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+              <div className="grid grid-cols-4 h-8 bg-white/50 rounded-lg p-0.5 border border-slate-200/50">
+                {GPA_MILESTONES.map(val => (
+                  <button
+                    key={val}
+                    type="button"
+                    className={`h-full text-[10px] font-black transition-all rounded-md cursor-pointer ${targetGPA === val
+                        ? "bg-white text-blue-600 shadow-sm"
+                        : "text-slate-400 hover:text-slate-600 hover:bg-white/30"
+                      }`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setValStr(val.toString());
+                      onSelect(val);
+                    }}
+                  >
+                    {val.toFixed(1)}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -313,7 +344,7 @@ function EffortPlanStep({ currentCredits, remainingCredits, onTotalChange, onRem
   }, [remainingCredits]);
 
   return (
-    <div className={`bg-white border border-slate-100 rounded-[1.5rem] shadow-sm relative z-10 transition-all duration-300 overflow-hidden ${isExpanded ? "p-2.5 space-y-2" : "p-2.5"}`}>
+    <div className={`bg-white border border-slate-100 rounded-[1.5rem] shadow-sm relative z-10 transition-all duration-300 overflow-hidden ${isExpanded ? "p-2.5" : "p-2.5"}`}>
       <div
         className="flex items-center justify-between cursor-pointer hover:opacity-80 transition-opacity"
         onClick={onToggle}
@@ -326,69 +357,83 @@ function EffortPlanStep({ currentCredits, remainingCredits, onTotalChange, onRem
         </div>
         <div className="flex items-center gap-3 shrink-0">
           {!isExpanded && (
-            <span className="text-[9px] font-black text-blue-600 bg-blue-50/50 px-2 py-1 rounded-lg border border-blue-100/30 whitespace-nowrap shadow-sm">
+            <motion.span 
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="text-[9px] font-black text-blue-600 bg-blue-50/50 px-2 py-1 rounded-lg border border-blue-100/30 whitespace-nowrap shadow-sm"
+            >
               {remainingCredits} TC CÒN LẠI
-            </span>
+            </motion.span>
           )}
           {isExpanded ? <ChevronUp className="h-3 w-3 text-slate-300" /> : <ChevronDown className="h-3 w-3 text-slate-300" />}
         </div>
       </div>
 
-      {isExpanded && (
-        <div className="bg-slate-50/50 p-2 pt-3.5 rounded-2xl border border-slate-100/50 space-y-3">
-          <Tabs defaultValue="remaining" className="w-full gap-3 flex flex-col">
-            <TabsContent value="total" className="mt-0">
-              <div className="relative group">
-                <Input
-                  type="number"
-                  min={0}
-                  max={300}
-                  value={totalStr}
-                  onChange={e => {
-                    const s = e.target.value;
-                    setTotalStr(s);
-                    if (s === "") return onRemainingChange(0);
-                    const val = parseInt(s);
-                    if (!isNaN(val)) onTotalChange(Math.min(300, Math.max(0, val)));
-                  }}
-                  placeholder="Ví dụ: 140"
-                  className="text-center text-lg font-black text-blue-700 bg-white border-2 border-blue-100 focus:ring-blue-500/20 rounded-xl h-10 shadow-sm transition-all group-hover:border-blue-200"
-                />
-                <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-white px-2.5 py-0.5 rounded-full border border-blue-100 text-[9px] font-black text-blue-600 uppercase tracking-widest whitespace-nowrap pointer-events-none shadow-sm">Tổng tín chỉ toàn khóa</div>
-              </div>
-            </TabsContent>
+      <AnimatePresence initial={false}>
+        {isExpanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0, marginTop: 0 }}
+            animate={{ height: "auto", opacity: 1, marginTop: 8 }}
+            exit={{ height: 0, opacity: 0, marginTop: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="overflow-hidden"
+          >
+            <div className="bg-slate-50/50 p-2 pt-3.5 rounded-2xl border border-slate-100/50 space-y-3">
+              <Tabs defaultValue="remaining" className="w-full gap-3 flex flex-col">
+                <TabsContent value="total" className="mt-0">
+                  <div className="relative group">
+                    <Input
+                      type="number"
+                      min={0}
+                      max={300}
+                      value={totalStr}
+                      onChange={e => {
+                        const s = e.target.value;
+                        setTotalStr(s);
+                        if (s === "") return onRemainingChange(0);
+                        const val = parseInt(s);
+                        if (!isNaN(val)) onTotalChange(Math.min(300, Math.max(0, val)));
+                      }}
+                      placeholder="Ví dụ: 140"
+                      className="text-center text-lg font-black text-blue-700 bg-white border-2 border-blue-100 focus:ring-blue-500/20 rounded-xl h-10 shadow-sm transition-all group-hover:border-blue-200"
+                    />
+                    <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-white px-2.5 py-0.5 rounded-full border border-blue-100 text-[9px] font-black text-blue-600 uppercase tracking-widest whitespace-nowrap pointer-events-none shadow-sm">Tổng tín chỉ toàn khóa</div>
+                  </div>
+                </TabsContent>
 
-            <TabsContent value="remaining" className="mt-0">
-              <div className="relative group">
-                <Input
-                  type="number"
-                  min={0}
-                  max={200}
-                  value={remStr}
-                  onChange={e => {
-                    const s = e.target.value;
-                    setRemStr(s);
-                    const val = s === "" ? 0 : parseInt(s);
-                    if (!isNaN(val)) onRemainingChange(Math.min(200, Math.max(0, val)));
-                  }}
-                  placeholder="Ví dụ: 30"
-                  className="text-center text-lg font-black text-blue-700 bg-white border-2 border-blue-100 focus:ring-blue-500/20 rounded-xl h-10 shadow-sm transition-all group-hover:border-blue-200"
-                />
-                <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-white px-2.5 py-0.5 rounded-full border border-blue-100 text-[9px] font-black text-blue-600 uppercase tracking-widest whitespace-nowrap pointer-events-none shadow-sm">Số tín chỉ dự kiến học</div>
-              </div>
-            </TabsContent>
+                <TabsContent value="remaining" className="mt-0">
+                  <div className="relative group">
+                    <Input
+                      type="number"
+                      min={0}
+                      max={200}
+                      value={remStr}
+                      onChange={e => {
+                        const s = e.target.value;
+                        setRemStr(s);
+                        const val = s === "" ? 0 : parseInt(s);
+                        if (!isNaN(val)) onRemainingChange(Math.min(200, Math.max(0, val)));
+                      }}
+                      placeholder="Ví dụ: 30"
+                      className="text-center text-lg font-black text-blue-700 bg-white border-2 border-blue-100 focus:ring-blue-500/20 rounded-xl h-10 shadow-sm transition-all group-hover:border-blue-200"
+                    />
+                    <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-white px-2.5 py-0.5 rounded-full border border-blue-100 text-[9px] font-black text-blue-600 uppercase tracking-widest whitespace-nowrap pointer-events-none shadow-sm">Số tín chỉ dự kiến học</div>
+                  </div>
+                </TabsContent>
 
-            <TabsList className="grid w-full grid-cols-2 h-7 bg-white/50 rounded-lg p-0.5 border border-slate-200/50 order-last">
-              <TabsTrigger value="remaining" className="text-[9px] font-black uppercase tracking-tighter rounded-md data-active:bg-white data-active:text-blue-600 data-active:shadow-sm transition-all h-6">
-                <BookOpen className="h-3 w-3 mr-1.5" /> Còn lại
-              </TabsTrigger>
-              <TabsTrigger value="total" className="text-[9px] font-black uppercase tracking-tighter rounded-md data-active:bg-white data-active:text-blue-600 data-active:shadow-sm transition-all h-6">
-                <GraduationCap className="h-3 w-3 mr-1.5" /> Tổng cộng
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </div>
-      )}
+                <TabsList className="grid w-full grid-cols-2 h-7 bg-white/50 rounded-lg p-0.5 border border-slate-200/50 order-last">
+                  <TabsTrigger value="remaining" className="text-[9px] font-semibold uppercase tracking-tighter rounded-md data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm transition-all h-6">
+                    <BookOpen className="h-3 w-3 mr-1.5" /> Còn lại
+                  </TabsTrigger>
+                  <TabsTrigger value="total" className="text-[9px] font-semibold uppercase tracking-tighter rounded-md data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm transition-all h-6">
+                    <GraduationCap className="h-3 w-3 mr-1.5" /> Tổng cộng
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -406,7 +451,7 @@ interface ImprovementStepProps {
 
 function ImprovementStep({ retakes, onAddRetake, onRemoveRetake, onUpdateRetake, manualImprovableCourses, onToggleFromManual, isExpanded, onToggle }: ImprovementStepProps) {
   return (
-    <div className={`bg-white border border-slate-100 rounded-[1.5rem] shadow-sm relative z-10 transition-all duration-300 overflow-hidden ${isExpanded ? "p-2.5 space-y-2" : "p-2.5"}`}>
+    <div className={`bg-white border border-slate-100 rounded-[1.5rem] shadow-sm relative z-10 transition-all duration-300 overflow-hidden ${isExpanded ? "p-2.5" : "p-2.5"}`}>
       <div
         className="flex items-center justify-between cursor-pointer hover:opacity-80 transition-opacity"
         onClick={onToggle}
@@ -419,26 +464,40 @@ function ImprovementStep({ retakes, onAddRetake, onRemoveRetake, onUpdateRetake,
         </div>
         <div className="flex items-center gap-3 shrink-0">
           {!isExpanded && (
-            <span className="text-[9px] font-black text-blue-600 bg-blue-50/50 px-2 py-1 rounded-lg border border-blue-100/30 whitespace-nowrap shadow-sm">
+            <motion.span 
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="text-[9px] font-black text-blue-600 bg-blue-50/50 px-2 py-1 rounded-lg border border-blue-100/30 whitespace-nowrap shadow-sm"
+            >
               {retakes.length} MÔN CẢI THIỆN
-            </span>
+            </motion.span>
           )}
           {isExpanded ? <ChevronUp className="h-3 w-3 text-blue-300" /> : <ChevronDown className="h-3 w-3 text-blue-300" />}
         </div>
       </div>
 
-      {isExpanded && (
-        <div className="pt-1">
-          <RetakeList
-            retakes={retakes}
-            onAdd={onAddRetake}
-            onRemove={onRemoveRetake}
-            onUpdate={onUpdateRetake}
-            manualImprovableCourses={manualImprovableCourses}
-            onToggleFromManual={onToggleFromManual}
-          />
-        </div>
-      )}
+      <AnimatePresence initial={false}>
+        {isExpanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0, marginTop: 0 }}
+            animate={{ height: "auto", opacity: 1, marginTop: 8 }}
+            exit={{ height: 0, opacity: 0, marginTop: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="overflow-hidden"
+          >
+            <div className="pt-1">
+              <RetakeList
+                retakes={retakes}
+                onAdd={onAddRetake}
+                onRemove={onRemoveRetake}
+                onUpdate={onUpdateRetake}
+                manualImprovableCourses={manualImprovableCourses}
+                onToggleFromManual={onToggleFromManual}
+              />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -1,11 +1,12 @@
 "use client";
 
-import { TrendingUp, AlertCircle, Plus } from "lucide-react";
+import { Sparkles, AlertCircle, Plus } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { GRADE_SCALE, type GradeCombination, type RetakeSuggestion } from "@/lib/gpa-engine";
 import type { RoadmapComputed } from "@/hooks/useRoadmapState";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface ScenarioCardProps {
   scenarioText: string;
@@ -47,15 +48,19 @@ export function ScenarioCard({
 
 function RecommendedScenario({ scenarioText }: { scenarioText: string }) {
   return (
-    <div className="p-2.5 bg-slate-50/80 rounded-xl border border-slate-100 relative overflow-hidden group">
+    <motion.div 
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="p-2.5 bg-slate-50/80 rounded-xl border border-slate-100 relative overflow-hidden group"
+    >
       <div className="absolute top-0 right-0 p-3 opacity-[0.03] group-hover:scale-110 transition-transform duration-700 pointer-events-none">
-        <TrendingUp className="h-16 w-16 text-blue-600" strokeWidth={1.5} />
+        <Sparkles className="h-16 w-16 text-blue-600" strokeWidth={1.5} />
       </div>
       <div className="relative z-10">
         <div className="text-[10px] font-bold text-blue-600 uppercase tracking-[0.15em] mb-1">Kịch bản khuyến nghị</div>
         <div className="text-sm font-bold text-slate-800 leading-snug tracking-tight">{scenarioText}</div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -96,7 +101,12 @@ function CombinationCard({ combo: c, index: i, result, targetGPA }: CombinationC
   const isBest = i === 0;
 
   return (
-    <div className="group/combo p-2 bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-md hover:border-blue-200 transition-all duration-300">
+    <motion.div 
+      initial={{ opacity: 0, x: -10 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay: i * 0.05 }}
+      className="group/combo p-2 bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-md hover:border-blue-200 transition-all duration-300"
+    >
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           <Badge variant="outline" className="bg-slate-50 border-slate-100 text-slate-500 text-[9px] font-black py-0.5 px-2 rounded-lg uppercase tracking-widest">
@@ -127,7 +137,7 @@ function CombinationCard({ combo: c, index: i, result, targetGPA }: CombinationC
           <SingleGradeBlock grade={c.c1 > 0 ? c.g1.grade : c.g2.grade} credits={c.c1 + c.c2} />
         )}
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -252,8 +262,8 @@ function RescueSuggestions({ suggestions, hasManualData, missingScenarios, total
                   CÓ THỂ CỨU VÃN
                 </Badge>
               ) : (
-                <Badge className="bg-gradient-to-r from-rose-600 to-pink-600 text-white border-none text-[9px] font-bold px-2.5 h-4.5 rounded-full shadow-sm shadow-rose-200 uppercase tracking-wider">
-                  KHÔNG KHẢ THI
+                <Badge className="bg-gradient-to-r from-orange-500 to-amber-500 text-white border-none text-[9px] font-bold px-2.5 h-4.5 rounded-full shadow-sm shadow-orange-200 uppercase tracking-wider">
+                  CẦN CẢI THIỆN
                 </Badge>
               )}
             </div>
@@ -335,7 +345,12 @@ interface RescueSuggestionRowProps {
 
 function RescueSuggestionRow({ suggestion: s, onAdd, index }: RescueSuggestionRowProps) {
   return (
-    <div className="bg-white border border-slate-100 rounded-xl shadow-sm hover:border-indigo-200 hover:shadow-indigo-500/5 hover:shadow-lg transition-all duration-300 overflow-hidden group/row">
+    <motion.div 
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.1 }}
+      className="bg-white border border-slate-100 rounded-xl shadow-sm hover:border-indigo-200 hover:shadow-indigo-500/5 hover:shadow-lg transition-all duration-300 overflow-hidden group/row"
+    >
       <div className="p-2">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
@@ -382,7 +397,6 @@ function RescueSuggestionRow({ suggestion: s, onAdd, index }: RescueSuggestionRo
           ))}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
-

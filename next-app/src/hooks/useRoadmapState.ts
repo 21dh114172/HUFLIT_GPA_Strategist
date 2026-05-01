@@ -189,7 +189,7 @@ export function useRoadmapState(initialData?: InitialRoadmapData | null) {
     
     // The deficit is how many total grade points we are missing to hit the target at graduation
     const pointsGap = targetPointsAtGraduation - maxPossiblePointsAtGraduation;
-
+    
     if (pointsGap <= 0) return [];
 
     // Different retake strategies
@@ -272,26 +272,35 @@ export function useRoadmapState(initialData?: InitialRoadmapData | null) {
       setCurrentCredits(calcResult.totalCredits);
       setManualVersion(v => v + 1);
 
-      // Sync retakes (courses added in manual tab but without grades)
+      // Sync retakes and remaining credits
       const manualRetakes: RetakeItem[] = [];
+      let manualRemainingCredits = 0;
+      
       if (hasSemesters) {
         semesters.forEach((sem: any) => {
           sem.courses.forEach((c: any) => {
-            if (c.isRetake && (!c.grade || c.grade === "")) {
-              const gInfo = findGradeInfo(c.oldGrade || "D");
-              manualRetakes.push({
-                id: Math.random().toString(),
-                oldGrade: gInfo?.gpa || 1.0,
-                credits: c.credits,
-                name: c.name,
-              });
+            // Course without grade
+            if (!c.grade || c.grade === "") {
+              if (c.isRetake) {
+                const gInfo = findGradeInfo(c.oldGrade || "D");
+                manualRetakes.push({
+                  id: Math.random().toString(),
+                  oldGrade: gInfo?.gpa || 1.0,
+                  credits: c.credits,
+                  name: c.name,
+                });
+              } else {
+                // New course planned but not yet graded
+                manualRemainingCredits += c.credits;
+              }
             }
           });
         });
       }
       
-      // Always sync retakes to ensure consistency
+      // Always sync to ensure consistency
       setRetakes(manualRetakes);
+      setRemainingCredits(manualRemainingCredits);
 
       // Auto-suggest next target GPA milestone based on new cumulative GPA
       const milestones = [2.0, 2.5, 3.2, 3.6];

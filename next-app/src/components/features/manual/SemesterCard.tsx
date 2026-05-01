@@ -1,7 +1,7 @@
 "use client";
 
 import { memo } from "react";
-import { BookOpen, Plus, Trash2, History } from "lucide-react";
+import { GraduationCap, Plus, Trash2, History } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -45,8 +45,8 @@ const SemesterCard = memo(({
       <Card className="ring-0 border border-slate-200 bg-white/80 backdrop-blur-xl shadow-xl shadow-blue-500/5 hover:shadow-blue-500/10 transition-all duration-500 overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-300 gap-0 py-0">
         <CardHeader className="bg-white border-b border-slate-100 py-3 !pb-3 px-4 flex flex-row items-center justify-between group/header transition-all hover:bg-slate-50/30">
           <div className="flex items-center gap-3 flex-1 min-w-0">
-            <div className="h-8 w-8 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shadow-sm shrink-0 group-hover/header:scale-105 transition-transform duration-300">
-              <BookOpen className="h-4 w-4" />
+            <div className="h-8 w-8 rounded-lg bg-blue-50/50 backdrop-blur-sm border border-blue-100/50 flex items-center justify-center text-blue-600 shadow-sm shrink-0 group-hover/header:scale-105 transition-transform duration-300">
+              <GraduationCap className="h-4 w-4" />
             </div>
             
             <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -86,7 +86,7 @@ const SemesterCard = memo(({
             <Table>
               <TableHeader className="bg-slate-50/50 border-b border-slate-200">
                 <TableRow className="hover:bg-transparent border-none">
-                  <TableHead className="w-[45%] text-[10px] font-semibold uppercase text-slate-500 tracking-widest ps-5 py-2">Môn học</TableHead>
+                  <TableHead className="w-[45%] text-[10px] font-semibold uppercase text-slate-500 tracking-widest ps-6 py-2">Môn học</TableHead>
                   <TableHead className="w-[15%] text-[10px] font-semibold uppercase text-slate-500 tracking-widest text-center py-2">Tín chỉ</TableHead>
                   <TableHead className="w-[20%] text-[10px] font-semibold uppercase text-slate-500 tracking-widest text-center py-2">Điểm</TableHead>
                   <TableHead className="w-[10%] text-[10px] font-semibold uppercase text-slate-500 tracking-widest text-center py-2">Học Lại</TableHead>

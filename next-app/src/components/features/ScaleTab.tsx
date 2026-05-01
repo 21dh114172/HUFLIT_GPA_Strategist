@@ -27,7 +27,7 @@ export const ScaleTab = memo(() => {
             { rank: "Khá", range: "2.5 - 3.19", color: "bg-cyan-100 text-cyan-700" },
             { rank: "Trung bình", range: "2.0 - 2.49", color: "bg-amber-100 text-amber-700" },
             { rank: "Yếu", range: "1.0 - 1.99", color: "bg-orange-100 text-orange-700" },
-            { rank: "Kém", range: "< 1.0", color: "bg-red-100 text-red-700" },
+            { rank: "Kém", range: "0.0 - 0.99", color: "bg-red-100 text-red-700" },
           ]}
         />
 
@@ -38,11 +38,11 @@ export const ScaleTab = memo(() => {
           valueColumnName="Khoảng điểm"
           data={[
             { rank: "Xuất sắc", range: "90 - 100", color: "bg-emerald-100 text-emerald-700" },
-            { rank: "Tốt", range: "80 - <90", color: "bg-blue-100 text-blue-700" },
-            { rank: "Khá", range: "65 - <80", color: "bg-cyan-100 text-cyan-700" },
-            { rank: "Trung bình", range: "50 - <65", color: "bg-amber-100 text-amber-700" },
-            { rank: "Yếu", range: "35 - <50", color: "bg-orange-100 text-orange-700" },
-            { rank: "Kém", range: "< 35", color: "bg-red-100 text-red-700" },
+            { rank: "Tốt", range: "80 - 89", color: "bg-blue-100 text-blue-700" },
+            { rank: "Khá", range: "65 - 79", color: "bg-cyan-100 text-cyan-700" },
+            { rank: "Trung bình", range: "50 - 64", color: "bg-amber-100 text-amber-700" },
+            { rank: "Yếu", range: "35 - 49", color: "bg-orange-100 text-orange-700" },
+            { rank: "Kém", range: "0 - 34", color: "bg-red-100 text-red-700" },
           ]}
         />
       </motion.div>

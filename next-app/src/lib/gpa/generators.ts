@@ -95,7 +95,7 @@ export function calculateCombination(g1: { grade: string; gpa: number }, g2: { g
 export function generateScenarioText(combination: GradeCombination | null, totalEffortCredits: number = 0, isImpossible: boolean = false): string {
   if (isImpossible) {
     if (totalEffortCredits === 0) return "Cần thêm môn học cải thiện hoặc đăng ký tín chỉ mới để nâng điểm.";
-    return "Mục tiêu hiện tại không khả thi với số tín chỉ dự kiến này.";
+    return "Mục tiêu này cần bổ sung thêm môn học cải thiện hoặc tăng số tín chỉ đăng ký mới.";
   }
   
   if (!combination) return "Hãy thiết lập số tín chỉ và mục tiêu để xem kịch bản.";
