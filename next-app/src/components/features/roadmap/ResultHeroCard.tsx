@@ -1,6 +1,7 @@
 "use client";
 
 import { AlertCircle, TrendingUp } from "lucide-react";
+import { motion } from "framer-motion";
 import type { RoadmapComputed } from "@/hooks/useRoadmapState";
 import {
   getStatusTextColor,
@@ -19,18 +20,28 @@ interface ResultHeroCardProps {
   targetGPA: number;
   currentCredits: number;
 }
-
 export function ResultHeroCard({ result, status, maxPossibleGPA, targetGPA, currentCredits }: ResultHeroCardProps) {
   const textColor = getStatusTextColor(status);
   const borderColor = getStatusBorderColor(status);
   const isNegative = isStatusNegative(status);
 
   return (
-    <div className={`px-4 py-2.5 sm:px-5 sm:py-2.5 border shadow-sm overflow-hidden bg-white transition-all duration-700 rounded-[2rem] flex flex-col items-center text-center space-y-4 ${borderColor}`}>
+    <motion.div 
+      initial={false}
+      animate={status === "achieved" ? { 
+        scale: [1, 1.02, 1],
+      } : {}}
+      transition={{ 
+        duration: 2, 
+        repeat: status === "achieved" ? Infinity : 0,
+        ease: "easeInOut"
+      }}
+      className={`px-4 py-2.5 sm:px-5 sm:py-2.5 border shadow-sm overflow-hidden bg-white transition-all duration-700 rounded-[2rem] flex flex-col items-center text-center space-y-4 ${borderColor}`}
+    >
       <GPADisplay status={status} requiredGPA={result.requiredGPA} textColor={textColor} />
       <StatusBadge status={status} maxPossibleGPA={maxPossibleGPA} textColor={textColor} isNegative={isNegative} />
       <StatsRow result={result} status={status} maxPossibleGPA={maxPossibleGPA} targetGPA={targetGPA} currentCredits={currentCredits} />
-    </div>
+    </motion.div>
   );
 }
 
