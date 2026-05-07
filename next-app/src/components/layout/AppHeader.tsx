@@ -6,6 +6,7 @@ import { memo } from "react";
 import { AuthorInfoDialog } from "./AuthorInfoDialog";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { VisitorCount } from "./VisitorCount";
 
 interface AppHeaderProps {
   activeTab: string;
@@ -95,14 +96,10 @@ export const AppHeader = memo(({ activeTab, onTabChange }: AppHeaderProps) => {
 
         {/* Action Section */}
         <div className="flex items-center gap-1.5 pr-0.5 shrink-0">
-          <div 
-            onClick={() => onTabChange?.("news")}
-            className="hidden sm:flex w-7 h-7 rounded-full items-center justify-center cursor-pointer hover:bg-slate-100/50 transition-all text-slate-400 hover:text-blue-600 active:scale-90"
-            role="button"
-            aria-label="Xem tin tức"
-          >
-            <Newspaper className="h-3.5 w-3.5" strokeWidth={2.5} />
+          <div className="flex items-center">
+            <VisitorCount />
           </div>
+
           <AuthorInfoDialog>
             <button 
               className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 p-[1px] shadow-sm active:scale-90 transition-transform cursor-pointer overflow-hidden border-none outline-none"

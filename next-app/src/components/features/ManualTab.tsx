@@ -75,18 +75,20 @@ const ManualTab = memo(({ onSwitchToRoadmap }: ManualTabProps) => {
         transition={{ duration: 0.5, delay: 0.2 }}
         className="lg:col-span-8 space-y-6"
       >
-        <div className="flex items-center justify-between px-2 mb-2">
-          <h2 className="text-[12px] font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full bg-blue-600"></span>
+        <div className="flex items-center justify-between px-2 mb-2 gap-2">
+          <h2 className="text-[12px] font-black text-slate-800 uppercase tracking-wider flex items-center gap-2 whitespace-nowrap">
+            <span className="h-2 w-2 rounded-full bg-blue-600 shrink-0"></span>
             Chi tiết các học kỳ
           </h2>
           <Button
             onClick={addSemester}
             variant="ghost"
             size="sm"
-            className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 font-bold text-xs gap-1.5 h-8 px-3 rounded-lg"
+            className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 font-bold text-xs gap-1.5 h-8 px-3 rounded-lg shrink-0"
           >
-            <Plus className="h-3.5 w-3.5" /> Thêm học kỳ mới
+            <Plus className="h-3.5 w-3.5" /> 
+            <span className="hidden sm:inline">Thêm học kỳ mới</span>
+            <span className="sm:hidden">Thêm HK</span>
           </Button>
         </div>
 

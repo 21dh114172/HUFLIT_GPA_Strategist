@@ -43,7 +43,7 @@ const InitialStatsCard = memo(({
         <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200 space-y-2 shadow-sm">
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label className="text-[11px] font-semibold text-slate-500 uppercase tracking-widest ps-1">GPA Hiện tại</Label>
+              <Label className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider ps-1">GPA Hiện tại</Label>
               <Input
                 type="number"
                 step="0.01"
@@ -54,7 +54,7 @@ const InitialStatsCard = memo(({
               />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-[11px] font-semibold text-slate-500 uppercase tracking-widest ps-1">Tích lũy</Label>
+              <Label className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider ps-1">Tích lũy</Label>
               <Input
                 type="number"
                 className="bg-white border-slate-300 rounded-xl h-9 text-center font-bold text-blue-600 placeholder:text-slate-500 shadow-sm focus:ring-1 focus:ring-blue-500 transition-all"

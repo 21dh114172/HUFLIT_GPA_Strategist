@@ -8,6 +8,7 @@ import { BottomNav } from "@/components/layout/BottomNav";
 import { TabSkeleton } from "@/components/features/TabSkeleton";
 import { Newspaper } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { VisitorCount } from "@/components/layout/VisitorCount";
 
 // Dynamic Imports for performance optimization
 const ScaleTab = dynamic(() => import("@/components/features/ScaleTab").then(mod => mod.ScaleTab), {
@@ -113,7 +114,7 @@ export default function Home() {
             </div>
           </TabsContent>
         </div>
-        </Tabs>
+      </Tabs>
 
       {/* Bottom Navigation — Mobile only */}
       <BottomNav activeTab={activeTab} onTabChange={handleTabChange} />

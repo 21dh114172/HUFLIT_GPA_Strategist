@@ -137,7 +137,7 @@ const StartingPointStep = memo(({ currentGPA, currentCredits, onGPAChange, onCre
             <span className="text-xs font-black">1</span>
           </div>
           <div className="flex items-center gap-2 min-w-0">
-            <Label className={`text-[11px] font-bold uppercase tracking-widest whitespace-nowrap truncate cursor-pointer transition-colors duration-300 ${isExpanded ? "text-slate-700" : "text-slate-500"}`}>
+            <Label className={`text-[11px] font-bold uppercase tracking-wider whitespace-nowrap truncate cursor-pointer transition-colors duration-300 ${isExpanded ? "text-slate-700" : "text-slate-500"}`}>
               Dữ liệu tích lũy
             </Label>
           </div>
@@ -261,7 +261,7 @@ const TargetGPAStep = memo(({ targetGPA, onSelect, isExpanded, onToggle }: Targe
           <div className={`flex items-center justify-center w-6 h-6 rounded-full shadow-md shrink-0 border transition-all duration-300 ${isExpanded ? "bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-blue-500/20 border-blue-400/50" : "bg-blue-50/80 text-blue-500 border-blue-100 shadow-none"}`}>
             <span className="text-xs font-black">2</span>
           </div>
-          <Label className={`text-[11px] font-bold uppercase tracking-widest cursor-pointer transition-colors duration-300 ${isExpanded ? "text-slate-700" : "text-slate-500"}`}>
+          <Label className={`text-[11px] font-bold uppercase tracking-wider whitespace-nowrap cursor-pointer transition-colors duration-300 ${isExpanded ? "text-slate-700" : "text-slate-500"}`}>
             Mục tiêu mong muốn
           </Label>
         </div>
@@ -362,7 +362,7 @@ const EffortPlanStep = memo(({ currentCredits, remainingCredits, onTotalChange, 
           <div className={`flex items-center justify-center w-6 h-6 rounded-full shadow-md shrink-0 border transition-all duration-300 ${isExpanded ? "bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-blue-500/20 border-blue-400/50" : "bg-blue-50/80 text-blue-500 border-blue-100 shadow-none"}`}>
             <span className="text-xs font-black">3</span>
           </div>
-          <Label className={`text-[11px] font-bold uppercase tracking-widest cursor-pointer transition-colors duration-300 ${isExpanded ? "text-slate-700" : "text-slate-500"}`}>
+          <Label className={`text-[11px] font-bold uppercase tracking-wider whitespace-nowrap cursor-pointer transition-colors duration-300 ${isExpanded ? "text-slate-700" : "text-slate-500"}`}>
             Kế hoạch nỗ lực
           </Label>
         </div>
@@ -471,7 +471,7 @@ const ImprovementStep = memo(({ retakes, onAddRetake, onRemoveRetake, onUpdateRe
           <div className={`flex items-center justify-center w-6 h-6 rounded-full shadow-md shrink-0 border transition-all duration-300 ${isExpanded ? "bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-blue-500/20 border-blue-400/50" : "bg-blue-50/80 text-blue-500 border-blue-100 shadow-none"}`}>
             <span className="text-xs font-black">4</span>
           </div>
-          <Label className={`text-[11px] font-bold uppercase tracking-widest cursor-pointer transition-colors duration-300 ${isExpanded ? "text-blue-700" : "text-blue-500/80"}`}>
+          <Label className={`text-[11px] font-bold uppercase tracking-wider whitespace-nowrap cursor-pointer transition-colors duration-300 ${isExpanded ? "text-blue-700" : "text-blue-500/80"}`}>
             Học cải thiện
           </Label>
         </div>

@@ -61,11 +61,11 @@ const ManualStats = memo(({ result, semesters, onSwitchToRoadmap }: ManualStatsP
         {/* Stats Grid */}
         <div className="grid grid-cols-2 pt-2.5 pb-0 border-t border-slate-200">
           <div className="flex flex-col items-center justify-center space-y-0.5 py-1 border-r border-slate-200">
-            <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">Tín chỉ</div>
+            <div className="text-[10px] font-bold text-slate-600 uppercase tracking-wider">Tín chỉ</div>
             <div className="text-xl font-bold text-slate-800">{result.totalCredits}</div>
           </div>
           <div className="flex flex-col items-center justify-center space-y-1 py-1">
-            <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">Xếp loại</div>
+            <div className="text-[10px] font-bold text-slate-600 uppercase tracking-wider">Xếp loại</div>
             <div className={`text-lg font-bold whitespace-nowrap ${
               result.rank === "Xuất sắc" ? "text-emerald-500" :
               result.rank === "Giỏi" ? "text-blue-600" :
