@@ -25,7 +25,7 @@ const YearSummaryCard = memo(({ year, data }: YearSummaryCardProps) => {
           <div className="h-[0.5px] flex-1 bg-slate-200 mx-4"></div>
         </div>
         
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+        <div className="grid grid-cols-2 min-[400px]:grid-cols-3 sm:flex sm:flex-wrap items-center gap-x-4 gap-y-3 sm:gap-x-6 sm:gap-y-2">
           {[
             { label: "TC Đạt", value: data.passedCredits, color: "text-emerald-600" },
             { label: "TC Rớt", value: data.failedCredits, color: "text-rose-500" },
@@ -33,7 +33,7 @@ const YearSummaryCard = memo(({ year, data }: YearSummaryCardProps) => {
             { label: "TC Tích lũy", value: data.cumulativeCredits, color: "text-slate-900" },
             { label: "GPA Tích lũy", value: data.cumulativeGPA.toFixed(2), color: "text-blue-600" }
           ].map((item, idx) => (
-            <div key={idx} className="flex items-baseline gap-1.5">
+            <div key={idx} className="flex items-baseline gap-1.5 whitespace-nowrap">
               <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{item.label}</span>
               <span className={`text-sm font-black ${item.color} tracking-tight`}>{item.value}</span>
             </div>

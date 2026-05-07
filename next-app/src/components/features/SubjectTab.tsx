@@ -33,7 +33,7 @@ export function SubjectTab() {
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}
-        className="lg:col-span-4 sticky top-20 h-fit self-start z-20 space-y-4 w-full flex flex-col"
+        className="lg:col-span-4 static lg:sticky lg:top-20 h-fit self-start z-20 space-y-4 w-full flex flex-col"
       >
         <SubjectConfigCard
           ratio={ratio}

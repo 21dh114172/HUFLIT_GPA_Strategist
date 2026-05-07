@@ -13,7 +13,7 @@ export const ScaleTab = memo(() => {
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}
-        className="lg:col-span-4 sticky top-14 space-y-2 h-fit z-20 self-start w-full"
+        className="lg:col-span-4 static lg:sticky lg:top-20 space-y-2 h-fit z-20 self-start w-full"
       >
         {/* Card 1: Thang điểm học tập */}
         <GradeScaleTable />

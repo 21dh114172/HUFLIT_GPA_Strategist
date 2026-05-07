@@ -73,9 +73,6 @@ export function SubjectConfigCard({
               <Label htmlFor="process-score" className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
                 Điểm quá trình (Hệ 10)
               </Label>
-              <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
-                {processScore >= 5 ? "Đạt" : "Cần cố gắng"}
-              </span>
             </div>
             <div className="p-2.5 bg-white/50 backdrop-blur-md border border-white/40 rounded-2xl space-y-2.5 shadow-inner">
               <input

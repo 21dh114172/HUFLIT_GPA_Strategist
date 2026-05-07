@@ -23,6 +23,16 @@
 # misc
 .DS_Store
 *.pem
+.eslintcache
+.cache
+.turbo
+/.swc/
+/.nyc_output
+*.local
+
+# editor
+.vscode/
+.idea/
 
 # debug
 npm-debug.log*
@@ -39,3 +49,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# agent
+.agent

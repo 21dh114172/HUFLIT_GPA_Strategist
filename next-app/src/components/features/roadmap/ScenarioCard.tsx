@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { GRADE_SCALE, type GradeCombination, type RetakeSuggestion } from "@/lib/gpa-engine";
 import type { RoadmapComputed } from "@/hooks/useRoadmapState";
 import { motion, AnimatePresence } from "framer-motion";
+import { memo } from "react";
 
 interface ScenarioCardProps {
   scenarioText: string;
@@ -21,9 +22,9 @@ interface ScenarioCardProps {
   onSwitchTab?: (tab: string) => void;
 }
 
-export function ScenarioCard({
+export const ScenarioCard = memo(({
   scenarioText, combinations, result, retakeSuggestions, hasManualData, missingScenarios, targetGPA, totalPointsGap, onAddRetakeSuggestion, onSwitchTab,
-}: ScenarioCardProps) {
+}: ScenarioCardProps) => {
   return (
     <Card className="border-slate-200 shadow-sm overflow-hidden bg-white rounded-2xl py-0 gap-0">
       <CardContent className="p-2.5 sm:p-3 space-y-2.5">
@@ -44,9 +45,11 @@ export function ScenarioCard({
       </CardContent>
     </Card>
   );
-}
+});
 
-function RecommendedScenario({ scenarioText }: { scenarioText: string }) {
+ScenarioCard.displayName = "ScenarioCard";
+
+const RecommendedScenario = memo(({ scenarioText }: { scenarioText: string }) => {
   return (
     <motion.div 
       initial={{ opacity: 0, y: 10 }}
@@ -62,7 +65,9 @@ function RecommendedScenario({ scenarioText }: { scenarioText: string }) {
       </div>
     </motion.div>
   );
-}
+});
+
+RecommendedScenario.displayName = "RecommendedScenario";
 
 interface AlternativeCombinationsProps {
   combinations: GradeCombination[];
@@ -70,14 +75,18 @@ interface AlternativeCombinationsProps {
   targetGPA: number;
 }
 
-function AlternativeCombinations({ combinations, result, targetGPA }: AlternativeCombinationsProps) {
+const AlternativeCombinations = memo(({ combinations, result, targetGPA }: AlternativeCombinationsProps) => {
   return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Các phương án thay thế khả thi:</div>
-        <Badge variant="secondary" className="bg-slate-100 text-slate-500 text-[10px] font-bold h-5 border-none">
-          {combinations.length} tổ hợp
-        </Badge>
+    <div className="space-y-3 pt-4 pb-2 border-t border-slate-50">
+      <div className="flex items-center gap-3">
+        <div className="h-px flex-1 bg-slate-100" />
+        <div className="flex items-center gap-2 shrink-0">
+          <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">Phương án thay thế</div>
+          <Badge variant="secondary" className="bg-slate-100/80 text-slate-500 text-[9px] font-black h-4 px-1.5 border-none rounded-md">
+            {combinations.length}
+          </Badge>
+        </div>
+        <div className="h-px flex-1 bg-slate-100" />
       </div>
       <div className="grid grid-cols-1 gap-2 max-h-[320px] overflow-y-auto pr-2 custom-scrollbar">
         {combinations.map((combo, i) => (
@@ -86,7 +95,9 @@ function AlternativeCombinations({ combinations, result, targetGPA }: Alternativ
       </div>
     </div>
   );
-}
+});
+
+AlternativeCombinations.displayName = "AlternativeCombinations";
 
 interface CombinationCardProps {
   combo: GradeCombination;
@@ -95,7 +106,7 @@ interface CombinationCardProps {
   targetGPA: number;
 }
 
-function CombinationCard({ combo: c, index: i, result, targetGPA }: CombinationCardProps) {
+const CombinationCard = memo(({ combo: c, index: i, result, targetGPA }: CombinationCardProps) => {
   const earnedPoints = (targetGPA * result.totalFutureCredits) - result.requiredPoints + (c.g1.gpa * c.c1 + c.g2.gpa * c.c2);
   const totalPoints = targetGPA * result.totalFutureCredits;
   const isBest = i === 0;
@@ -139,7 +150,9 @@ function CombinationCard({ combo: c, index: i, result, targetGPA }: CombinationC
       </div>
     </motion.div>
   );
-}
+});
+
+CombinationCard.displayName = "CombinationCard";
 
 type GradeLevel = "excellent" | "good" | "average" | "poor" | "fail";
 
@@ -197,7 +210,7 @@ const GRADE_THEME: Record<GradeLevel, {
   },
 };
 
-function GradeBlock({ grade, credits }: { grade: string; credits: number }) {
+const GradeBlock = memo(({ grade, credits }: { grade: string; credits: number }) => {
   const level = getGradeLevel(grade);
   const theme = GRADE_THEME[level];
 
@@ -210,9 +223,11 @@ function GradeBlock({ grade, credits }: { grade: string; credits: number }) {
       </div>
     </div>
   );
-}
+});
 
-function SingleGradeBlock({ grade, credits }: { grade: string; credits: number }) {
+GradeBlock.displayName = "GradeBlock";
+
+const SingleGradeBlock = memo(({ grade, credits }: { grade: string; credits: number }) => {
   const level = getGradeLevel(grade);
   const theme = GRADE_THEME[level];
 
@@ -228,8 +243,9 @@ function SingleGradeBlock({ grade, credits }: { grade: string; credits: number }
       </div>
     </div>
   );
-}
+});
 
+SingleGradeBlock.displayName = "SingleGradeBlock";
 
 interface RescueSuggestionsProps {
   suggestions: RetakeSuggestion[];
@@ -240,7 +256,7 @@ interface RescueSuggestionsProps {
   onSwitchTab?: (tab: string) => void;
 }
 
-function RescueSuggestions({ suggestions, hasManualData, missingScenarios, totalPointsGap, onAdd, onSwitchTab }: RescueSuggestionsProps) {
+const RescueSuggestions = memo(({ suggestions, hasManualData, missingScenarios, totalPointsGap, onAdd, onSwitchTab }: RescueSuggestionsProps) => {
   const primaryMissing = missingScenarios.length > 0 ? missingScenarios[0].credits : 0;
 
   return (
@@ -268,17 +284,17 @@ function RescueSuggestions({ suggestions, hasManualData, missingScenarios, total
               )}
             </div>
 
-            <div className="grid grid-cols-2 gap-1.5">
-              <div className="bg-white border border-slate-100 px-2.5 py-1.5 rounded-xl flex items-center justify-between shadow-sm group/gap">
-                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Tín chỉ thiếu (~A)</span>
-                <div className="flex items-baseline gap-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div className="bg-white border border-slate-100 px-3 py-2 rounded-xl flex items-center justify-between shadow-sm group/gap">
+                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest whitespace-nowrap">Tín chỉ thiếu (~A)</span>
+                <div className="flex items-baseline gap-1 ml-2">
                   <span className="text-base font-black text-rose-500 tracking-tighter group-hover/gap:scale-110 transition-transform tabular-nums">{primaryMissing}</span>
                   <span className="text-[9px] font-black text-rose-300 uppercase tracking-widest">TC</span>
                 </div>
               </div>
-              <div className="bg-white border border-slate-100 px-2.5 py-1.5 rounded-xl flex items-center justify-between shadow-sm group/gap">
-                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Điểm tổng thiếu</span>
-                <div className="flex items-baseline gap-1">
+              <div className="bg-white border border-slate-100 px-3 py-2 rounded-xl flex items-center justify-between shadow-sm group/gap">
+                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest whitespace-nowrap">Điểm tổng thiếu</span>
+                <div className="flex items-baseline gap-1 ml-2">
                   <span className="text-base font-black text-rose-500 tracking-tighter group-hover/gap:scale-110 transition-transform tabular-nums">{totalPointsGap.toFixed(2)}</span>
                   <span className="text-[9px] font-black text-rose-300 uppercase tracking-widest">ĐIỂM</span>
                 </div>
@@ -335,7 +351,9 @@ function RescueSuggestions({ suggestions, hasManualData, missingScenarios, total
       )}
     </div>
   );
-}
+});
+
+RescueSuggestions.displayName = "RescueSuggestions";
 
 interface RescueSuggestionRowProps {
   suggestion: RetakeSuggestion;
@@ -343,7 +361,7 @@ interface RescueSuggestionRowProps {
   index: number;
 }
 
-function RescueSuggestionRow({ suggestion: s, onAdd, index }: RescueSuggestionRowProps) {
+const RescueSuggestionRow = memo(({ suggestion: s, onAdd, index }: RescueSuggestionRowProps) => {
   return (
     <motion.div 
       initial={{ opacity: 0, y: 10 }}
@@ -399,4 +417,6 @@ function RescueSuggestionRow({ suggestion: s, onAdd, index }: RescueSuggestionRo
       </div>
     </motion.div>
   );
-}
+});
+
+RescueSuggestionRow.displayName = "RescueSuggestionRow";

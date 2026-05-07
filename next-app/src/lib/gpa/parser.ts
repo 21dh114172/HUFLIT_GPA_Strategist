@@ -33,6 +33,9 @@ export function parsePortalText(text: string): Semester[] {
 
       const credits = parseFloat(courseMatch[1]);
       let gradeChar = courseMatch[4];
+
+      if (gradeChar === 'A+') gradeChar = 'A';
+
       const isValidGrade = GRADE_SCALE.some(g => g.grade === gradeChar);
 
       if (isValidGrade && credits < 20) {

@@ -1,6 +1,7 @@
 "use client";
 
 import { Info, Calculator } from "lucide-react";
+import { memo } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -9,7 +10,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import type { RetakeItem, RoadmapState, RoadmapComputed } from "@/hooks/useRoadmapState";
+import type { RetakeItem, RoadmapComputed } from "@/hooks/useRoadmapState";
 
 interface AlgorithmDialogProps {
   currentGPA: number;
@@ -20,9 +21,9 @@ interface AlgorithmDialogProps {
   result: RoadmapComputed["result"];
 }
 
-export function AlgorithmDialog({
+export const AlgorithmDialog = memo(({
   currentGPA, currentCredits, targetGPA, remainingCredits, retakes, result,
-}: AlgorithmDialogProps) {
+}: AlgorithmDialogProps) => {
   const retakePointsTotal = retakes.reduce((acc, r) => acc + r.oldGrade * r.credits, 0);
   const effectiveCurrentPoints = currentGPA * currentCredits - retakePointsTotal;
   const extraRetakeCredits = result.totalFutureCredits - currentCredits - remainingCredits;
@@ -87,9 +88,11 @@ export function AlgorithmDialog({
       </Dialog>
     </div>
   );
-}
+});
 
-function DialogHeader() {
+AlgorithmDialog.displayName = "AlgorithmDialog";
+
+const DialogHeader = memo(() => {
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-2 opacity-60">
@@ -104,7 +107,9 @@ function DialogHeader() {
       </DialogDescription>
     </div>
   );
-}
+});
+
+DialogHeader.displayName = "DialogHeader";
 
 interface AlgorithmRow {
   label: string;
@@ -121,7 +126,7 @@ interface AlgorithmStepProps {
   rows: AlgorithmRow[];
 }
 
-function AlgorithmStep({ number, title, rows }: AlgorithmStepProps) {
+const AlgorithmStep = memo(({ number, title, rows }: AlgorithmStepProps) => {
   return (
     <div className="space-y-2">
       <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
@@ -156,4 +161,6 @@ function AlgorithmStep({ number, title, rows }: AlgorithmStepProps) {
       </div>
     </div>
   );
-}
+});
+
+AlgorithmStep.displayName = "AlgorithmStep";

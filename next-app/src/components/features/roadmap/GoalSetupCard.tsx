@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import { Compass, RefreshCcw, BookOpen, GraduationCap, HelpCircle, ChevronDown, ChevronUp } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -23,27 +23,39 @@ interface GoalSetupCardProps {
 
 const GPA_MILESTONES = [2.0, 2.5, 3.2, 3.6];
 
-export function GoalSetupCard({ state, actions, computed, expandedSteps, onToggleStep, onToggleAll }: GoalSetupCardProps) {
+export const GoalSetupCard = memo(({ state, actions, computed, expandedSteps, onToggleStep, onToggleAll }: GoalSetupCardProps) => {
   const { currentGPA, currentCredits, targetGPA, remainingCredits, retakes } = state;
   const isAnyExpanded = Object.values(expandedSteps).some(Boolean);
 
   return (
     <Card className="border-slate-200 bg-white shadow-xl shadow-blue-500/5 rounded-3xl overflow-hidden border gap-0 py-0">
       <CardHeader className="py-2.5 px-4 border-b border-slate-200 bg-slate-50/50">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="bg-blue-50/50 backdrop-blur-sm p-1.5 rounded-lg border border-blue-100/50 shadow-sm">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="hidden xs:flex bg-blue-50/50 backdrop-blur-sm p-1.5 rounded-lg border border-blue-100/50 shadow-sm shrink-0">
               <Compass className="h-4 w-4 text-blue-600" />
             </div>
-            <CardTitle className="text-sm text-slate-800 font-bold tracking-tight">Thiết lập mục tiêu</CardTitle>
+            <CardTitle className="text-[13px] sm:text-sm text-slate-800 font-bold tracking-tight whitespace-nowrap overflow-hidden text-ellipsis">
+              Thiết lập mục tiêu
+            </CardTitle>
           </div>
           <Button
-            variant="ghost"
+            variant="outline"
             size="sm"
             onClick={onToggleAll}
-            className="h-6 text-[10px] font-bold text-slate-500 hover:text-slate-700 hover:bg-slate-200 px-2 rounded-lg"
+            className="h-7 text-[9px] font-black uppercase tracking-[0.1em] text-slate-500 bg-white border-slate-200 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all rounded-xl px-2 sm:px-2.5 gap-1 sm:gap-1.5 active:scale-95 shadow-sm shrink-0"
           >
-            {isAnyExpanded ? "Thu gọn tất cả" : "Mở tất cả"}
+            {isAnyExpanded ? (
+              <>
+                <ChevronUp className="h-3 w-3" />
+                <span>Thu gọn<span className="hidden sm:inline"> tất cả</span></span>
+              </>
+            ) : (
+              <>
+                <ChevronDown className="h-3 w-3" />
+                <span>Mở<span className="hidden sm:inline"> tất cả</span></span>
+              </>
+            )}
           </Button>
         </div>
       </CardHeader>
@@ -88,7 +100,9 @@ export function GoalSetupCard({ state, actions, computed, expandedSteps, onToggl
       </CardContent>
     </Card>
   );
-}
+});
+
+GoalSetupCard.displayName = "GoalSetupCard";
 
 interface StartingPointStepProps {
   currentGPA: number;
@@ -100,17 +114,17 @@ interface StartingPointStepProps {
   onToggle(): void;
 }
 
-function StartingPointStep({ currentGPA, currentCredits, onGPAChange, onCreditsChange, onSync, isExpanded, onToggle }: StartingPointStepProps) {
+const StartingPointStep = memo(({ currentGPA, currentCredits, onGPAChange, onCreditsChange, onSync, isExpanded, onToggle }: StartingPointStepProps) => {
   const [gpaStr, setGpaStr] = useState(currentGPA === 0 ? "" : currentGPA.toString());
   const [creditsStr, setCreditsStr] = useState(currentCredits === 0 ? "" : currentCredits.toString());
 
   useEffect(() => {
     if (parseFloat(gpaStr) !== currentGPA) setGpaStr(currentGPA === 0 ? "" : currentGPA.toString());
-  }, [currentGPA]);
+  }, [currentGPA, gpaStr]);
 
   useEffect(() => {
     if (parseInt(creditsStr) !== currentCredits) setCreditsStr(currentCredits === 0 ? "" : currentCredits.toString());
-  }, [currentCredits]);
+  }, [currentCredits, creditsStr]);
 
   return (
     <div className={`bg-white border border-slate-100 rounded-[1.5rem] shadow-sm relative z-10 transition-all duration-300 overflow-hidden ${isExpanded ? "p-2.5" : "p-2.5"}`}>
@@ -214,7 +228,7 @@ function StartingPointStep({ currentGPA, currentCredits, onGPAChange, onCreditsC
       </AnimatePresence>
     </div>
   );
-}
+});
 
 interface TargetGPAStepProps {
   targetGPA: number;
@@ -223,12 +237,12 @@ interface TargetGPAStepProps {
   onToggle(): void;
 }
 
-function TargetGPAStep({ targetGPA, onSelect, isExpanded, onToggle }: TargetGPAStepProps) {
+const TargetGPAStep = memo(({ targetGPA, onSelect, isExpanded, onToggle }: TargetGPAStepProps) => {
   const [valStr, setValStr] = useState(targetGPA === 0 ? "" : targetGPA.toString());
 
   useEffect(() => {
     if (parseFloat(valStr) !== targetGPA) setValStr(targetGPA === 0 ? "" : targetGPA.toString());
-  }, [targetGPA]);
+  }, [targetGPA, valStr]);
 
   const handleInputChange = (raw: string) => {
     setValStr(raw);
@@ -314,7 +328,7 @@ function TargetGPAStep({ targetGPA, onSelect, isExpanded, onToggle }: TargetGPAS
       </AnimatePresence>
     </div>
   );
-}
+});
 
 interface EffortPlanStepProps {
   currentCredits: number;
@@ -325,18 +339,18 @@ interface EffortPlanStepProps {
   onToggle(): void;
 }
 
-function EffortPlanStep({ currentCredits, remainingCredits, onTotalChange, onRemainingChange, isExpanded, onToggle }: EffortPlanStepProps) {
+const EffortPlanStep = memo(({ currentCredits, remainingCredits, onTotalChange, onRemainingChange, isExpanded, onToggle }: EffortPlanStepProps) => {
   const totalVal = currentCredits + remainingCredits;
   const [totalStr, setTotalStr] = useState(totalVal === 0 ? "" : totalVal.toString());
   const [remStr, setRemStr] = useState(remainingCredits === 0 ? "" : remainingCredits.toString());
 
   useEffect(() => {
     if (parseInt(totalStr) !== totalVal) setTotalStr(totalVal === 0 ? "" : totalVal.toString());
-  }, [totalVal]);
+  }, [totalVal, totalStr]);
 
   useEffect(() => {
     if (parseInt(remStr) !== remainingCredits) setRemStr(remainingCredits === 0 ? "" : remainingCredits.toString());
-  }, [remainingCredits]);
+  }, [remainingCredits, remStr]);
 
   return (
     <div className={`bg-white border border-slate-100 rounded-[1.5rem] shadow-sm relative z-10 transition-all duration-300 overflow-hidden ${isExpanded ? "p-2.5" : "p-2.5"}`}>
@@ -433,7 +447,7 @@ function EffortPlanStep({ currentCredits, remainingCredits, onTotalChange, onRem
       </AnimatePresence>
     </div>
   );
-}
+});
 
 interface ImprovementStepProps {
   retakes: RoadmapState["retakes"];
@@ -446,7 +460,7 @@ interface ImprovementStepProps {
   onToggle(): void;
 }
 
-function ImprovementStep({ retakes, onAddRetake, onRemoveRetake, onUpdateRetake, manualImprovableCourses, onToggleFromManual, isExpanded, onToggle }: ImprovementStepProps) {
+const ImprovementStep = memo(({ retakes, onAddRetake, onRemoveRetake, onUpdateRetake, manualImprovableCourses, onToggleFromManual, isExpanded, onToggle }: ImprovementStepProps) => {
   return (
     <div className={`bg-white border border-slate-100 rounded-[1.5rem] shadow-sm relative z-10 transition-all duration-300 overflow-hidden ${isExpanded ? "p-2.5" : "p-2.5"}`}>
       <div
@@ -499,4 +513,4 @@ function ImprovementStep({ retakes, onAddRetake, onRemoveRetake, onUpdateRetake,
       </AnimatePresence>
     </div>
   );
-}
+});

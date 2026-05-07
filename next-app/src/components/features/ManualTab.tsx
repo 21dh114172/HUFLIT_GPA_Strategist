@@ -11,6 +11,7 @@ import ManualStats from "./manual/ManualStats";
 import ManualChart from "./manual/ManualChart";
 import SemesterCard from "./manual/SemesterCard";
 import YearSummaryCard from "./manual/YearSummaryCard";
+import { ScrollToTop } from "@/components/ui/ScrollToTop";
 
 interface ManualTabProps {
   onSwitchToRoadmap?: (data: any) => void;
@@ -40,13 +41,13 @@ const ManualTab = memo(({ onSwitchToRoadmap }: ManualTabProps) => {
   if (!isLoaded) return null;
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 items-start pb-10">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-4 items-start pb-10">
       {/* SIDEBAR */}
       <motion.div 
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}
-        className="lg:col-span-4 sticky top-16 space-y-2 order-first h-fit z-20 self-start"
+        className="lg:col-span-4 static lg:sticky lg:top-20 space-y-2 order-first h-fit z-20 self-start"
       >
         <InitialStatsCard
           initialGPA={initialGPA}
@@ -134,6 +135,7 @@ const ManualTab = memo(({ onSwitchToRoadmap }: ManualTabProps) => {
           </Button>
         </div>
       </motion.div>
+      <ScrollToTop />
     </div>
   );
 });

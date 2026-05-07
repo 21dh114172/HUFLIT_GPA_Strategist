@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import {
   calculateTargetResult,
   generateGradeCombinations,
@@ -236,7 +236,7 @@ export function useRoadmapState(initialData?: InitialRoadmapData | null) {
     } catch { return []; }
   }, [manualVersion]);
 
-  const syncFromManual = () => {
+  const syncFromManual = useCallback(() => {
     const saved = localStorage.getItem(MANUAL_STORAGE_KEY);
     
     // Clear everything if no saved data exists
@@ -315,29 +315,29 @@ export function useRoadmapState(initialData?: InitialRoadmapData | null) {
       setRemainingCredits(0);
       setRetakes([]);
     }
-  };
+  }, []);
 
-  const addRetake = () =>
-    setRetakes(prev => [...prev, { id: Math.random().toString(), oldGrade: 1.0, credits: 3, targetGrade: undefined }]);
+  const addRetake = useCallback(() =>
+    setRetakes(prev => [...prev, { id: Math.random().toString(), oldGrade: 1.0, credits: 3, targetGrade: undefined }]), []);
 
-  const removeRetake = (id: string) =>
-    setRetakes(prev => prev.filter(r => r.id !== id));
+  const removeRetake = useCallback((id: string) =>
+    setRetakes(prev => prev.filter(r => r.id !== id)), []);
 
-  const updateRetake = (id: string, field: string, value: unknown) =>
-    setRetakes(prev => prev.map(r => r.id === id ? { ...r, [field]: value ?? undefined } : r));
+  const updateRetake = useCallback((id: string, field: string, value: unknown) =>
+    setRetakes(prev => prev.map(r => r.id === id ? { ...r, [field]: value ?? undefined } : r)), []);
 
-  const setTotalGraduationCredits = (total: number) =>
-    setRemainingCredits(Math.max(0, total - currentCredits));
+  const setTotalGraduationCredits = useCallback((total: number) =>
+    setRemainingCredits(Math.max(0, total - currentCredits)), [currentCredits]);
 
-  const addRetakesFromSuggestion = (suggestion: RetakeSuggestion) => {
+  const addRetakesFromSuggestion = useCallback((suggestion: RetakeSuggestion) => {
     const newItems: RetakeItem[] = suggestion.courses.map(c => {
       const gInfo = findGradeInfo(c.grade);
       return { id: Math.random().toString(), oldGrade: gInfo?.gpa || 1.0, credits: c.credits, name: c.name };
     });
     setRetakes(prev => [...prev, ...newItems]);
-  };
+  }, []);
 
-  const toggleRetakeFromManual = (course: { name: string; credits: number; grade: string }) => {
+  const toggleRetakeFromManual = useCallback((course: { name: string; credits: number; grade: string }) => {
     const isAlreadyAdded = retakes.some(r => r.name === course.name);
     if (isAlreadyAdded) {
       setRetakes(prev => prev.filter(r => r.name !== course.name));
@@ -350,11 +350,13 @@ export function useRoadmapState(initialData?: InitialRoadmapData | null) {
         name: course.name,
       }]);
     }
-  };
+  }, [retakes]);
 
-  const state: RoadmapState = { currentGPA, currentCredits, targetGPA, remainingCredits, retakes };
+  const state: RoadmapState = useMemo(() => ({ 
+    currentGPA, currentCredits, targetGPA, remainingCredits, retakes 
+  }), [currentGPA, currentCredits, targetGPA, remainingCredits, retakes]);
 
-  const actions: RoadmapActions = {
+  const actions: RoadmapActions = useMemo(() => ({
     setCurrentGPA,
     setCurrentCredits,
     setTargetGPA,
@@ -366,9 +368,9 @@ export function useRoadmapState(initialData?: InitialRoadmapData | null) {
     updateRetake,
     addRetakesFromSuggestion,
     toggleRetakeFromManual,
-  };
+  }), [setTotalGraduationCredits, syncFromManual, addRetake, removeRetake, updateRetake, addRetakesFromSuggestion, toggleRetakeFromManual]);
 
-  const computed: RoadmapComputed = {
+  const computed: RoadmapComputed = useMemo(() => ({
     result,
     maxPossibleGPA,
     combinations,
@@ -379,7 +381,7 @@ export function useRoadmapState(initialData?: InitialRoadmapData | null) {
     missingScenarios,
     manualImprovableCourses,
     totalPointsGap,
-  };
+  }), [result, maxPossibleGPA, combinations, scenarioText, retakeSuggestions, status, hasManualData, missingScenarios, manualImprovableCourses, totalPointsGap]);
 
   return { state, actions, computed };
 }

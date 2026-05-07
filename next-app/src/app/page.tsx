@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { AppHeader } from "@/components/layout/AppHeader";
+import { BottomNav } from "@/components/layout/BottomNav";
 import { TabSkeleton } from "@/components/features/TabSkeleton";
 import { Newspaper } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -87,7 +88,7 @@ export default function Home() {
         <AppHeader activeTab={activeTab} onTabChange={handleTabChange} />
 
         {/* Main Content Area */}
-        <div className="max-w-[1074px] mx-auto px-4 sm:px-6 mt-4 w-full pb-6">
+        <div className="max-w-[1074px] mx-auto px-3 sm:px-6 mt-4 w-full pb-24 sm:pb-6">
           <TabsContent value="roadmap" className="focus-visible:outline-none focus-visible:ring-0 m-0 w-full">
             <RoadmapTab initialData={roadmapInitialData} onSwitchTab={handleTabChange} />
           </TabsContent>
@@ -108,11 +109,14 @@ export default function Home() {
             <div className="text-center py-20 text-slate-500 bg-white rounded-3xl border border-slate-200">
               <Newspaper className="h-12 w-12 mx-auto mb-4 opacity-20" />
               <h3 className="font-medium text-lg">Bản tin Sinh viên</h3>
-              <p className="text-sm mt-1">Phân hệ kết nối Notion API đang được thiết lập.</p>
+              <p className="text-sm mt-1 italic opacity-60">Tính năng đang được cập nhật dữ liệu...</p>
             </div>
           </TabsContent>
         </div>
         </Tabs>
+
+      {/* Bottom Navigation — Mobile only */}
+      <BottomNav activeTab={activeTab} onTabChange={handleTabChange} />
     </main>
   );
 }

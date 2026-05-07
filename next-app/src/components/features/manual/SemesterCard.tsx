@@ -76,6 +76,7 @@ const SemesterCard = memo(({
               disabled={isOnlySemester}
               onClick={() => onRemoveSemester(sIdx)}
               className="h-8 w-8 text-slate-300 hover:text-red-500 hover:bg-red-50 transition-all rounded-lg opacity-0 group-hover/header:opacity-100"
+              aria-label={`Xóa học kỳ ${sIdx + 1}`}
             >
               <Trash2 className="h-4 w-4" />
             </Button>
@@ -86,11 +87,14 @@ const SemesterCard = memo(({
             <Table>
               <TableHeader className="bg-slate-50/50 border-b border-slate-200">
                 <TableRow className="hover:bg-transparent border-none">
-                  <TableHead className="w-[45%] text-[10px] font-semibold uppercase text-slate-500 tracking-widest ps-6 py-2">Môn học</TableHead>
-                  <TableHead className="w-[15%] text-[10px] font-semibold uppercase text-slate-500 tracking-widest text-center py-2">Tín chỉ</TableHead>
-                  <TableHead className="w-[20%] text-[10px] font-semibold uppercase text-slate-500 tracking-widest text-center py-2">Điểm</TableHead>
-                  <TableHead className="w-[10%] text-[10px] font-semibold uppercase text-slate-500 tracking-widest text-center py-2">Học Lại</TableHead>
-                  <TableHead className="w-[10%] text-right pe-5 py-2"></TableHead>
+                  <TableHead className="text-[10px] font-semibold uppercase text-slate-500 tracking-widest ps-2 sm:ps-6 py-2">Môn học</TableHead>
+                  <TableHead className="w-[15%] sm:w-[15%] text-[10px] font-semibold uppercase text-slate-500 tracking-widest text-center py-2 px-1">Tín</TableHead>
+                  <TableHead className="w-[18%] text-[10px] font-semibold uppercase text-slate-500 tracking-widest text-center py-2 px-1">Điểm</TableHead>
+                  <TableHead className="w-[15%] text-[10px] font-semibold uppercase text-slate-500 tracking-widest text-center py-2 px-1">
+                    <span className="hidden sm:inline">Học Lại</span>
+                    <span className="sm:hidden">HL</span>
+                  </TableHead>
+                  <TableHead className="w-[8%] text-right pe-2 sm:pe-5 py-2"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -113,6 +117,7 @@ const SemesterCard = memo(({
                 size="sm"
                 onClick={() => onAddCourse(sIdx)}
                 className="text-blue-600 hover:text-blue-700 hover:bg-blue-100/50 font-bold text-xs gap-2 h-8 px-4 rounded-lg transition-all"
+                aria-label="Thêm môn học mới"
               >
                 <Plus className="h-3.5 w-3.5" /> Thêm môn học
               </Button>

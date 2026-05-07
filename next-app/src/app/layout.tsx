@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Be_Vietnam_Pro } from "next/font/google";
 import "./globals.css";
 
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+const withBasePath = (path: string) => `${basePath}${path}`;
+
 const beVietnamPro = Be_Vietnam_Pro({
   subsets: ["latin", "vietnamese"],
   weight: ["300", "400", "500", "600", "700", "800", "900"],
@@ -25,9 +28,9 @@ export const metadata: Metadata = {
     telephone: false,
   },
   alternates: {
-    canonical: "/",
+    canonical: basePath ? `${basePath}/` : "/",
   },
-  manifest: "/manifest.json",
+  manifest: withBasePath("/manifest.webmanifest"),
   openGraph: {
     title: "HUFLIT GPA Strategist - Tính toán & Lập kế hoạch điểm số",
     description: "Công cụ tối ưu giúp sinh viên HUFLIT tính GPA, dự đoán điểm cần đạt và gợi ý môn học lại thông minh.",
@@ -37,7 +40,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/ava.jpg",
+        url: withBasePath("/ava.jpg"),
         width: 800,
         height: 800,
         alt: "HUFLIT GPA Strategist Preview",
@@ -48,7 +51,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "HUFLIT GPA Strategist - Tính toán & Lập kế hoạch điểm số",
     description: "Công cụ tối ưu giúp sinh viên HUFLIT tính GPA, dự đoán điểm cần đạt và gợi ý môn học lại thông minh.",
-    images: ["/ava.jpg"],
+    images: [withBasePath("/ava.jpg")],
   },
   robots: {
     index: true,
@@ -62,8 +65,8 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: "/icon.svg",
-    apple: "/ava.jpg",
+    icon: withBasePath("/icon.svg"),
+    apple: withBasePath("/ava.jpg"),
   },
 };
 
@@ -105,7 +108,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="min-h-full flex flex-col font-sans">
+      <body className="min-h-full flex flex-col font-sans overflow-x-hidden">
         {children}
         <Toaster richColors closeButton position="top-right" />
       </body>

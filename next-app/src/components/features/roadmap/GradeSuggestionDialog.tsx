@@ -56,9 +56,9 @@ export function GradeSuggestionDialog({ courses, retakes, onToggle }: GradeSugge
     <Dialog>
       <DialogTrigger render={
         <Button
-          variant="ghost"
+          variant="outline"
           size="sm"
-          className="h-7 text-[9px] font-black text-blue-600 uppercase tracking-tight hover:bg-blue-50 rounded-xl px-1.5 gap-1 border border-blue-100/50"
+          className="h-7 text-[9px] font-black text-blue-600 uppercase tracking-tight bg-white border-blue-200 hover:bg-blue-50 hover:border-blue-300 rounded-xl px-2 gap-1 shadow-sm transition-all"
         >
           <Lightbulb className="h-3 w-3" strokeWidth={3} /> Xem tất cả
         </Button>

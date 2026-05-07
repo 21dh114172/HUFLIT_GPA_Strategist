@@ -1,14 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useState, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useRoadmapState, type InitialRoadmapData } from "@/hooks/useRoadmapState";
 import { GoalSetupCard } from "./roadmap/GoalSetupCard";
 import { ResultHeroCard } from "./roadmap/ResultHeroCard";
 import { AlgorithmDialog } from "./roadmap/AlgorithmDialog";
 import { ScenarioCard } from "./roadmap/ScenarioCard";
-import confetti from "canvas-confetti";
-import { useEffect } from "react";
+import { SuccessCelebration } from "./roadmap/SuccessCelebration";
 
 interface RoadmapTabProps {
   initialData?: InitialRoadmapData | null;
@@ -27,33 +26,7 @@ export function RoadmapTab({ initialData, onSwitchTab }: RoadmapTabProps) {
     4: false
   });
 
-  // Hiệu ứng pháo hoa khi đạt mục tiêu
-  useEffect(() => {
-    if (status === "achieved") {
-      const duration = 3 * 1000;
-      const animationEnd = Date.now() + duration;
-      const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
-
-      const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
-
-      const interval: any = setInterval(function() {
-        const timeLeft = animationEnd - Date.now();
-
-        if (timeLeft <= 0) {
-          return clearInterval(interval);
-        }
-
-        const particleCount = 50 * (timeLeft / duration);
-        // since particles fall down, start a bit higher than random
-        confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
-        confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
-      }, 250);
-
-      return () => clearInterval(interval);
-    }
-  }, [status]);
-
-  const toggleStep = (step: number) => {
+  const toggleStep = useCallback((step: number) => {
     setExpandedSteps(prev => {
       const isOpening = !prev[step];
       const newState = { ...prev, [step]: isOpening };
@@ -66,11 +39,11 @@ export function RoadmapTab({ initialData, onSwitchTab }: RoadmapTabProps) {
       
       return newState;
     });
-  };
+  }, []);
 
   const isAnyExpanded = Object.values(expandedSteps).some(Boolean);
 
-  const toggleAllSteps = () => {
+  const toggleAllSteps = useCallback(() => {
     if (isAnyExpanded) {
       setExpandedSteps({
         1: false,
@@ -86,9 +59,9 @@ export function RoadmapTab({ initialData, onSwitchTab }: RoadmapTabProps) {
         4: true
       });
     }
-  };
+  }, [isAnyExpanded]);
 
-  const handleAddRetakeSuggestion = (suggestion: any) => {
+  const handleAddRetakeSuggestion = useCallback((suggestion: any) => {
     actions.addRetakesFromSuggestion(suggestion);
     // Tự động mở thẻ 4 và đóng thẻ 2, 3 khi bấm Áp dụng
     setExpandedSteps(prev => ({
@@ -97,15 +70,16 @@ export function RoadmapTab({ initialData, onSwitchTab }: RoadmapTabProps) {
       2: false,
       3: false
     }));
-  };
+  }, [actions]);
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-8 items-start">
+      <SuccessCelebration active={status === "achieved"} />
       <motion.div 
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}
-        className="lg:col-span-4 sticky top-20 space-y-6 h-fit z-20 self-start"
+        className="lg:col-span-4 static lg:sticky lg:top-20 space-y-6 h-fit z-20 self-start"
       >
         <GoalSetupCard 
           state={state} 
@@ -138,20 +112,30 @@ export function RoadmapTab({ initialData, onSwitchTab }: RoadmapTabProps) {
           retakes={state.retakes}
           result={result}
         />
-        {status !== "achieved" && (
-          <ScenarioCard
-            scenarioText={scenarioText}
-            combinations={combinations}
-            result={result}
-            retakeSuggestions={retakeSuggestions}
-            hasManualData={computed.hasManualData}
-            missingScenarios={computed.missingScenarios}
-            targetGPA={state.targetGPA}
-            totalPointsGap={computed.totalPointsGap}
-            onAddRetakeSuggestion={handleAddRetakeSuggestion}
-            onSwitchTab={onSwitchTab}
-          />
-        )}
+        <AnimatePresence mode="wait">
+          {status !== "achieved" && (
+            <motion.div
+              key="scenario-card"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <ScenarioCard
+                scenarioText={scenarioText}
+                combinations={combinations}
+                result={result}
+                retakeSuggestions={retakeSuggestions}
+                hasManualData={computed.hasManualData}
+                missingScenarios={computed.missingScenarios}
+                targetGPA={state.targetGPA}
+                totalPointsGap={computed.totalPointsGap}
+                onAddRetakeSuggestion={handleAddRetakeSuggestion}
+                onSwitchTab={onSwitchTab}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
     </div>
   );

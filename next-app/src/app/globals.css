@@ -162,3 +162,13 @@
     text-orientation: mixed;
   }
 }
+
+/* iOS safe area support for Bottom Navigation */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .bottom-nav-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}

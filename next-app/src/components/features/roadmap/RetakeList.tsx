@@ -91,10 +91,10 @@ export function RetakeList({
             Môn đã chọn ({retakes.length})
           </Label>
           <Button
-            variant="ghost"
+            variant="outline"
             size="sm"
             onClick={onAdd}
-            className="h-7 text-[9px] font-black text-blue-600 uppercase tracking-tight hover:bg-blue-50 rounded-xl px-1.5 gap-1 border border-blue-100/50"
+            className="h-7 text-[9px] font-black text-blue-600 uppercase tracking-tight bg-white border-blue-200 hover:bg-blue-50 hover:border-blue-300 rounded-xl px-2 gap-1 shadow-sm transition-all active:scale-95"
           >
             <PlusCircle className="h-3 w-3" strokeWidth={3} /> Thêm môn
           </Button>

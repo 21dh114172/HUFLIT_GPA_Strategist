@@ -1,7 +1,7 @@
 "use client";
 
 import { AlertCircle, TrendingUp } from "lucide-react";
-import { motion } from "framer-motion";
+import { memo } from "react";
 import type { RoadmapComputed } from "@/hooks/useRoadmapState";
 import {
   getStatusTextColor,
@@ -20,30 +20,22 @@ interface ResultHeroCardProps {
   targetGPA: number;
   currentCredits: number;
 }
-export function ResultHeroCard({ result, status, maxPossibleGPA, targetGPA, currentCredits }: ResultHeroCardProps) {
+
+export const ResultHeroCard = memo(({ result, status, maxPossibleGPA, targetGPA, currentCredits }: ResultHeroCardProps) => {
   const textColor = getStatusTextColor(status);
   const borderColor = getStatusBorderColor(status);
   const isNegative = isStatusNegative(status);
 
   return (
-    <motion.div 
-      initial={false}
-      animate={status === "achieved" ? { 
-        scale: [1, 1.02, 1],
-      } : {}}
-      transition={{ 
-        duration: 2, 
-        repeat: status === "achieved" ? Infinity : 0,
-        ease: "easeInOut"
-      }}
-      className={`px-4 py-2.5 sm:px-5 sm:py-2.5 border shadow-sm overflow-hidden bg-white transition-all duration-700 rounded-[2rem] flex flex-col items-center text-center space-y-4 ${borderColor}`}
-    >
+    <div className={`px-4 py-2.5 sm:px-5 sm:py-2.5 border shadow-sm overflow-hidden bg-white transition-all duration-700 rounded-[2rem] flex flex-col items-center text-center space-y-4 ${borderColor}`}>
       <GPADisplay status={status} requiredGPA={result.requiredGPA} textColor={textColor} />
       <StatusBadge status={status} maxPossibleGPA={maxPossibleGPA} textColor={textColor} isNegative={isNegative} />
       <StatsRow result={result} status={status} maxPossibleGPA={maxPossibleGPA} targetGPA={targetGPA} currentCredits={currentCredits} />
-    </motion.div>
+    </div>
   );
-}
+});
+
+ResultHeroCard.displayName = "ResultHeroCard";
 
 interface GPADisplayProps {
   status: ResultHeroCardProps["status"];
@@ -51,7 +43,7 @@ interface GPADisplayProps {
   textColor: string;
 }
 
-function GPADisplay({ status, requiredGPA, textColor }: GPADisplayProps) {
+const GPADisplay = memo(({ status, requiredGPA, textColor }: GPADisplayProps) => {
   const displayVal = getDisplayGPA(status, requiredGPA);
   const isNumeric = !isNaN(Number(displayVal));
 
@@ -69,7 +61,7 @@ function GPADisplay({ status, requiredGPA, textColor }: GPADisplayProps) {
       </div>
     </div>
   );
-}
+});
 
 interface StatusBadgeProps {
   status: ResultHeroCardProps["status"];
@@ -78,16 +70,28 @@ interface StatusBadgeProps {
   isNegative: boolean;
 }
 
-function StatusBadge({ status, maxPossibleGPA, textColor, isNegative }: StatusBadgeProps) {
+const StatusBadge = memo(({ status, maxPossibleGPA, textColor, isNegative }: StatusBadgeProps) => {
+  const label = getStatusLabel(status, maxPossibleGPA);
+  const parts = label.split(' • ');
+
   return (
     <div className={`flex items-center justify-center gap-2 ${textColor}`}>
-      {isNegative ? <AlertCircle className="h-4 w-4" /> : <TrendingUp className="h-4 w-4" />}
-      <span className="font-black text-[10px] uppercase tracking-[0.15em]">
-        {getStatusLabel(status, maxPossibleGPA)}
-      </span>
+      {isNegative ? <AlertCircle className="h-4 w-4 shrink-0" /> : <TrendingUp className="h-4 w-4 shrink-0" />}
+      <div className="flex flex-col sm:flex-row items-center sm:gap-1.5 text-center sm:text-left">
+        {parts.map((part, i) => (
+          <div key={i} className="flex items-center">
+            <span className="font-black text-[10px] uppercase tracking-[0.15em] leading-tight">
+              {part}
+            </span>
+            {i === 0 && parts.length > 1 && (
+              <span className="hidden sm:inline mx-1 opacity-50">•</span>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   );
-}
+});
 
 interface StatsRowProps {
   result: ResultHeroCardProps["result"];
@@ -97,7 +101,7 @@ interface StatsRowProps {
   currentCredits: number;
 }
 
-function StatsRow({ result, status, maxPossibleGPA, targetGPA, currentCredits }: StatsRowProps) {
+const StatsRow = memo(({ result, status, maxPossibleGPA, targetGPA, currentCredits }: StatsRowProps) => {
   const isImpossible = status === "impossible";
 
   return (
@@ -129,7 +133,7 @@ function StatsRow({ result, status, maxPossibleGPA, targetGPA, currentCredits }:
       </div>
     </div>
   );
-}
+});
 
 interface StatItemProps {
   label: string;
@@ -138,7 +142,7 @@ interface StatItemProps {
   subtitle: string;
 }
 
-function StatItem({ label, value, precision = 0, subtitle }: StatItemProps) {
+const StatItem = memo(({ label, value, precision = 0, subtitle }: StatItemProps) => {
   return (
     <div className="space-y-0">
       <div className="text-[9px] text-slate-400 font-black uppercase tracking-[0.1em]">{label}</div>
@@ -148,5 +152,5 @@ function StatItem({ label, value, precision = 0, subtitle }: StatItemProps) {
       <div className="text-[10px] text-slate-400 font-bold leading-tight">{subtitle}</div>
     </div>
   );
-}
+});
 

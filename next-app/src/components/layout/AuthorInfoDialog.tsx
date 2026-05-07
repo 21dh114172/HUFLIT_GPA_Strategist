@@ -20,6 +20,9 @@ import { Button } from "@/components/ui/button";
 import { memo } from "react";
 
 export const AuthorInfoDialog = memo(({ children }: { children: React.ReactElement }) => {
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+  const avatarSrc = `${basePath}/ava.jpg`;
+
   return (
     <Dialog>
       <DialogTrigger render={children} />
@@ -35,7 +38,7 @@ export const AuthorInfoDialog = memo(({ children }: { children: React.ReactEleme
             <div className="absolute inset-0 rounded-full bg-white p-1.5 shadow-xl transition-transform group-hover:scale-105 duration-500">
               <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-white ring-2 ring-blue-50/50">
                 <Image 
-                  src="/ava.jpg" 
+                  src={avatarSrc}
                   alt="Tiến Dũng" 
                   fill 
                   className="object-cover"
