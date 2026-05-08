@@ -8,7 +8,7 @@ const withBasePath = (path: string) => `${basePath}${path}`;
 
 const beVietnamPro = Be_Vietnam_Pro({
   subsets: ["latin", "vietnamese"],
-  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  weight: ["400", "500", "600", "700", "800"],
   variable: "--font-be-vietnam",
 });
 
@@ -73,29 +73,30 @@ export const metadata: Metadata = {
 
 import { Toaster } from "sonner";
 
+// JSON-LD Structured Data - Moved outside for performance
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "HUFLIT GPA Strategist",
+  "description": "Công cụ tính toán GPA và lập lộ trình học tập cho sinh viên HUFLIT.",
+  "applicationCategory": "EducationalApplication",
+  "operatingSystem": "Web",
+  "author": {
+    "@type": "Person",
+    "name": "TienxDun"
+  },
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "VND"
+  }
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // JSON-LD Structured Data
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "WebApplication",
-    "name": "HUFLIT GPA Strategist",
-    "description": "Công cụ tính toán GPA và lập lộ trình học tập cho sinh viên HUFLIT.",
-    "applicationCategory": "EducationalApplication",
-    "operatingSystem": "Web",
-    "author": {
-      "@type": "Person",
-      "name": "TienxDun"
-    },
-    "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "VND"
-    }
-  };
 
   return (
     <html

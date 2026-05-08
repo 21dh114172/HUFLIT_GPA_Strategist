@@ -8,6 +8,9 @@ import { ResultHeroCard } from "./roadmap/ResultHeroCard";
 import { AlgorithmDialog } from "./roadmap/AlgorithmDialog";
 import { ScenarioCard } from "./roadmap/ScenarioCard";
 import { SuccessCelebration } from "./roadmap/SuccessCelebration";
+import { encodeRoadmapState } from "@/lib/share-utils";
+import { toast } from "sonner";
+
 
 interface RoadmapTabProps {
   initialData?: InitialRoadmapData | null;
@@ -71,6 +74,36 @@ export function RoadmapTab({ initialData, onSwitchTab }: RoadmapTabProps) {
       3: false
     }));
   }, [actions]);
+  
+  const copyToClipboard = useCallback((text: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      toast.success("Đã sao chép liên kết!", {
+        description: "Bạn có thể gửi liên kết này cho bạn bè.",
+        duration: 3000,
+      });
+    });
+  }, []);
+
+  const handleShare = useCallback(() => {
+    try {
+      const shareData = encodeRoadmapState(state);
+      const url = new URL(window.location.href);
+      url.searchParams.set('s', shareData);
+      const shareUrl = url.toString();
+
+      if (navigator.share) {
+        navigator.share({
+          title: 'Lộ trình GPA - HUFLIT GPA Strategist',
+          text: 'Xem lộ trình mục tiêu GPA của mình nè!',
+          url: shareUrl,
+        }).catch(() => copyToClipboard(shareUrl));
+      } else {
+        copyToClipboard(shareUrl);
+      }
+    } catch (err) {
+      toast.error("Không thể tạo liên kết chia sẻ");
+    }
+  }, [state, copyToClipboard]);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-8 items-start">
@@ -103,6 +136,7 @@ export function RoadmapTab({ initialData, onSwitchTab }: RoadmapTabProps) {
           maxPossibleGPA={maxPossibleGPA}
           targetGPA={state.targetGPA}
           currentCredits={state.currentCredits}
+          onShare={handleShare}
         />
         <AlgorithmDialog
           currentGPA={state.currentGPA}

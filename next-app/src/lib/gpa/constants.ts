@@ -10,6 +10,8 @@ export const GRADE_SCALE = [
   { grade: 'F', min: 0.0, max: 3.9, gpa: 0.0 },
 ];
 
+export const GRADE_MAP = Object.fromEntries(GRADE_SCALE.map(g => [g.grade, g]));
+
 export const APP_CONFIG = {
   MAX_GPA: 4.0,
   MIN_GPA: 0.0,

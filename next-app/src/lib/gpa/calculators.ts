@@ -1,8 +1,8 @@
-import { GRADE_SCALE, GPA_RANKS } from "./constants";
+import { GRADE_SCALE, GPA_RANKS, GRADE_MAP } from "./constants";
 import { Semester, GPAResult } from "./types";
 
 export function findGradeInfo(grade: string) {
-  return GRADE_SCALE.find((g) => g.grade === grade);
+  return GRADE_MAP[grade];
 }
 
 export function roundGPA(gpa: number): number {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo, useCallback, useDeferredValue } from "react";
-import { Semester, Course, calculateManualGPA, GPAResult, parsePortalText, GRADE_SCALE } from "@/lib/gpa-engine";
+import { Semester, Course, calculateManualGPA, GPAResult, parsePortalText, GRADE_MAP } from "@/lib/gpa-engine";
 import { toast } from "sonner";
 
 const STORAGE_KEY = "huflit-manual-gpa-state";
@@ -81,7 +81,7 @@ export const useManualGPA = () => {
       }
       
       sem.courses.forEach((c) => {
-        const gInfo = GRADE_SCALE.find(g => g.grade === c.grade);
+        const gInfo = GRADE_MAP[c.grade];
         if (gInfo) {
           const credits = c.credits || 0;
           stats[year].points += gInfo.gpa * credits;

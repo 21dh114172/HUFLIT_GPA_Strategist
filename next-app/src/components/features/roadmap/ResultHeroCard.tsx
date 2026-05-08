@@ -1,7 +1,8 @@
 "use client";
 
-import { AlertCircle, TrendingUp } from "lucide-react";
+import { AlertCircle, TrendingUp, Share2 } from "lucide-react";
 import { memo } from "react";
+import { Button } from "@/components/ui/button";
 import type { RoadmapComputed } from "@/hooks/useRoadmapState";
 import {
   getStatusTextColor,
@@ -19,15 +20,28 @@ interface ResultHeroCardProps {
   maxPossibleGPA: number;
   targetGPA: number;
   currentCredits: number;
+  onShare?: () => void;
 }
 
-export const ResultHeroCard = memo(({ result, status, maxPossibleGPA, targetGPA, currentCredits }: ResultHeroCardProps) => {
+export const ResultHeroCard = memo(({ result, status, maxPossibleGPA, targetGPA, currentCredits, onShare }: ResultHeroCardProps) => {
   const textColor = getStatusTextColor(status);
   const borderColor = getStatusBorderColor(status);
   const isNegative = isStatusNegative(status);
 
   return (
-    <div className={`px-4 py-2.5 sm:px-5 sm:py-2.5 border shadow-sm overflow-hidden bg-white transition-all duration-700 rounded-[2rem] flex flex-col items-center text-center space-y-4 ${borderColor}`}>
+    <div className={`relative px-4 py-2.5 sm:px-5 sm:py-2.5 border shadow-sm overflow-hidden bg-white transition-all duration-700 rounded-[2rem] flex flex-col items-center text-center space-y-4 ${borderColor}`}>
+      {onShare && (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onShare}
+          className="absolute top-3 right-3 sm:top-4 sm:right-4 h-8 text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-blue-600 hover:bg-blue-50 hover:text-blue-700 rounded-xl px-2 sm:px-3 gap-1.5 border border-blue-100/50 shadow-sm transition-all active:scale-95 group"
+          title="Chia sẻ lộ trình này"
+        >
+          <Share2 className="h-3.5 w-3.5 group-hover:rotate-12 transition-transform" />
+          <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider">Chia sẻ</span>
+        </Button>
+      )}
       <GPADisplay status={status} requiredGPA={result.requiredGPA} textColor={textColor} />
       <StatusBadge status={status} maxPossibleGPA={maxPossibleGPA} textColor={textColor} isNegative={isNegative} />
       <StatsRow result={result} status={status} maxPossibleGPA={maxPossibleGPA} targetGPA={targetGPA} currentCredits={currentCredits} />
