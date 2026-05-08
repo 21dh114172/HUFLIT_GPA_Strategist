@@ -28,6 +28,7 @@ export interface RetakeItem {
 export interface InitialRoadmapData {
   gpa: number;
   credits: number;
+  targetGPA?: number;
   remainingCredits?: number;
   pendingRetakes?: RetakeItem[];
 }
@@ -120,9 +121,14 @@ export function useRoadmapState(initialData?: InitialRoadmapData | null) {
     setCurrentCredits(initialData.credits);
     setRemainingCredits(initialData.remainingCredits || 0);
     setRetakes(initialData.pendingRetakes || []);
-    const milestones = [2.0, 2.5, 3.2, 3.6];
-    const nextTarget = milestones.find(m => m > initialData.gpa) || 0;
-    setTargetGPA(nextTarget);
+    
+    if (initialData.targetGPA !== undefined && initialData.targetGPA > 0) {
+      setTargetGPA(initialData.targetGPA);
+    } else {
+      const milestones = [2.0, 2.5, 3.2, 3.6];
+      const nextTarget = milestones.find(m => m > initialData.gpa) || 0;
+      setTargetGPA(nextTarget);
+    }
   }, [initialData]);
 
   const result = useMemo(

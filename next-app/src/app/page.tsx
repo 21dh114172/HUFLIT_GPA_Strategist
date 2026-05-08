@@ -9,6 +9,8 @@ import { TabSkeleton } from "@/components/features/TabSkeleton";
 import { Newspaper } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { VisitorCount } from "@/components/layout/VisitorCount";
+import { decodeRoadmapState } from "@/lib/share-utils";
+import { toast } from "sonner";
 
 // Dynamic Imports for performance optimization
 const ScaleTab = dynamic(() => import("@/components/features/ScaleTab").then(mod => mod.ScaleTab), {
@@ -40,14 +42,41 @@ export default function Home() {
     pendingRetakes?: { id: string; oldGrade: number; credits: number; name?: string }[];
   } | null>(null);
 
-  // Preload dynamic components in the background
+  // Preload dynamic components and check for shared data
   useEffect(() => {
-    // Preload heavy components after initial render to make tab switching instant
+    // 1. Xử lý dữ liệu chia sẻ từ URL
+    const params = new URLSearchParams(window.location.search);
+    const sharedData = params.get("s");
+    
+    if (sharedData) {
+      const decoded = decodeRoadmapState(sharedData);
+      if (decoded) {
+        setRoadmapInitialData({
+          gpa: decoded.currentGPA,
+          credits: decoded.currentCredits,
+          targetGPA: decoded.targetGPA,
+          remainingCredits: decoded.remainingCredits,
+          pendingRetakes: decoded.retakes
+        });
+        setActiveTab("roadmap");
+        
+        // Dọn dẹp URL để trông chuyên nghiệp hơn
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, "", newUrl);
+        
+        // Thông báo cho người dùng
+        setTimeout(() => {
+          toast.success("Lộ trình đã được nạp thành công", {
+            description: "Dữ liệu từ liên kết chia sẻ đã sẵn sàng.",
+            duration: 4000,
+          });
+        }, 800);
+      }
+    }
+
+    // 2. Preload heavy components after initial render to make tab switching instant
     const preload = async () => {
-      // Small delay to ensure initial paint is done without interruption
       await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Execute imports in parallel
       Promise.all([
         import("@/components/features/ScaleTab"),
         import("@/components/features/SubjectTab"),

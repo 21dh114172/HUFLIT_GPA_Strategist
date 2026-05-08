@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, memo } from "react";
-import { Compass, RefreshCcw, BookOpen, GraduationCap, HelpCircle, ChevronDown, ChevronUp } from "lucide-react";
+import { Compass, RefreshCcw, BookOpen, GraduationCap, HelpCircle, ChevronDown, ChevronUp, Share2 } from "lucide-react";
+import { encodeRoadmapState } from "@/lib/share-utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,6 +28,36 @@ export const GoalSetupCard = memo(({ state, actions, computed, expandedSteps, on
   const { currentGPA, currentCredits, targetGPA, remainingCredits, retakes } = state;
   const isAnyExpanded = Object.values(expandedSteps).some(Boolean);
 
+  const handleShare = () => {
+    try {
+      const shareData = encodeRoadmapState(state);
+      const url = new URL(window.location.href);
+      url.searchParams.set('s', shareData);
+      const shareUrl = url.toString();
+
+      if (navigator.share) {
+        navigator.share({
+          title: 'Lộ trình GPA - HUFLIT GPA Strategist',
+          text: 'Xem lộ trình mục tiêu GPA của mình nè!',
+          url: shareUrl,
+        }).catch(() => copyToClipboard(shareUrl));
+      } else {
+        copyToClipboard(shareUrl);
+      }
+    } catch (err) {
+      toast.error("Không thể tạo liên kết chia sẻ");
+    }
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      toast.success("Đã sao chép liên kết!", {
+        description: "Bạn có thể gửi liên kết này cho bạn bè.",
+        duration: 3000,
+      });
+    });
+  };
+
   return (
     <Card className="border-slate-200 bg-white shadow-xl shadow-blue-500/5 rounded-3xl overflow-hidden border gap-0 py-0">
       <CardHeader className="py-2.5 px-4 border-b border-slate-200 bg-slate-50/50">
@@ -39,24 +70,35 @@ export const GoalSetupCard = memo(({ state, actions, computed, expandedSteps, on
               Thiết lập mục tiêu
             </CardTitle>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onToggleAll}
-            className="h-7 text-[9px] font-black uppercase tracking-[0.1em] text-slate-500 bg-white border-slate-200 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all rounded-xl px-2 sm:px-2.5 gap-1 sm:gap-1.5 active:scale-95 shadow-sm shrink-0"
-          >
-            {isAnyExpanded ? (
-              <>
-                <ChevronUp className="h-3 w-3" />
-                <span>Thu gọn<span className="hidden sm:inline"> tất cả</span></span>
-              </>
-            ) : (
-              <>
-                <ChevronDown className="h-3 w-3" />
-                <span>Mở<span className="hidden sm:inline"> tất cả</span></span>
-              </>
-            )}
-          </Button>
+          <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleShare}
+              className="h-7 text-[9px] font-black uppercase tracking-[0.05em] text-blue-600 bg-white border-blue-100 hover:bg-blue-50 hover:border-blue-200 transition-all rounded-xl px-2 gap-1 active:scale-95 shadow-sm"
+            >
+              <Share2 className="h-3 w-3" />
+              <span>Chia sẻ</span>
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onToggleAll}
+              className="h-7 text-[9px] font-black uppercase tracking-[0.05em] text-slate-500 bg-white border-slate-200 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all rounded-xl px-2 gap-1 active:scale-95 shadow-sm"
+            >
+              {isAnyExpanded ? (
+                <>
+                  <ChevronUp className="h-3 w-3" />
+                  <span>Thu gọn</span>
+                </>
+              ) : (
+                <>
+                  <ChevronDown className="h-3 w-3" />
+                  <span>Mở</span>
+                </>
+              )}
+            </Button>
+          </div>
         </div>
       </CardHeader>
 
