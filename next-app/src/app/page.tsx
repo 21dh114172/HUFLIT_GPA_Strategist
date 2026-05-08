@@ -11,6 +11,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { VisitorCount } from "@/components/layout/VisitorCount";
 import { decodeRoadmapState } from "@/lib/share-utils";
 import { toast } from "sonner";
+import { type InitialRoadmapData } from "@/hooks/useRoadmapState";
+
 
 // Dynamic Imports for performance optimization
 const ScaleTab = dynamic(() => import("@/components/features/ScaleTab").then(mod => mod.ScaleTab), {
@@ -35,12 +37,7 @@ const RoadmapTab = dynamic(() => import("@/components/features/RoadmapTab").then
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState("manual");
-  const [roadmapInitialData, setRoadmapInitialData] = useState<{ 
-    gpa: number; 
-    credits: number;
-    remainingCredits?: number;
-    pendingRetakes?: { id: string; oldGrade: number; credits: number; name?: string }[];
-  } | null>(null);
+  const [roadmapInitialData, setRoadmapInitialData] = useState<InitialRoadmapData | null>(null);
 
   // Preload dynamic components and check for shared data
   useEffect(() => {
@@ -94,7 +91,7 @@ export default function Home() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleSwitchToRoadmap = (data: any) => {
+  const handleSwitchToRoadmap = (data: InitialRoadmapData) => {
     setRoadmapInitialData(data);
     setActiveTab("roadmap");
     window.scrollTo({ top: 0, behavior: "smooth" });

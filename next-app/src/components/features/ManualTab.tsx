@@ -5,16 +5,23 @@ import { motion } from "framer-motion";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useManualGPA } from "@/hooks/useManualGPA";
+import { type InitialRoadmapData } from "@/hooks/useRoadmapState";
+
 import InitialStatsCard from "./manual/InitialStatsCard";
 import PortalImportDialog from "./manual/PortalImportDialog";
 import ManualStats from "./manual/ManualStats";
-import ManualChart from "./manual/ManualChart";
+import dynamic from "next/dynamic";
+const ManualChart = dynamic(() => import("./manual/ManualChart"), {
+  ssr: false,
+  loading: () => <div className="h-[145px] w-full animate-pulse bg-slate-50 rounded-2xl border border-slate-200" />
+});
+
 import SemesterCard from "./manual/SemesterCard";
 import YearSummaryCard from "./manual/YearSummaryCard";
 import { ScrollToTop } from "@/components/ui/ScrollToTop";
 
 interface ManualTabProps {
-  onSwitchToRoadmap?: (data: any) => void;
+  onSwitchToRoadmap?: (data: InitialRoadmapData) => void;
 }
 
 const ManualTab = memo(({ onSwitchToRoadmap }: ManualTabProps) => {

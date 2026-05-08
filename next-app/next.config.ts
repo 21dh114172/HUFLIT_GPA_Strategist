@@ -16,6 +16,12 @@ const nextConfig: NextConfig = {
   env: {
     NEXT_PUBLIC_BASE_PATH: basePath,
   },
+  experimental: {
+    optimizePackageImports: ["lucide-react", "recharts", "framer-motion", "sonner"],
+  },
+  compiler: {
+    removeConsole: process.env.NODE_ENV === "production",
+  },
 };
 
 export default nextConfig;
