@@ -6,7 +6,6 @@ import { memo } from "react";
 import { AuthorInfoDialog } from "./AuthorInfoDialog";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { VisitorCount } from "./VisitorCount";
 
 interface AppHeaderProps {
   activeTab: string;
@@ -96,9 +95,6 @@ export const AppHeader = memo(({ activeTab, onTabChange }: AppHeaderProps) => {
 
         {/* Action Section */}
         <div className="flex items-center gap-1.5 pr-0.5 shrink-0">
-          <div className="flex items-center">
-            <VisitorCount />
-          </div>
 
           <AuthorInfoDialog>
             <button 

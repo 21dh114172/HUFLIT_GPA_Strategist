@@ -35,7 +35,7 @@ export const ResultHeroCard = memo(({ result, status, maxPossibleGPA, targetGPA,
           variant="ghost"
           size="sm"
           onClick={onShare}
-          className="absolute top-3 right-3 sm:top-4 sm:right-4 h-8 text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-blue-600 hover:bg-blue-50 hover:text-blue-700 rounded-xl px-2 sm:px-3 gap-1.5 border border-blue-100/50 shadow-sm transition-all active:scale-95 group"
+          className="hidden sm:flex absolute top-3 right-3 sm:top-4 sm:right-4 h-8 text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-blue-600 hover:bg-blue-50 hover:text-blue-700 rounded-xl px-2 sm:px-3 gap-1.5 border border-blue-100/50 shadow-sm transition-all active:scale-95 group"
           title="Chia sẻ lộ trình này"
         >
           <Share2 className="h-3.5 w-3.5 group-hover:rotate-12 transition-transform" />

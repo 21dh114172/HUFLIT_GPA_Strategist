@@ -69,6 +69,14 @@ export const metadata: Metadata = {
     icon: withBasePath("/icon.svg"),
     apple: withBasePath("/ava.jpg"),
   },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "GPA Strategist",
+  },
+  formatDetection: {
+    telephone: false,
+  },
 };
 
 import { Toaster } from "sonner";
@@ -108,6 +116,21 @@ export default function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                  navigator.serviceWorker.register('${withBasePath("/sw.js")}').then(function(registration) {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                  }, function(err) {
+                    console.log('ServiceWorker registration failed: ', err);
+                  });
+                });
+              }
+            `,
+          }}
         />
       </head>
       <body className="min-h-full flex flex-col font-sans overflow-x-hidden">

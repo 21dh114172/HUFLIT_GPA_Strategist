@@ -19,11 +19,12 @@ interface GoalSetupCardProps {
   expandedSteps: Record<number, boolean>;
   onToggleStep: (step: number) => void;
   onToggleAll: () => void;
+  onShare?: () => void;
 }
 
 const GPA_MILESTONES = [2.0, 2.5, 3.2, 3.6];
 
-export const GoalSetupCard = memo(({ state, actions, computed, expandedSteps, onToggleStep, onToggleAll }: GoalSetupCardProps) => {
+export const GoalSetupCard = memo(({ state, actions, computed, expandedSteps, onToggleStep, onToggleAll, onShare }: GoalSetupCardProps) => {
   const { currentGPA, currentCredits, targetGPA, remainingCredits, retakes } = state;
   const isAnyExpanded = Object.values(expandedSteps).some(Boolean);
 
@@ -41,6 +42,21 @@ export const GoalSetupCard = memo(({ state, actions, computed, expandedSteps, on
             </CardTitle>
           </div>
           <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
+            {onShare && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onShare();
+                }}
+                className="sm:hidden h-7 text-[9px] font-black uppercase tracking-widest text-blue-600 bg-white border-blue-100/50 hover:bg-blue-50 hover:text-blue-700 transition-all rounded-xl px-2 gap-1.5 active:scale-95 shadow-sm"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-share2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                <span>Chia sẻ</span>
+              </Button>
+            )}
+
             <Button
               variant="outline"
               size="sm"

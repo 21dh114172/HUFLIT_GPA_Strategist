@@ -121,6 +121,7 @@ export function RoadmapTab({ initialData, onSwitchTab }: RoadmapTabProps) {
           expandedSteps={expandedSteps}
           onToggleStep={toggleStep}
           onToggleAll={toggleAllSteps}
+          onShare={handleShare}
         />
       </motion.div>
 

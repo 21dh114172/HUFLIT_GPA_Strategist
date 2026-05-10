@@ -8,7 +8,6 @@ import { BottomNav } from "@/components/layout/BottomNav";
 import { TabSkeleton } from "@/components/features/TabSkeleton";
 import { Newspaper } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { VisitorCount } from "@/components/layout/VisitorCount";
 import { decodeRoadmapState } from "@/lib/share-utils";
 import { toast } from "sonner";
 import { type InitialRoadmapData } from "@/hooks/useRoadmapState";

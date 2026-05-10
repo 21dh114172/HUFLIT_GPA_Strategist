@@ -14,16 +14,34 @@ export default function manifest(): MetadataRoute.Manifest {
     display: "standalone",
     background_color: "#ffffff",
     theme_color: "#2563eb",
+    orientation: "portrait",
+    scope: withBasePath("/"),
+    categories: ["education", "productivity"],
+    screenshots: [
+      {
+        src: withBasePath("/ava.jpg"),
+        sizes: "800x800",
+        type: "image/jpeg",
+        label: "HUFLIT GPA Strategist Home",
+      }
+    ],
     icons: [
       {
-        src: withBasePath("/favicon.ico"),
+        src: withBasePath("/icon.svg"),
         sizes: "any",
-        type: "image/x-icon",
+        type: "image/svg+xml",
+      },
+      {
+        src: withBasePath("/icon.svg"),
+        sizes: "192x192",
+        type: "image/svg+xml",
+        purpose: "maskable",
       },
       {
         src: withBasePath("/ava.jpg"),
         sizes: "512x512",
         type: "image/jpeg",
+        purpose: "any",
       },
     ],
   };
