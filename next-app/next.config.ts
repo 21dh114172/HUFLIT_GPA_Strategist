@@ -19,6 +19,7 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ["lucide-react", "recharts", "framer-motion", "sonner"],
   },
+  trailingSlash: true,
   compiler: {
     removeConsole: process.env.NODE_ENV === "production",
   },
