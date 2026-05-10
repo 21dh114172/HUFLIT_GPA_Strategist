@@ -74,9 +74,6 @@ export const metadata: Metadata = {
     statusBarStyle: "default",
     title: "GPA Strategist",
   },
-  formatDetection: {
-    telephone: false,
-  },
 };
 
 import { Toaster } from "sonner";
