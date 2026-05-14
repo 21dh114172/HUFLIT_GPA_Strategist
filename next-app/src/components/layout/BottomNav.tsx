@@ -1,7 +1,7 @@
 "use client";
 
 import { memo } from "react";
-import { Calculator, Target, BookOpen, BarChart3, Newspaper } from "lucide-react";
+import { Calculator, Target, BookOpen, BarChart3, Newspaper, MonitorOff } from "lucide-react";
 import { motion } from "framer-motion";
 
 const tabs = [
@@ -75,6 +75,21 @@ export const BottomNav = memo(({ activeTab, onTabChange }: BottomNavProps) => {
               </button>
             );
           })}
+
+          {/* System Switch Button */}
+          <button
+            onClick={() => {
+              localStorage.setItem("app-preference", "legacy");
+              window.location.replace(`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/legacy/`);
+            }}
+            aria-label="Chuyển sang bản Classic"
+            className="relative flex flex-col items-center justify-center gap-0.5 flex-1 min-h-[52px] rounded-xl transition-colors active:scale-90 cursor-pointer text-slate-400 hover:text-amber-600"
+          >
+            <div className="bg-amber-50 p-1.5 rounded-lg mb-0.5">
+              <MonitorOff className="h-4 w-4 text-amber-600" />
+            </div>
+            <span className="text-[10px] font-bold leading-none tracking-tight">Classic</span>
+          </button>
         </div>
     </nav>
   );
