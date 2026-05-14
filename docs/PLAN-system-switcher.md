@@ -17,21 +17,22 @@ Implement a seamless switching mechanism between two versions of HUFLIT GPA Stra
 
 ### Behavior
 
-1. **Auto-redirect:** If browser version is below threshold → redirect to `/legacy/`
-2. **Manual switch:** Button in both versions to toggle between systems
-3. **Preference override:** User's manual choice stored in `localStorage`, overrides auto-detection
-4. **Clean start:** No GPA data is carried over between systems
+1. **Legacy First (Default):** All first-time visitors are redirected to `/legacy/` for maximum compatibility.
+2. **Opt-in Modern:** Users can manually switch to the Next.js version via a button.
+3. **Manual switch:** Button in both versions to toggle between systems.
+4. **Preference override:** User's manual choice stored in `localStorage`, overrides default behavior.
+5. **Clean start:** No GPA data is carried over between systems.
 
 ---
 
 ## Success Criteria
 
-- [x] Old browsers (Chrome < 90, Safari < 15, Firefox < 90, Edge < 90) auto-redirect to `/legacy/`
-- [x] Modern browsers load Next.js at `/` by default
-- [x] Switch button visible in **both** Next.js and Legacy apps
-- [x] Manual preference persists via `localStorage` across sessions
-- [x] GitHub Pages deployment serves both versions correctly
-- [x] No performance regression (detection script < 1KB, runs before paint)
+- [x] All visitors default to `/legacy/` on first visit.
+- [x] Modern version accessible via manual switch button.
+- [x] Switch button visible in **both** Next.js and Legacy apps.
+- [x] Manual preference persists via `localStorage` across sessions.
+- [x] GitHub Pages deployment serves both versions correctly.
+- [x] No performance regression (detection script < 1KB, runs before paint).
 
 ---
 
