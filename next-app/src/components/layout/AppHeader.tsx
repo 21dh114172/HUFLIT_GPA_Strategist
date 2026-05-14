@@ -4,6 +4,7 @@ import { GraduationCap, Calculator, Target, BookOpen, Newspaper, BarChart3 } fro
 import { TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { memo } from "react";
 import { AuthorInfoDialog } from "./AuthorInfoDialog";
+import { SystemSwitchButton } from "./SystemSwitchButton";
 import Image from "next/image";
 import { motion } from "framer-motion";
 
@@ -95,6 +96,7 @@ export const AppHeader = memo(({ activeTab, onTabChange }: AppHeaderProps) => {
 
         {/* Action Section */}
         <div className="flex items-center gap-1.5 pr-0.5 shrink-0">
+          <SystemSwitchButton />
 
           <AuthorInfoDialog>
             <button 

@@ -116,6 +116,41 @@ export default function RootLayout({
         />
         <script
           dangerouslySetInnerHTML={{
+            __html: `window.NEXT_PUBLIC_BASE_PATH = "${basePath}";`,
+          }}
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+(function() {
+  var p = localStorage.getItem('app-preference');
+  if (p === 'nextjs') return;
+  if (p === 'legacy') {
+    if (!window.location.pathname.includes('/legacy/')) {
+      window.location.replace((window.NEXT_PUBLIC_BASE_PATH || '') + '/legacy/');
+    }
+    return;
+  }
+
+  var ua = navigator.userAgent;
+  var n = 'unknown', v = 0;
+  if (ua.indexOf('Firefox/') > -1) { n = 'firefox'; v = parseInt(ua.split('Firefox/')[1], 10); }
+  else if (ua.indexOf('Edg/') > -1) { n = 'edge'; v = parseInt(ua.split('Edg/')[1], 10); }
+  else if (ua.indexOf('OPR/') > -1) { n = 'opera'; v = parseInt(ua.split('OPR/')[1], 10); }
+  else if (ua.indexOf('Chrome/') > -1) { n = 'chrome'; v = parseInt(ua.split('Chrome/')[1], 10); }
+  else if (ua.indexOf('Safari/') > -1 && ua.indexOf('Version/') > -1) { n = 'safari'; v = parseInt(ua.split('Version/')[1], 10); }
+
+  var t = {chrome:90,firefox:90,safari:15,edge:90,opera:76};
+  var isOld = n !== 'unknown' && v < (t[n] || 0);
+  
+  if (isOld && !window.location.pathname.includes('/legacy/')) {
+    window.location.replace((window.NEXT_PUBLIC_BASE_PATH || '') + '/legacy/');
+  }
+})();`.trim(),
+          }}
+        />
+        <script
+          dangerouslySetInnerHTML={{
             __html: `
               if ('serviceWorker' in navigator) {
                 window.addEventListener('load', function() {

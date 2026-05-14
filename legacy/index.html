@@ -63,6 +63,38 @@
 
     <!-- Chart.js for GPA Progress Tracking (defer) -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+
+    <!-- Browser Detection & Redirect -->
+    <script>
+    (function() {
+        var p = localStorage.getItem('app-preference');
+        if (p === 'legacy') return;
+        if (p === 'nextjs') {
+            window.location.replace('../');
+            return;
+        }
+
+        var ua = navigator.userAgent;
+        var n = 'unknown', v = 0;
+        if (ua.indexOf('Firefox/') > -1) { n = 'firefox'; v = parseInt(ua.split('Firefox/')[1], 10); }
+        else if (ua.indexOf('Edg/') > -1) { n = 'edge'; v = parseInt(ua.split('Edg/')[1], 10); }
+        else if (ua.indexOf('OPR/') > -1) { n = 'opera'; v = parseInt(ua.split('OPR/')[1], 10); }
+        else if (ua.indexOf('Chrome/') > -1) { n = 'chrome'; v = parseInt(ua.split('Chrome/')[1], 10); }
+        else if (ua.indexOf('Safari/') > -1 && ua.indexOf('Version/') > -1) { n = 'safari'; v = parseInt(ua.split('Version/')[1], 10); }
+
+        var t = {chrome:90,firefox:90,safari:15,edge:90,opera:76};
+        var isModern = n === 'unknown' || v >= (t[n] || 0);
+        
+        if (isModern) {
+            window.location.replace('../');
+        }
+    })();
+
+    function switchToNext() {
+        localStorage.setItem('app-preference', 'nextjs');
+        window.location.replace('../');
+    }
+    </script>
 </head>
 
 <body>
@@ -132,9 +164,19 @@
                     </ul>
 
                     <!-- Desktop Theme Toggle -->
-                    <button class="btn btn-light border rounded-circle ms-3" id="theme-toggle-desktop"
+                    <button class="btn btn-light border rounded-circle ms-2" id="theme-toggle-desktop"
                         aria-label="Toggle theme">
                         <i class="bi bi-moon-stars-fill"></i>
+                    </button>
+
+                    <!-- System Switch -->
+                    <button class="btn btn-primary rounded-pill px-3 ms-3 fw-bold d-none d-xl-flex align-items-center shadow-sm" 
+                        onclick="switchToNext()" style="font-size: 0.75rem;">
+                        <i class="bi bi-stars me-2"></i>Phiên bản mới
+                    </button>
+                    <button class="btn btn-primary rounded-circle ms-2 d-xl-none" 
+                        onclick="switchToNext()" title="Chuyển sang bản mới">
+                        <i class="bi bi-stars"></i>
                     </button>
                 </div>
 

@@ -40,6 +40,9 @@ jobs:
       - name: Build static site
         run: npm run build
 
+      - name: Copy legacy app
+        run: cp -r ../legacy ./out/legacy
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
